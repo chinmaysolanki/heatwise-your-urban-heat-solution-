@@ -24,9 +24,11 @@ export function PhoneLoginScreen({ onOtpSent }) {
       if (data?.debugOtp) setDebugOtp(String(data.debugOtp));
       onOtpSent?.({
         phoneNumber: data?.phoneNumber ?? phoneNumber,
-        debugOtp: data?.debugOtp ? String(data.debugOtp) : null,
+        debugOtp:    data?.debugOtp  ? String(data.debugOtp) : null,
         otpDelivery: data?.delivery === "console" ? "console" : "sms",
-        otpNotice: typeof data?.notice === "string" ? data.notice : null,
+        otpNotice:   typeof data?.notice === "string" ? data.notice : null,
+        devToken:    data?.devToken  ?? null,
+        expiresAt:   data?.expiresAt ?? null,
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to send OTP");

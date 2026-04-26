@@ -2,13 +2,16 @@ import { useCallback, useState } from "react";
 import { signIn } from "next-auth/react";
 import { T } from "@/components/heatwise/theme";
 
-export function OTPVerificationScreen({ phoneNumber, initialDebugOtp, otpDelivery, otpNotice, onBack, onAuthed }) {
+export function OTPVerificationScreen({ phoneNumber, initialDebugOtp, otpDelivery, otpNotice, devToken: initialDevToken, expiresAt: initialExpiresAt, onBack, onAuthed }) {
   const [otp, setOtp] = useState(initialDebugOtp ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [debugOtp, setDebugOtp] = useState(initialDebugOtp ?? null);
   const [delivery, setDelivery] = useState(otpDelivery ?? "console");
   const [notice, setNotice] = useState(otpNotice ?? null);
+  const [devToken, setDevToken] = useState(initialDevToken ?? null);
+  const [expiresAt, setExpiresAt] = useState(initialExpiresAt ?? null);
+
   const resend = useCallback(async () => {
     setBusy(true);
     setError(null);
@@ -24,6 +27,8 @@ export function OTPVerificationScreen({ phoneNumber, initialDebugOtp, otpDeliver
       if (data?.debugOtp) setDebugOtp(String(data.debugOtp));
       if (data?.delivery === "console" || data?.delivery === "sms") setDelivery(data.delivery);
       if (typeof data?.notice === "string") setNotice(data.notice);
+      if (data?.devToken)  setDevToken(data.devToken);
+      if (data?.expiresAt) setExpiresAt(data.expiresAt);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to resend OTP");
     } finally {
@@ -39,6 +44,8 @@ export function OTPVerificationScreen({ phoneNumber, initialDebugOtp, otpDeliver
         redirect: false,
         phoneNumber,
         otp,
+        devToken:  devToken  ?? "",
+        expiresAt: expiresAt ?? "",
       });
       if (!result || result.error) throw new Error(result?.error ?? "OTP verification failed");
       onAuthed?.();

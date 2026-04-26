@@ -10843,6 +10843,8 @@ export default function App(){
             initialDebugOtp={onboarding.debugOtp}
             otpDelivery={onboarding.otpDelivery}
             otpNotice={onboarding.otpNotice}
+            devToken={onboarding.devToken ?? null}
+            expiresAt={onboarding.expiresAt ?? null}
             onBack={() =>
               setOnboarding({
                 step: "phone",
@@ -10850,6 +10852,8 @@ export default function App(){
                 debugOtp: null,
                 otpDelivery: undefined,
                 otpNotice: null,
+                devToken: null,
+                expiresAt: null,
               })}
             onAuthed={() => { /* session will update */ }}
           />
@@ -10859,13 +10863,15 @@ export default function App(){
     return (
       <AuthShell>
         <PhoneLoginScreen
-          onOtpSent={({ phoneNumber, debugOtp, otpDelivery, otpNotice }) =>
+          onOtpSent={({ phoneNumber, debugOtp, otpDelivery, otpNotice, devToken, expiresAt }) =>
             setOnboarding({
               step: "otp",
               phoneNumber,
-              debugOtp: debugOtp ?? null,
+              debugOtp:    debugOtp    ?? null,
               otpDelivery: otpDelivery ?? "console",
-              otpNotice: otpNotice ?? null,
+              otpNotice:   otpNotice   ?? null,
+              devToken:    devToken    ?? null,
+              expiresAt:   expiresAt   ?? null,
             })}
         />
       </AuthShell>
