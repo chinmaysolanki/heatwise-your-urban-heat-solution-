@@ -1,5 +1,9 @@
 import bcrypt from "bcryptjs";
-import { db } from "@/lib/db";
+// Lazy import db so module loads even when DATABASE_URL is not set
+async function getDb() {
+  const { db } = await import("@/lib/db");
+  return db;
+}
 
 export function normalizePhoneNumber(raw: unknown): string | null {
   if (raw == null) return null;
@@ -25,6 +29,7 @@ export async function createOrReplaceOtp(params: {
   const expiresAt = new Date(Date.now() + ttl * 60_000);
   const codeHash = await bcrypt.hash(params.otpCode, 10);
 
+  const db = await getDb();
   await db.phoneOtp.upsert({
     where: { phoneNumber: params.phoneNumber },
     update: {
@@ -49,6 +54,7 @@ export async function verifyOtpAndConsume(params: {
   phoneNumber: string;
   otpCode: string;
 }): Promise<{ ok: true } | { ok: false; reason: "invalid" | "expired" | "consumed" | "too_many_attempts" }> {
+  const db = await getDb();
   const row = await db.phoneOtp.findUnique({ where: { phoneNumber: params.phoneNumber } });
   if (!row) return { ok: false, reason: "invalid" };
   if (row.consumedAt) return { ok: false, reason: "consumed" };
@@ -92,6 +98,7 @@ export async function sendOtpSms(params: { phoneNumber: string; otpCode: string 
 }
 
 export async function findOrCreateUserByPhone(phoneNumber: string) {
+  const db = await getDb();
   const existing = await db.user.findUnique({ where: { phoneNumber } });
   if (existing) {
     if (!existing.phoneVerified) {

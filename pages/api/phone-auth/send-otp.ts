@@ -1,23 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import crypto from "crypto";
-import {
-  createOrReplaceOtp,
-  generateOtpCode,
-  normalizePhoneNumber,
-  sendOtpSms,
-  usesConsoleOtpDelivery,
-} from "@/lib/phoneOtp";
+import { generateOtpCode, normalizePhoneNumber } from "@/lib/phoneOtp";
 
-/** HMAC-SHA256 of `phone|code|expiresAt` using NEXTAUTH_SECRET. */
-function signDevToken(phone: string, code: string, expiresAt: number): string {
+/** HMAC-SHA256 token — stateless, no DB needed */
+export function signDevToken(phone: string, code: string, expiresAt: number): string {
   const secret = process.env.NEXTAUTH_SECRET ?? "heatwise-dev-secret";
   return crypto
     .createHmac("sha256", secret)
     .update(`${phone}|${code}|${expiresAt}`)
     .digest("hex");
 }
-
-export { signDevToken };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -30,38 +22,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: "Invalid phone number" });
   }
 
-  const otpCode = generateOtpCode();
-  const consoleDelivery = usesConsoleOtpDelivery();
+  const otpCode    = generateOtpCode();
+  const expiresAt  = Date.now() + 10 * 60_000;  // 10 min
+  const devToken   = signDevToken(phoneNumber, otpCode, expiresAt);
 
-  // ── Dev / no-DB mode ──────────────────────────────────────────────────────
-  // When HEATWISE_DEV_OTP=true we skip the database entirely and use a
-  // stateless signed token. This lets the app work before Neon is connected.
-  if (consoleDelivery) {
-    const expiresAt = Date.now() + 10 * 60_000; // 10 min
-    const devToken  = signDevToken(phoneNumber, otpCode, expiresAt);
-
-    // eslint-disable-next-line no-console
-    console.log(`[HeatWise OTP] ${phoneNumber}: ${otpCode}`);
-
-    return res.status(200).json({
-      ok:        true,
-      phoneNumber,
-      expiresAt: new Date(expiresAt).toISOString(),
-      delivery:  "console",
-      debugOtp:  otpCode,
-      devToken,                    // sent back to client, echoed on verify
-      notice:    "Dev mode — no SMS sent. Code shown on screen.",
-    });
+  // Try to persist to DB (works in production with Neon; skipped silently otherwise)
+  let savedToDb = false;
+  try {
+    const isPostgres = (process.env.DATABASE_URL ?? "").startsWith("postgres");
+    const devOtp     = String(process.env.HEATWISE_DEV_OTP ?? "").toLowerCase() === "true";
+    if (isPostgres && !devOtp) {
+      const { createOrReplaceOtp, sendOtpSms } = await import("@/lib/phoneOtp");
+      await createOrReplaceOtp({ phoneNumber, otpCode, ttlMinutes: 10 });
+      await sendOtpSms({ phoneNumber, otpCode });
+      savedToDb = true;
+    }
+  } catch {
+    // DB not connected or SMS not configured — fall through to stateless dev mode
+    savedToDb = false;
   }
 
-  // ── Production mode (DB + real SMS) ──────────────────────────────────────
-  const { expiresAt } = await createOrReplaceOtp({ phoneNumber, otpCode, ttlMinutes: 10 });
-  await sendOtpSms({ phoneNumber, otpCode });
+  // Log OTP to server console always (visible in Vercel function logs)
+  // eslint-disable-next-line no-console
+  console.log(`[HeatWise OTP] ${phoneNumber}: ${otpCode}`);
 
   return res.status(200).json({
-    ok:        true,
+    ok:         true,
     phoneNumber,
-    expiresAt: expiresAt.toISOString(),
-    delivery:  "sms",
+    expiresAt:  new Date(expiresAt).toISOString(),
+    delivery:   savedToDb ? "sms" : "console",
+    debugOtp:   savedToDb ? undefined : otpCode,
+    devToken:   savedToDb ? undefined : devToken,
+    notice:     savedToDb
+      ? undefined
+      : "Dev mode — no SMS sent. Your code is shown below.",
   });
 }
