@@ -1,0 +1,2 @@
+{"event_type":"crm.lead_synced","domain":"crm","source_system":"heatwise_core","target_system":"crm_sink","entity_type":"project","entity_id":"cabcdefghijklmnopqrs012345","payload":{"lead_stage":"qualified"},"correlation_id":"corr-001"}
+{"event_type":"payment.capture_requested","domain":"payment","source_system":"heatwise_core","target_system":"payment_provider","payload":{"amount_cents":4999,"currency":"USD"}}

@@ -1,0 +1,4 @@
+# HeatWise v1 training baselines (use alongside bootstrap data generation)
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3

@@ -1,0 +1,1875 @@
+// Operational schema: same models deploy to Postgres in production (set provider + DATABASE_URL).
+// Local dev may use SQLite; enums use String where SQLite lacks native enum.
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                     String   @id @default(cuid())
+  name                   String   @default("")
+  email                  String?  @unique
+  password               String?
+  phoneNumber            String?  @unique
+  phoneVerified          Boolean  @default(false)
+  profileCompleted       Boolean  @default(false)
+  city                   String?
+  state                  String?
+  country                String?
+  age                    Int?
+  gardeningInterestScore Int?
+  createdAt              DateTime @default(now())
+  projects               Project[]
+  settings               UserSettings?
+  userPreferences        UserPreference[]
+  telemetrySessions      RecommendationTelemetrySession[]
+  installOutcomes        InstallOutcomeRecord[]
+  installerQuoteRequests InstallerQuoteRequest[]
+  installerInstallJobs   InstallerInstallJob[]
+  longitudinalFollowupSchedules LongitudinalFollowupSchedule[]
+  revenueEvents                  RevenueEvent[]
+  leadFunnelEvents               LeadFunnelEvent[]
+  recommendationDossiers         RecommendationDossier[]
+  consentRecords                 UserConsentRecord[]
+  governancePolicyFlags          GovernancePolicyFlag[]
+  governanceReviewsRelated       GovernanceReviewRecord[] @relation("GovernanceReviewRelatedUser")
+}
+
+model PhoneOtp {
+  id          String   @id @default(cuid())
+  phoneNumber String   @unique
+  codeHash    String
+  expiresAt   DateTime
+  attempts    Int      @default(0)
+  consumedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model UserSettings {
+  id             String  @id @default(cuid())
+  userId         String  @unique
+  user           User    @relation(fields: [userId], references: [id])
+  units          String  @default("metric")
+  darkMode       Boolean @default(false)
+  notifications  Boolean @default(true)
+}
+
+model Project {
+  id                   String                @id @default(cuid())
+  name                 String
+  location             String
+  surfaceType          String
+  primaryGoal          String
+  area                 Float
+  obstacles            String
+  userId               String
+  user                 User                  @relation(fields: [userId], references: [id])
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  status               String                @default("Draft")
+  analysis             Analysis?
+  installationRequest  InstallationRequest?
+  spaces               Space[]
+  userPreferences      UserPreference[]
+  recommendationRuns   RecommendationRun[]
+  telemetrySessions    RecommendationTelemetrySession[]
+  installOutcomes      InstallOutcomeRecord[]
+  installerQuoteRequests InstallerQuoteRequest[]
+  installerInstallJobs   InstallerInstallJob[]
+  verifiedInstallRecords VerifiedInstallRecord[]
+  outcomeVerifications   OutcomeVerificationRecord[]
+  longitudinalFollowupSchedules LongitudinalFollowupSchedule[]
+  longitudinalRemeasurements      LongitudinalRemeasurement[]
+  recommendationConstraintSnapshots RecommendationConstraintSnapshot[]
+  costEstimateSnapshots            CostEstimateSnapshot[]
+  quoteComparisonRecords           QuoteComparisonRecord[]
+  budgetFitAssessments             BudgetFitAssessment[]
+  geoContexts                      GeoContext[]
+  microclimateSnapshots            MicroclimateSnapshot[]
+  siteExposureProfiles             SiteExposureProfile[]
+  geoEnrichmentSnapshots         GeoEnrichmentSnapshot[]
+  revenueEvents                  RevenueEvent[]
+  leadFunnelEvents               LeadFunnelEvent[]
+  commercialOutcomes             CommercialOutcome[]
+  recommendationDossiers         RecommendationDossier[]
+  installerExecutionSummaries  InstallerExecutionSummary[]
+  governancePolicyFlags        GovernancePolicyFlag[]
+  governanceReviewRecords      GovernanceReviewRecord[] @relation("GovernanceReviewRelatedProject")
+}
+
+model Space {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name        String
+  label       String?
+  areaSqm     Float?
+  lengthM     Float?   @map("length_m")
+  widthM      Float?   @map("width_m")
+  aspect      String?
+  floorLevel  Int?
+  spaceKind   String   @default("ROOFTOP")
+  indoor      Boolean  @default(false)
+  waterAccess     String? @map("water_access")
+  drainageQuality String? @map("drainage_quality")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  environmentSnapshots EnvironmentSnapshot[]
+  recommendationRuns   RecommendationRun[]
+
+  @@index([projectId])
+}
+
+model EnvironmentSnapshot {
+  id            String   @id @default(cuid())
+  spaceId       String
+  space         Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  tempC         Float?
+  sunIndex      Float?
+  windIndex     Float?
+  humidityPct   Float?
+  soilPh        Float?
+  soilMoisture  Float?
+  notes         String?
+  sunlightHours     Float?  @map("sunlight_hours")
+  shadeLevel        String? @map("shade_level")
+  peakSurfaceTempC  Float?  @map("peak_surface_temp_c")
+  rainfallLevel     String? @map("rainfall_level")
+  heatIslandScore   Float?  @map("heat_island_score")
+  createdAt     DateTime @default(now())
+
+  recommendationRuns RecommendationRun[]
+  photoSessions      PhotoSession[]
+
+  @@index([spaceId])
+}
+
+model UserPreference {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId         String?
+  project           Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  gardeningScore    Int?
+  budgetBand        Int?
+  maintenanceBand   Int?
+  waterConstraint   String?
+  preferredStyle      String?  @map("preferred_style")
+  ediblePreference    Boolean? @map("edible_preference")
+  floweringPreference Boolean? @map("flowering_preference")
+  petSafeRequired     Boolean? @map("pet_safe_required")
+  irrigationAllowed   Boolean? @map("irrigation_allowed")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  recommendationRuns RecommendationRun[]
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+/// Canonical species row for rules, filtering, and ML labels (`code` → `species_<code>` in exports).
+model SpeciesCatalog {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  displayName String
+  /// Taxonomic / UX metadata (rule filters, explainability).
+  scientificName String?
+  family         String?
+  category       String?
+  /// Terrace/rooftop rule flags (also used for ML feature exports if needed).
+  edible           Boolean  @default(false)
+  flowering        Boolean  @default(false)
+  petSafe          Boolean  @default(false) @map("pet_safe")
+  droughtTolerant  Boolean  @default(false) @map("drought_tolerant")
+  heatTolerant     Boolean  @default(false) @map("heat_tolerant")
+  lowMaintenance   Boolean  @default(false) @map("low_maintenance")
+  /// Typical acceptable direct-sun hours per day (container / roof context).
+  minSunHours      Int?     @map("min_sun_hours")
+  maxSunHours      Int?     @map("max_sun_hours")
+  notes            String?
+  /// JSON array of strings, e.g. ["monsoon_ok","wind_exposed"].
+  tagsJson         String?  @map("tags_json")
+  /// Rule & retrieval: legacy vocab (LOW | MED | HIGH) — optional if booleans are source of truth.
+  droughtTolerance String?
+  sunExposure      String?
+  hardinessZoneMin Int?
+  hardinessZoneMax Int?
+  maxHeightCm      Float?
+  growthHabit      String?
+  nativeRangeNotes String?
+  invasiveRisk     String?
+  ruleTagsJson     String?
+  mlWeight         Float?
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  recommendationCandidates RecommendationCandidate[]
+  outcomeEvents            OutcomeEvent[]
+
+  @@index([category])
+  @@index([active])
+  @@index([family])
+  @@index([heatTolerant])
+  @@index([droughtTolerant])
+}
+
+/// Legacy GPT-backed analysis persisted by removed `POST /api/analysis/run`. Kept for existing DB rows + project list; no current HTTP writer in app.
+model Analysis {
+  id            String   @id @default(cuid())
+  projectId     String   @unique
+  project       Project  @relation(fields: [projectId], references: [id])
+  score         Int
+  coolingDrop   Float
+  co2Annual     Float
+  energySaving  Float
+  confidence    Float
+  plants        String
+  createdAt     DateTime @default(now())
+}
+
+model InstallationRequest {
+  id            String   @id @default(cuid())
+  projectId     String   @unique
+  project       Project  @relation(fields: [projectId], references: [id])
+  contactName   String
+  email         String
+  phone         String?
+  contactMethod String
+  timeline      String
+  exportJson    String?
+  createdAt     DateTime @default(now())
+}
+
+model RecommendationFeedbackEvent {
+  id               String                  @id @default(cuid())
+  eventId          String                  @unique
+  userId           String?
+  recommendationId String
+  projectId        String?
+  action           String
+  timestamp        DateTime
+  dwellMs          Int?
+  scoreBefore      Float?
+  scoreAfter       Float?
+  notes            String?
+  extra            String?
+  createdAt        DateTime                @default(now())
+  candidateId      String?
+  candidate        RecommendationCandidate? @relation(fields: [candidateId], references: [id])
+}
+
+/// One recommendation request in a project/space context; training-quality rows should set project + space (+ optional snapshot).
+model RecommendationRun {
+  id                    String                    @id @default(cuid())
+  createdAt             DateTime                  @default(now())
+  input                 String
+  durationMs            Int
+  totalCandidates       Int
+  candidates            RecommendationCandidate[]
+  projectId             String?
+  project               Project?                  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  photoSessionId        String?
+  photoSession          PhotoSession?             @relation(fields: [photoSessionId], references: [id], onDelete: SetNull)
+  spaceId               String?
+  space                 Space?                    @relation(fields: [spaceId], references: [id], onDelete: SetNull)
+  environmentSnapshotId String?
+  environmentSnapshot   EnvironmentSnapshot?      @relation(fields: [environmentSnapshotId], references: [id], onDelete: SetNull)
+  userPreferenceId      String?
+  userPreference        UserPreference?           @relation(fields: [userPreferenceId], references: [id], onDelete: SetNull)
+  outcomeEvents         OutcomeEvent[]
+  telemetrySession      RecommendationTelemetrySession?
+  learningTelemetryEvents RecommendationTelemetryEvent[]
+
+  @@index([projectId])
+  @@index([photoSessionId])
+  @@index([spaceId])
+  @@index([environmentSnapshotId])
+  @@index([userPreferenceId])
+  @@index([projectId, spaceId])
+}
+
+/// Phase 8–9: append-only server observation per POST /api/recommendations/generate (rollout metrics + guardrails + failure paths).
+model RecommendationRuntimeObservation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  projectId String?
+
+  /// success | client_error | handler_error
+  observationKind String @default("success")
+  /// HTTP status intended for this observation (200 even if layout failed; 400/500 for errors).
+  outcomeHttpStatus Int?
+  errorCode           String?
+  errorMessageTruncated String?
+
+  /// Stable request identity (Phase 9 dedupe).
+  requestFingerprint String @default("unknown")
+  /// canonical | shadow_experiment | compat_client
+  trafficChannel     String @default("canonical")
+
+  /// python_usable | catalog_hybrid_ts | rules_only_emergency | empty_response | handler_error | client_error
+  runtimePathCategory String
+  generatorSource     String?
+  mlMode              String?
+  heatwiseServingOk   Boolean?
+
+  candidateTotal               Int
+  candidateOpen                Int
+  candidatesWithSpeciesCode    Int
+  layoutRecommendationCount     Int @default(0)
+  layoutUnresolvedIdentityCount Int @default(0)
+
+  layoutSlateStatus String?
+  layoutFailureCode String?
+
+  /// Parsed from mlErrors, e.g. catalog_fallback_reason:python_nonzero_exit
+  fallbackReasonTag String?
+  mlErrorsTruncated String?
+
+  @@index([createdAt])
+  @@index([runtimePathCategory])
+  @@index([generatorSource])
+  @@index([projectId])
+  @@index([requestFingerprint])
+  @@index([trafficChannel])
+  @@index([observationKind])
+}
+
+/// ML-oriented recommendation session: immutable snapshots + versioning (append-only events elsewhere).
+model RecommendationTelemetrySession {
+  id                        String   @id @default(cuid())
+  projectId                 String
+  userId                    String?
+  photoSessionId            String?
+  generatedAt               DateTime @default(now())
+  modelVersion              String
+  rulesVersion              String
+  generatorSource           String
+  projectSnapshotJson       String
+  environmentSnapshotJson   String
+  preferenceSnapshotJson    String
+  totalCandidates           Int
+  latencyMs                 Int
+  legacyRecommendationRunId String?  @unique
+  idempotencyKey            String?  @unique
+
+  project                 Project                 @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user                    User?                   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  photoSession            PhotoSession?           @relation(fields: [photoSessionId], references: [id], onDelete: SetNull)
+  legacyRun               RecommendationRun?      @relation(fields: [legacyRecommendationRunId], references: [id], onDelete: SetNull)
+  candidateSnapshots      RecommendationCandidateSnapshot[]
+  telemetryEvents         RecommendationTelemetryEvent[]
+  installOutcomes         InstallOutcomeRecord[]
+  installerQuoteRequests  InstallerQuoteRequest[]
+  recommendationConstraintSnapshots RecommendationConstraintSnapshot[]
+  costEstimateSnapshots             CostEstimateSnapshot[]
+  quoteComparisonRecords          QuoteComparisonRecord[]
+  geoEnrichmentSnapshots          GeoEnrichmentSnapshot[]
+  revenueEvents                   RevenueEvent[]
+  leadFunnelEvents                LeadFunnelEvent[]
+  recommendationDossiers          RecommendationDossier[]
+
+  @@index([projectId])
+  @@index([userId])
+  @@index([photoSessionId])
+  @@index([generatedAt])
+}
+
+/// Exact candidate card as shown to the user (training reproducibility).
+model RecommendationCandidateSnapshot {
+  id                            String   @id @default(cuid())
+  sessionId                     String
+  candidateRank                 Int
+  candidateScore                Float?
+  candidateSource               String
+  candidatePayloadJson          String
+  speciesPayloadJson            String?
+  estimatedInstallCostInr       Float?
+  estimatedMaintenanceCostInr   Float?
+  expectedTempReductionC        Float?
+  expectedSurfaceTempReductionC Float?
+  feasibilityScore              Float?
+  safetyScore                   Float?
+  heatMitigationScore           Float?
+  waterEfficiencyScore          Float?
+  wasShownToUser                Boolean  @default(false)
+
+  session           RecommendationTelemetrySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  telemetryEvents   RecommendationTelemetryEvent[]
+  selectedOutcomes  InstallOutcomeRecord[]
+  installerQuoteRequests InstallerQuoteRequest[]
+  installerInstallJobs   InstallerInstallJob[]
+  costEstimateSnapshots  CostEstimateSnapshot[]
+  quoteComparisonRecords QuoteComparisonRecord[]
+  budgetFitAssessments   BudgetFitAssessment[]
+  selectedInDossiers     RecommendationDossier[] @relation("DossierSelectedCandidate")
+
+  @@unique([sessionId, candidateRank])
+  @@index([sessionId])
+}
+
+/// Append-only user/installer telemetry (explicit + implicit learning signals).
+model RecommendationTelemetryEvent {
+  id                  String   @id @default(cuid())
+  feedbackEventId     String   @unique
+  sessionId           String
+  candidateSnapshotId String?
+  projectId           String
+  userId              String?
+  eventType           String
+  eventTimestamp      DateTime @default(now())
+  eventSource         String
+  screenName          String?
+  uiPosition          Int?
+  dwellTimeMs         Int?
+  eventValue          String?
+  metadataJson        String?
+  /// Optional FK for export joins without parsing metadata (mirrors session.legacyRecommendationRunId when set).
+  recommendationRunId String?
+  recommendationRun    RecommendationRun? @relation(fields: [recommendationRunId], references: [id], onDelete: SetNull)
+
+  session           RecommendationTelemetrySession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  candidateSnapshot RecommendationCandidateSnapshot? @relation(fields: [candidateSnapshotId], references: [id], onDelete: SetNull)
+
+  @@index([sessionId])
+  @@index([projectId])
+  @@index([eventType])
+  @@index([eventTimestamp])
+  @@index([recommendationRunId])
+}
+
+/// Post-install real-world outcome (separate from per-species OutcomeEvent).
+model InstallOutcomeRecord {
+  id                               String    @id @default(cuid())
+  projectId                        String
+  userId                           String?
+  telemetrySessionId               String?
+  selectedCandidateSnapshotId      String?
+  installerId                      String?
+  installStatus                    String
+  installDate                      DateTime?
+  actualInstallCostInr             Float?
+  actualMaintenancePlanInr         Float?
+  installedAreaSqft                Float?
+  irrigationInstalled              Boolean?
+  speciesInstalledJson             String?
+  deviationsFromRecommendationJson String?
+  userSatisfactionScore            Float?
+  installerFeasibilityRating       Float?
+  measuredTempChangeC              Float?
+  measuredSurfaceTempChangeC       Float?
+  plantSurvivalRate30d             Float?
+  plantSurvivalRate90d             Float?
+  maintenanceAdherenceScore        Float?
+  notes                            String?
+  idempotencyKey                   String?   @unique
+  createdAt                        DateTime  @default(now())
+
+  project                 Project                          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user                    User?                            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  telemetrySession        RecommendationTelemetrySession?  @relation(fields: [telemetrySessionId], references: [id], onDelete: SetNull)
+  selectedCandidateSnapshot RecommendationCandidateSnapshot? @relation(fields: [selectedCandidateSnapshotId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([telemetrySessionId])
+  @@index([installStatus])
+}
+
+/// Ranked recommendation slot; optional primary species + funnel flags for training and analytics.
+model RecommendationCandidate {
+  id                   String   @id @default(cuid())
+  runId                String
+  run                  RecommendationRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  rank                 Int
+  /// Model or blended relevance score for ranking (tabular export may omit to avoid leakage).
+  rankScore            Float?
+  recommendationId     String
+  layoutName           String
+  headline             String?
+  summary              String?
+  costEstimate         String
+  heatEstimate         String
+  layoutSchema         String
+  spatialMapping       String?
+  heatReductionSummary String?
+  /// Primary species for this row (multi-species layouts: use multiple candidate rows or JSON in layoutSchema).
+  speciesId            String?
+  species              SpeciesCatalog? @relation(fields: [speciesId], references: [id], onDelete: SetNull)
+  /// Denormalized `SpeciesCatalog.code` for training exports / linkage when FK optional or not yet seeded.
+  speciesCatalogCode   String?
+  shown                Boolean  @default(false)
+  clicked              Boolean  @default(false)
+  saved                Boolean  @default(false)
+  accepted             Boolean  @default(false)
+  installed            Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  feedbackEvents       RecommendationFeedbackEvent[]
+  selectedInSessions   PhotoSession[] @relation("SelectedPhotoSession")
+  outcomeEvents        OutcomeEvent[]
+
+  @@index([runId])
+  @@index([speciesId])
+  @@index([speciesCatalogCode])
+  @@index([runId, rank])
+}
+
+/// Longitudinal plant outcomes (survival, removal); append-only or updated follow-ups — separate from funnel flags on RecommendationCandidate.
+model OutcomeEvent {
+  id          String   @id @default(cuid())
+  runId       String
+  run         RecommendationRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  candidateId String?
+  candidate   RecommendationCandidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
+  speciesId   String
+  species     SpeciesCatalog @relation(fields: [speciesId], references: [id], onDelete: Cascade)
+  /// e.g. SURVIVAL_30D | SURVIVAL_90D | REMOVAL | HEALTH_CHECK | INSTALL_CONFIRM
+  eventKind   String
+  survived30d   Boolean?
+  survived90d   Boolean?
+  removed       Boolean  @default(false)
+  removedReason String?
+  healthScore   Float?
+  source        String?
+  metadataJson  String?
+  recordedAt    DateTime @default(now())
+
+  @@index([runId])
+  @@index([speciesId])
+  @@index([candidateId])
+  @@index([eventKind])
+  @@index([recordedAt])
+}
+
+model PhotoSession {
+  id                     String   @id @default(cuid())
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  projectId              String?
+  userId                 String?
+  capturedAt             DateTime?
+  photoData              String?
+  photoMime              String?
+  photoWidth             Int?
+  photoHeight            Int?
+  measurementStatus      String?
+  widthM                 Float?
+  lengthM                Float?
+  floorLevel             Int?
+  measurementCompletedAt DateTime?
+  recommendationJson     String?
+  layoutSchema           String?
+  spatialMapping         String?
+  visualizationImageUrl  String?
+  visualizationPrompt    String?
+  selectedCandidateId    String?
+  selectedCandidate      RecommendationCandidate? @relation("SelectedPhotoSession", fields: [selectedCandidateId], references: [id])
+  environmentSnapshotId  String?
+  environmentSnapshot    EnvironmentSnapshot?     @relation(fields: [environmentSnapshotId], references: [id], onDelete: SetNull)
+  /// JSON: { projectMeta?, environment? } — client restore; normalized rows are source of truth for environment when linked.
+  sessionContextJson     String?                  @map("session_context_json")
+  visualizationRecords   VisualizationRecord[]
+  pipelineEvents         PhotoPipelineEvent[]
+  recommendationRuns     RecommendationRun[]
+  telemetrySessions      RecommendationTelemetrySession[]
+
+  @@index([environmentSnapshotId])
+}
+
+model PhotoPipelineEvent {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  photoSessionId String
+  action         String
+  userId         String?
+  projectId      String?
+  payload        String?
+
+  photoSession   PhotoSession @relation(fields: [photoSessionId], references: [id])
+}
+
+model VisualizationRecord {
+  id                  String        @id @default(cuid())
+  createdAt           DateTime      @default(now())
+  photoSessionId      String?
+  photoSession        PhotoSession? @relation(fields: [photoSessionId], references: [id])
+  sourcePhotoRef      String?
+  recommendationId    String
+  layoutSchema        String
+  spatialMapping      String
+  visualizationPrompt String
+  generatedImageUrl   String
+  generationVersion   Int           @default(1)
+}
+
+/// Network partner — capability and coverage (verified-outcomes / installer ops).
+model InstallerProfile {
+  id                          String   @id @default(cuid())
+  installerName               String
+  serviceRegionsJson          String   @default("[]")
+  supportedProjectTypesJson   String   @default("[]")
+  supportedSolutionTypesJson  String   @default("[]")
+  supportedBudgetBandsJson    String   @default("[]")
+  minJobSizeSqft              Float    @default(0)
+  maxJobSizeSqft              Float?
+  irrigationCapability        Boolean  @default(false)
+  structuralInstallCapability Boolean  @default(false)
+  shadeSystemCapability       Boolean  @default(false)
+  edibleGardenCapability      Boolean  @default(false)
+  maintenanceServiceAvailable Boolean  @default(false)
+  averageRating               Float?
+  jobsCompletedCount          Int      @default(0)
+  verificationStatus          String   @default("pending")
+  activeStatus                String   @default("active")
+  metadataJson                String?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  quoteAssignments InstallerQuoteAssignment[]
+  quotes           InstallerQuote[]
+  installJobs      InstallerInstallJob[]
+  verifiedInstalls VerifiedInstallRecord[]
+  revenueEvents              RevenueEvent[]
+  leadFunnelEvents           LeadFunnelEvent[]
+  commercialMetricsSnapshots InstallerCommercialMetrics[]
+  partnerOperationsProfile   PartnerOperationsProfile?
+  partnerCapabilityMatrix  PartnerCapabilityMatrix?
+  partnerFieldOpsStatus      PartnerFieldOpsStatus?
+  partnerSlaMetrics          PartnerSLAMetrics[]
+
+  @@index([activeStatus])
+  @@index([verificationStatus])
+}
+
+/// Partner-level org & compliance (extends single-installer `InstallerProfile` for field network scale-up).
+model PartnerOperationsProfile {
+  id                   String           @id @default(cuid())
+  installerId          String           @unique
+  installer            InstallerProfile @relation(fields: [installerId], references: [id], onDelete: Cascade)
+  organizationName     String?
+  legalEntityName      String?
+  serviceAreasJson     String           @default("[]")
+  complianceStatus   String           @default("pending")
+  partnerActiveStatus  String           @default("operational")
+  primaryContactJson   String?
+  metadataJson         String?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  @@index([complianceStatus])
+  @@index([partnerActiveStatus])
+}
+
+/// Capability matrix: project/solution types, complexity, seasonality, readiness.
+model PartnerCapabilityMatrix {
+  id                      String           @id @default(cuid())
+  installerId             String           @unique
+  installer               InstallerProfile @relation(fields: [installerId], references: [id], onDelete: Cascade)
+  projectTypesJson        String           @default("[]")
+  solutionTypesJson       String           @default("[]")
+  complexityBandsJson     String           @default("[]")
+  seasonalConstraintsJson String           @default("{}")
+  serviceReadiness        String           @default("ready")
+  matrixExtrasJson        String?
+  updatedAt               DateTime         @updatedAt
+
+  @@index([serviceReadiness])
+}
+
+/// Live field-ops signals: availability, pauses, overload, regional readiness / coverage gaps.
+model PartnerFieldOpsStatus {
+  id                    String           @id @default(cuid())
+  installerId           String           @unique
+  installer             InstallerProfile @relation(fields: [installerId], references: [id], onDelete: Cascade)
+  availabilityState     String           @default("available")
+  pauseState            String?
+  overloadSignal        String           @default("none")
+  coverageGapsJson      String?
+  regionalReadinessJson String           @default("{}")
+  signalNotesJson       String?
+  updatedAt             DateTime         @updatedAt
+
+  @@index([availabilityState])
+}
+
+/// Rolling SLA-style metrics per installer and time window (from quotes, jobs, verifications).
+model PartnerSLAMetrics {
+  id                       String           @id @default(cuid())
+  installerId              String
+  installer                InstallerProfile @relation(fields: [installerId], references: [id], onDelete: Cascade)
+  windowStart              DateTime
+  windowEnd                DateTime
+  responseTimeMsP50        Int?
+  quoteTurnaroundHoursP50  Float?
+  siteVisitCompletionRate  Float?
+  installStartDelayDaysP50 Float?
+  verificationDelayDaysP50 Float?
+  jobSampleSize            Int              @default(0)
+  metadataJson             String?
+  computedAt               DateTime         @default(now())
+
+  @@unique([installerId, windowStart, windowEnd])
+  @@index([installerId, computedAt])
+}
+
+/// User-initiated quote flow tied to recommendation context (snapshots for reproducibility).
+model InstallerQuoteRequest {
+  id                          String   @id @default(cuid())
+  projectId                   String
+  userId                      String?
+  recommendationSessionId     String?
+  selectedCandidateSnapshotId String?
+  requestStatus               String   @default("submitted")
+  requestedAt                 DateTime @default(now())
+  userLocationRegion          String
+  projectSnapshotJson         String
+  candidateSnapshotJson       String?
+  notes                       String?
+
+  project               Project                          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user                  User?                            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  recommendationSession RecommendationTelemetrySession? @relation(fields: [recommendationSessionId], references: [id], onDelete: SetNull)
+  selectedCandidate     RecommendationCandidateSnapshot? @relation(fields: [selectedCandidateSnapshotId], references: [id], onDelete: SetNull)
+  assignments           InstallerQuoteAssignment[]
+  quotes                InstallerQuote[]
+  jobs                  InstallerInstallJob[]
+  revenueEvents         RevenueEvent[]
+  leadFunnelEvents      LeadFunnelEvent[]
+
+  @@index([projectId])
+  @@index([requestStatus])
+}
+
+/// One installer invited to bid on a quote request.
+model InstallerQuoteAssignment {
+  id                       String    @id @default(cuid())
+  quoteRequestId           String
+  installerId              String
+  assignmentStatus         String    @default("invited")
+  assignedAt               DateTime  @default(now())
+  declinedAt               DateTime?
+  rejectionReasonCodesJson String?
+
+  quoteRequest InstallerQuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
+  installer    InstallerProfile      @relation(fields: [installerId], references: [id], onDelete: Cascade)
+  quotes       InstallerQuote[]
+
+  @@unique([quoteRequestId, installerId])
+  @@index([installerId])
+}
+
+model InstallerQuote {
+  id                                   String   @id @default(cuid())
+  quoteRequestId                       String
+  quoteAssignmentId                    String
+  installerId                          String
+  quotedAt                             DateTime @default(now())
+  quoteStatus                          String   @default("submitted")
+  quoteAmountInr                       Float
+  estimatedTimelineDays                Int
+  includedScopeJson                    String
+  excludedScopeJson                    String?
+  proposedSpeciesJson                  String?
+  proposedMaterialsJson                String?
+  notes                                String?
+  deviationFromRecommendationFlagsJson String?
+
+  quoteRequest    InstallerQuoteRequest    @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
+  quoteAssignment InstallerQuoteAssignment @relation(fields: [quoteAssignmentId], references: [id], onDelete: Cascade)
+  installer       InstallerProfile         @relation(fields: [installerId], references: [id], onDelete: Cascade)
+  installJobs     InstallerInstallJob[]
+  quoteComparisonRecords QuoteComparisonRecord[]
+  revenueEvents          RevenueEvent[]
+  leadFunnelEvents       LeadFunnelEvent[]
+
+  @@index([quoteRequestId])
+  @@index([installerId])
+  @@index([quoteStatus])
+}
+
+/// Executable install after quote acceptance.
+model InstallerInstallJob {
+  id                          String    @id @default(cuid())
+  quoteRequestId              String
+  projectId                   String
+  userId                      String?
+  installerId                 String
+  sourceQuoteId               String?
+  selectedCandidateSnapshotId String?
+  jobStatus                   String    @default("scheduled")
+  scheduledDate               DateTime?
+  startedAt                   DateTime?
+  completedAt                 DateTime?
+  cancelledAt                 DateTime?
+  cancellationReason          String?
+  cancellationReasonCodesJson String?
+  estimatedCostInr            Float?
+  finalCostInr                Float?
+  installPlanJson             String
+  jobNotes                    String?
+
+  quoteRequest      InstallerQuoteRequest            @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
+  project           Project                          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user              User?                            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  installer         InstallerProfile                 @relation(fields: [installerId], references: [id], onDelete: Cascade)
+  sourceQuote       InstallerQuote?                  @relation(fields: [sourceQuoteId], references: [id], onDelete: SetNull)
+  selectedCandidate RecommendationCandidateSnapshot? @relation(fields: [selectedCandidateSnapshotId], references: [id], onDelete: SetNull)
+  verifiedInstall   VerifiedInstallRecord?
+  quoteComparisonRecords QuoteComparisonRecord[]
+  revenueEvents          RevenueEvent[]
+  leadFunnelEvents       LeadFunnelEvent[]
+  installerExecutionSummaries InstallerExecutionSummary[]
+
+  @@index([projectId])
+  @@index([installerId])
+  @@index([jobStatus])
+}
+
+/// As-built capture — ground truth for training (not the recommendation card).
+model VerifiedInstallRecord {
+  id                          String   @id @default(cuid())
+  installJobId                String   @unique
+  projectId                   String
+  installerId                 String
+  verifiedAt                  DateTime @default(now())
+  installedSolutionType       String
+  installedAreaSqft           Float
+  installedPlanterType        String
+  installedIrrigationType     String
+  installedShadeSolution      String
+  installedSpeciesJson        String
+  installedMaterialsJson      String
+  installedLayoutJson         String?
+  matchesRecommendedCandidate Boolean
+  mismatchReasonCodesJson     String
+  installerConfidenceScore    Float
+  evidencePhotoRefsJson       String?
+  notes                       String?
+
+  installJob           InstallerInstallJob         @relation(fields: [installJobId], references: [id], onDelete: Cascade)
+  project              Project                     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  installer            InstallerProfile            @relation(fields: [installerId], references: [id], onDelete: Cascade)
+  outcomeVerifications OutcomeVerificationRecord[]
+  longitudinalFollowupSchedules LongitudinalFollowupSchedule[]
+
+  @@index([projectId])
+}
+
+/// Post-install measured / confirmed outcomes (highest-confidence signal when tier is strong).
+model OutcomeVerificationRecord {
+  id                           String   @id @default(cuid())
+  verifiedInstallId            String
+  projectId                    String
+  verifiedByType               String
+  verifiedById                 String?
+  verificationDate             DateTime @default(now())
+  verificationWindowDays       Int
+  measuredTempChangeC          Float?
+  measuredSurfaceTempChangeC   Float?
+  userSatisfactionScore        Float?
+  installerFeasibilityRating   Float?
+  plantSurvivalRate30d         Float?
+  plantSurvivalRate90d         Float?
+  maintenanceAdherenceScore    Float?
+  waterUseAssessment           Float?
+  shadingEffectivenessScore    Float?
+  biodiversityObservationScore Float?
+  verificationConfidenceTier String
+  evidenceRefsJson             String?
+  notes                        String?
+
+  verifiedInstall VerifiedInstallRecord @relation(fields: [verifiedInstallId], references: [id], onDelete: Cascade)
+  project         Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([verifiedInstallId])
+}
+
+/// Post-install follow-up plan (7d / 30d / 90d / 180d checkpoints).
+model LongitudinalFollowupSchedule {
+  id                    String   @id @default(cuid())
+  projectId             String
+  userId                String?
+  verifiedInstallId     String?
+  baselineAt            DateTime
+  scheduleStatus        String   @default("active")
+  offsetsIncludedJson   String   @default("[7,30,90,180]")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  project           Project                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user              User?                    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  verifiedInstall   VerifiedInstallRecord?   @relation(fields: [verifiedInstallId], references: [id], onDelete: SetNull)
+  checkpoints       LongitudinalFollowupCheckpoint[]
+  remeasurements    LongitudinalRemeasurement[]
+
+  @@index([projectId])
+  @@index([baselineAt])
+  @@index([scheduleStatus])
+}
+
+model LongitudinalFollowupCheckpoint {
+  id                 String    @id @default(cuid())
+  scheduleId         String
+  offsetDays         Int
+  windowLabel        String
+  dueAt              DateTime
+  checkpointStatus   String    @default("pending")
+  rescheduledDueAt   DateTime?
+  completedAt        DateTime?
+  lastNote           String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  schedule       LongitudinalFollowupSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  events         LongitudinalFollowupEvent[]
+  remeasurements LongitudinalRemeasurement[]
+
+  @@unique([scheduleId, offsetDays])
+  @@index([dueAt])
+  @@index([checkpointStatus])
+}
+
+model LongitudinalFollowupEvent {
+  id               String   @id @default(cuid())
+  checkpointId     String
+  eventType        String
+  eventAt          DateTime @default(now())
+  metadataJson     String?
+  qualitativeNote  String?
+
+  checkpoint LongitudinalFollowupCheckpoint @relation(fields: [checkpointId], references: [id], onDelete: Cascade)
+
+  @@index([checkpointId])
+  @@index([eventType])
+  @@index([eventAt])
+}
+
+/// Repeated measurements tied to a follow-up window (or ad-hoc longitudinal row).
+model LongitudinalRemeasurement {
+  id                             String   @id @default(cuid())
+  projectId                      String
+  scheduleId                     String?
+  checkpointId                   String?
+  measuredAt                     DateTime @default(now())
+  windowLabel                    String
+  plantSurvivalRate              Float?
+  surfaceTempDeltaC              Float?
+  userSatisfactionScore          Float?
+  maintenanceAdherenceScore      Float?
+  heatMitigationStabilityScore   Float?
+  qualitativeNotes               String?
+  evidenceRefsJson               String?
+  ambientContextJson             String?
+
+  project    Project                       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  schedule   LongitudinalFollowupSchedule?   @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+  checkpoint LongitudinalFollowupCheckpoint? @relation(fields: [checkpointId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([measuredAt])
+  @@index([checkpointId])
+  @@index([scheduleId])
+}
+
+/// Supply-side species availability by region (curated / ingested signals).
+model SpeciesAvailability {
+  id                       String   @id @default(cuid())
+  speciesName              String
+  region                   String
+  cityTier                 String?
+  supplierSourceType       String
+  availabilityStatus       String
+  availabilityConfidence   Float    @default(0.8)
+  estimatedLeadTimeDays    Int?
+  seasonalAvailabilityNote String?
+  substituteSpeciesJson    String?
+  metadataJson             String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  @@index([region, speciesName])
+}
+
+model MaterialInventory {
+  id                          String   @id @default(cuid())
+  region                      String
+  materialType                String
+  materialName                String
+  availabilityStatus          String
+  stockBand                   String
+  estimatedLeadTimeDays       Int?
+  compatibleSolutionTypesJson String   @default("[]")
+  supplierSourceType          String
+  metadataJson                String?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  @@index([region, materialType])
+}
+
+model SeasonalWindow {
+  id               String   @id @default(cuid())
+  region           String
+  climateZone      String
+  projectType      String?
+  speciesName      String?
+  solutionType     String?
+  startMonth       Int
+  endMonth         Int
+  suitabilityLevel String
+  riskFlagsJson    String?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([region, climateZone])
+}
+
+model RegionalSupplyReadiness {
+  id                                String   @id @default(cuid())
+  region                            String
+  projectType                       String
+  solutionType                      String
+  installerCoverageScore            Float
+  speciesAvailabilityScore          Float
+  materialsAvailabilityScore        Float
+  irrigationReadinessScore          Float
+  structuralExecutionReadinessScore Float
+  seasonalReadinessScore            Float
+  overallSupplyReadinessScore       Float
+  createdAt                         DateTime @default(now())
+  updatedAt                         DateTime @updatedAt
+
+  @@unique([region, projectType, solutionType])
+  @@index([region])
+}
+
+model RecommendationConstraintSnapshot {
+  id                       String   @id @default(cuid())
+  projectId                String?
+  recommendationSessionId  String?
+  region                   String
+  climateZone              String
+  monthOfYear              Int
+  constraintFlagsJson      String
+  blockedSpeciesJson       String
+  blockedMaterialsJson     String
+  blockedSolutionTypesJson String
+  allowedSubstitutionsJson String
+  supplyReadinessScore     Float
+  seasonalReadinessScore   Float
+  generatedAt              DateTime @default(now())
+
+  project Project?                        @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  session RecommendationTelemetrySession? @relation(fields: [recommendationSessionId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([recommendationSessionId])
+  @@index([generatedAt])
+}
+
+/// HeatWise install + maintenance estimate at recommendation / preview time (reproducible).
+model CostEstimateSnapshot {
+  id                                   String   @id @default(cuid())
+  projectId                            String?
+  recommendationSessionId              String?
+  candidateSnapshotId                  String?
+  estimateGeneratedAt                  DateTime @default(now())
+  pricingModelVersion                  String?
+  pricingRulesVersion                  String?
+  region                               String
+  climateZone                          String
+  projectType                          String
+  solutionType                         String
+  estimateSource                       String
+  estimatedInstallCostMinInr           Float
+  estimatedInstallCostMedianInr        Float
+  estimatedInstallCostMaxInr           Float
+  estimatedAnnualMaintenanceMinInr     Float
+  estimatedAnnualMaintenanceMedianInr  Float
+  estimatedAnnualMaintenanceMaxInr     Float
+  materialCostComponentInr             Float?
+  laborCostComponentInr                Float?
+  irrigationCostComponentInr           Float?
+  shadeSystemCostComponentInr          Float?
+  logisticsCostComponentInr            Float?
+  contingencyPct                       Float?
+  estimateConfidenceBand               String
+  quoteVolatilityScore                 Float
+  budgetFitScore                       Float?
+  notes                                String?
+  metadataJson                         String?
+  majorCostDriversJson                 String?
+  uncertaintyReasonsJson               String?
+  cheaperAlternativesJson              String?
+  phasedInstallOptionJson              String?
+
+  project             Project?                        @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  session             RecommendationTelemetrySession? @relation(fields: [recommendationSessionId], references: [id], onDelete: SetNull)
+  candidateSnapshot   RecommendationCandidateSnapshot? @relation(fields: [candidateSnapshotId], references: [id], onDelete: SetNull)
+  quoteComparisons    QuoteComparisonRecord[]
+
+  @@index([projectId])
+  @@index([recommendationSessionId])
+  @@index([candidateSnapshotId])
+  @@index([estimateGeneratedAt])
+}
+
+model QuoteComparisonRecord {
+  id                             String   @id @default(cuid())
+  projectId                      String
+  recommendationSessionId        String?
+  candidateSnapshotId            String?
+  installerQuoteId               String?
+  installJobId                   String?
+  costEstimateId                 String?
+  comparisonGeneratedAt          DateTime @default(now())
+  predictedInstallCostMedianInr  Float?
+  quotedInstallCostInr           Float?
+  finalInstallCostInr            Float?
+  installCostErrorAbsInr         Float?
+  installCostErrorPct            Float?
+  quoteToFinalDeltaInr           Float?
+  quoteToFinalDeltaPct           Float?
+  maintenancePredictionErrorAbsInr Float?
+  maintenancePredictionErrorPct  Float?
+  pricingAccuracyBand            String?
+  costRiskFlagsJson              String?
+  notes                          String?
+
+  project           Project                          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  session           RecommendationTelemetrySession?  @relation(fields: [recommendationSessionId], references: [id], onDelete: SetNull)
+  candidateSnapshot RecommendationCandidateSnapshot? @relation(fields: [candidateSnapshotId], references: [id], onDelete: SetNull)
+  installerQuote    InstallerQuote?                  @relation(fields: [installerQuoteId], references: [id], onDelete: SetNull)
+  installJob        InstallerInstallJob?             @relation(fields: [installJobId], references: [id], onDelete: SetNull)
+  costEstimate      CostEstimateSnapshot?            @relation(fields: [costEstimateId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([installerQuoteId])
+  @@index([installJobId])
+  @@index([costEstimateId])
+  @@index([comparisonGeneratedAt])
+}
+
+model BudgetFitAssessment {
+  id                              String   @id @default(cuid())
+  projectId                       String
+  candidateSnapshotId             String?
+  userBudgetInr                   Float
+  estimatedInstallCostMedianInr Float
+  estimatedInstallCostMaxInr      Float
+  budgetFitBand                   String
+  budgetFitScore                  Float
+  stretchBudgetRequired           Boolean
+  affordabilityRiskLevel          String
+  downgradeSuggestionJson         String?
+  budgetFitReason                 String?
+  cheaperAlternativesJson         String?
+  phasedInstallOptionJson         String?
+  createdAt                       DateTime @default(now())
+
+  project           Project                          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  candidateSnapshot RecommendationCandidateSnapshot? @relation(fields: [candidateSnapshotId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([candidateSnapshotId])
+  @@index([createdAt])
+}
+
+model GeoContext {
+  id                          String   @id @default(cuid())
+  projectId                   String
+  region                      String
+  city                        String
+  cityTier                    String?
+  climateZone                 String
+  latitude                    Float?
+  longitude                   Float?
+  elevationM                  Float?
+  urbanDensityBand            String?
+  builtUpIndex                Float?
+  neighborhoodHeatRiskBand    String?
+  rainfallBand                String?
+  windExposureRegionBand      String?
+  airQualityBand              String?
+  waterStressBand             String?
+  sourceConfidence            Float
+  createdAt                   DateTime @default(now())
+  metadataJson                String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  geoEnrichmentSnapshots GeoEnrichmentSnapshot[] @relation("EnrichmentGeoContext")
+
+  @@index([projectId])
+  @@index([createdAt])
+}
+
+model MicroclimateSnapshot {
+  id                        String   @id @default(cuid())
+  projectId                 String
+  capturedAt                DateTime @default(now())
+  monthOfYear               Int
+  avgDayTempC               Float?
+  avgNightTempC             Float?
+  summerPeakTempC           Float?
+  humidityPct               Float?
+  rainfallLevel             String?
+  windExposureScore         Float?
+  sunExposureScore          Float?
+  shadeCoverScore           Float?
+  reflectedHeatRiskScore    Float?
+  dustExposureScore         Float?
+  runoffRiskScore           Float?
+  waterAvailabilityScore    Float?
+  seasonalHeatStressScore   Float?
+  sourceType                String
+  sourceConfidence          Float
+  metadataJson              String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  geoEnrichmentSnapshots GeoEnrichmentSnapshot[] @relation("EnrichmentMicroclimate")
+
+  @@index([projectId])
+  @@index([capturedAt])
+}
+
+model SiteExposureProfile {
+  id                           String   @id @default(cuid())
+  projectId                    String
+  projectType                  String
+  orientation                  String?
+  floorLevel                   Int?
+  surroundingBuiltDensity      String
+  roofMaterial                 String?
+  surfaceType                  String?
+  sunlightHours                Float?
+  shadeLevel                   String?
+  heatAbsorptionRiskScore      Float
+  windRiskScore                Float
+  waterRetentionRiskScore      Float
+  irrigationNeedRiskScore      Float
+  privacyExposureScore         Float
+  coolingNeedScore             Float
+  biodiversityOpportunityScore Float
+  maintenanceStressScore       Float
+  overallSiteComplexityScore   Float
+  createdAt                    DateTime @default(now())
+  metadataJson                 String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  geoEnrichmentSnapshots GeoEnrichmentSnapshot[] @relation("EnrichmentSiteExposure")
+
+  @@index([projectId])
+  @@index([createdAt])
+}
+
+model GeoEnrichmentSnapshot {
+  id                            String   @id @default(cuid())
+  projectId                     String
+  recommendationSessionId       String?
+  geoContextId                  String?
+  microclimateSnapshotId        String?
+  siteExposureId                String?
+  enrichmentCreatedAt           DateTime @default(now())
+  geoFeaturePayloadJson         String
+  microclimateFeaturePayloadJson String
+  siteExposurePayloadJson       String
+  overallGeoConfidence        Float
+  notes                         String?
+
+  project   Project                          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  session   RecommendationTelemetrySession?  @relation(fields: [recommendationSessionId], references: [id], onDelete: SetNull)
+  geoContext GeoContext?                     @relation("EnrichmentGeoContext", fields: [geoContextId], references: [id], onDelete: SetNull)
+  microclimate MicroclimateSnapshot?         @relation("EnrichmentMicroclimate", fields: [microclimateSnapshotId], references: [id], onDelete: SetNull)
+  siteExposure SiteExposureProfile?         @relation("EnrichmentSiteExposure", fields: [siteExposureId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([recommendationSessionId])
+  @@index([enrichmentCreatedAt])
+}
+
+/// Append-only monetization / revenue audit log.
+model RevenueEvent {
+  id                      String   @id @default(cuid())
+  eventType               String
+  eventTimestamp          DateTime @default(now())
+  userId                  String?
+  projectId               String?
+  recommendationSessionId String?
+  quoteRequestId          String?
+  installerQuoteId        String?
+  installJobId            String?
+  installerId             String?
+  currency                String   @default("INR")
+  grossAmount             Float?
+  netAmount               Float?
+  commissionAmount        Float?
+  platformFeeAmount       Float?
+  discountAmount          Float?
+  refundAmount            Float?
+  taxAmount               Float?
+  revenueStatus           String
+  paymentStatus           String?
+  revenueSource           String
+  metadataJson            String?
+  createdAt               DateTime @default(now())
+
+  user                  User?                            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  project               Project?                         @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  recommendationSession RecommendationTelemetrySession? @relation(fields: [recommendationSessionId], references: [id], onDelete: SetNull)
+  quoteRequest          InstallerQuoteRequest?           @relation(fields: [quoteRequestId], references: [id], onDelete: SetNull)
+  installerQuote        InstallerQuote?                  @relation(fields: [installerQuoteId], references: [id], onDelete: SetNull)
+  installJob            InstallerInstallJob?             @relation(fields: [installJobId], references: [id], onDelete: SetNull)
+  installer             InstallerProfile?                @relation(fields: [installerId], references: [id], onDelete: SetNull)
+
+  @@index([eventTimestamp])
+  @@index([eventType])
+  @@index([projectId])
+  @@index([installerId])
+}
+
+/// Append-only commercial funnel milestones.
+model LeadFunnelEvent {
+  id                      String   @id @default(cuid())
+  eventType               String
+  eventTimestamp          DateTime @default(now())
+  userId                  String?
+  projectId               String
+  recommendationSessionId String?
+  quoteRequestId          String?
+  installerQuoteId        String?
+  installJobId            String?
+  installerId             String?
+  funnelStage             String
+  sourceChannel           String?
+  campaignId              String?
+  region                  String?
+  projectType             String?
+  budgetBand              String?
+  metadataJson            String?
+  createdAt               DateTime @default(now())
+
+  user                  User?                            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  project               Project                          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  recommendationSession RecommendationTelemetrySession? @relation(fields: [recommendationSessionId], references: [id], onDelete: SetNull)
+  quoteRequest          InstallerQuoteRequest?           @relation(fields: [quoteRequestId], references: [id], onDelete: SetNull)
+  installerQuote        InstallerQuote?                  @relation(fields: [installerQuoteId], references: [id], onDelete: SetNull)
+  installJob            InstallerInstallJob?             @relation(fields: [installJobId], references: [id], onDelete: SetNull)
+  installer             InstallerProfile?                @relation(fields: [installerId], references: [id], onDelete: SetNull)
+
+  @@index([projectId, eventTimestamp])
+  @@index([funnelStage])
+  @@index([eventTimestamp])
+}
+
+/// One materialized commercial summary per project (rebuilt from source events).
+model CommercialOutcome {
+  id                       String    @id @default(cuid())
+  projectId                String    @unique
+  userId                   String?
+  installerId              String?
+  region                   String?
+  projectType              String?
+  firstRecommendationAt    DateTime?
+  firstQuoteRequestedAt    DateTime?
+  firstQuoteReceivedAt     DateTime?
+  quoteAcceptedAt          DateTime?
+  installCompletedAt       DateTime?
+  timeToQuoteHours         Float?
+  timeToInstallDays        Float?
+  quotesReceivedCount      Int       @default(0)
+  quoteAcceptanceRate      Float?
+  grossRevenueInr          Float?
+  netRevenueInr            Float?
+  platformMarginInr        Float?
+  totalDiscountInr         Float?
+  refundTotalInr           Float?
+  customerLtvInr           Float?
+  installerRevenueInr      Float?
+  commercialStatus         String
+  metadataJson             String?
+  updatedAt                DateTime  @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([commercialStatus])
+  @@index([installerId])
+}
+
+/// Aggregate unit economics for an admin-selected window + slice.
+model UnitEconomicsSnapshot {
+  id                                String   @id @default(cuid())
+  windowStart                       DateTime
+  windowEnd                         DateTime
+  region                            String?
+  projectType                       String?
+  sourceChannel                     String?
+  totalProjects                     Int
+  totalQuoteRequests                Int
+  totalQuotesReceived               Int
+  totalQuoteAcceptances             Int
+  totalInstallsCompleted            Int
+  quoteRequestToQuoteReceivedRate   Float?
+  quoteReceivedToAcceptanceRate     Float?
+  acceptanceToInstallRate           Float?
+  installConversionRate             Float?
+  avgRevenuePerProjectInr           Float?
+  avgRevenuePerInstallInr           Float?
+  avgPlatformMarginInr              Float?
+  avgQuoteValueInr                  Float?
+  avgFinalInstallValueInr           Float?
+  avgTimeToQuoteHours               Float?
+  avgTimeToInstallDays              Float?
+  refundRate                        Float?
+  repeatServiceRate                 Float?
+  createdAt                         DateTime @default(now())
+  metadataJson                      String?
+
+  @@index([windowStart, windowEnd])
+  @@index([region])
+}
+
+/// Installer-level commercial rollups for a window (descriptive analytics).
+model InstallerCommercialMetrics {
+  id                          String   @id @default(cuid())
+  installerId                 String
+  windowStart                 DateTime
+  windowEnd                   DateTime
+  region                      String?
+  quotesSubmitted             Int
+  quotesAccepted              Int
+  installsCompleted           Int
+  quoteAcceptanceRate         Float?
+  installCompletionRate     Float?
+  avgQuoteAmountInr           Float?
+  avgFinalInstallAmountInr    Float?
+  avgQuoteToFinalDeltaPct     Float?
+  totalInstallerRevenueInr    Float?
+  totalPlatformCommissionInr  Float?
+  cancellationRate            Float?
+  refundRate                  Float?
+  createdAt                   DateTime @default(now())
+  metadataJson                String?
+
+  installer InstallerProfile @relation(fields: [installerId], references: [id], onDelete: Cascade)
+
+  @@index([installerId, windowStart, windowEnd])
+}
+
+/// Immutable assembled recommendation dossier (structured JSON; PDF renderers consume this).
+model RecommendationDossier {
+  id                             String   @id @default(cuid())
+  projectId                      String
+  userId                         String?
+  recommendationSessionId        String
+  candidateSnapshotIdsJson       String
+  selectedCandidateSnapshotId    String?
+  generatedAt                    DateTime @default(now())
+  dossierType                    String
+  dossierVersion                 String
+  projectContextSnapshotJson     String
+  recommendationSummaryJson      String
+  pricingSummaryJson             String?
+  supplySummaryJson              String?
+  personalizationSummaryJson     String?
+  geospatialSummaryJson          String?
+  feasibilitySummaryJson         String?
+  scenarioSummaryJson            String?
+  installerReadinessSummaryJson  String?
+  executionNotesJson             String?
+  explanationProvenanceJson      String
+  metadataJson                   String?
+
+  project                  Project                          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user                     User?                            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  recommendationSession    RecommendationTelemetrySession @relation(fields: [recommendationSessionId], references: [id], onDelete: Cascade)
+  selectedCandidateSnapshot RecommendationCandidateSnapshot? @relation("DossierSelectedCandidate", fields: [selectedCandidateSnapshotId], references: [id], onDelete: SetNull)
+  reportSections           ReportSection[]
+  reportExplanations       ReportExplanation[]
+  installerExecutionSummary InstallerExecutionSummary?
+  adminReviewDossier        AdminReviewDossier?
+
+  @@index([projectId])
+  @@index([recommendationSessionId])
+  @@index([dossierType])
+  @@index([generatedAt])
+}
+
+model ReportSection {
+  id                     String   @id @default(cuid())
+  recommendationDossierId String
+  sectionKey             String
+  sectionOrder           Int
+  sectionTitle           String
+  sectionType            String
+  sectionPayloadJson     String
+  explanationRefsJson    String?
+  visibilityScope        String
+  createdAt              DateTime @default(now())
+
+  dossier RecommendationDossier @relation(fields: [recommendationDossierId], references: [id], onDelete: Cascade)
+
+  @@index([recommendationDossierId])
+  @@index([sectionKey])
+}
+
+model ReportExplanation {
+  id                      String   @id @default(cuid())
+  recommendationDossierId String
+  relatedSectionKey       String
+  explanationType         String
+  sourceLayer             String
+  sourceReferenceId       String?
+  explanationPayloadJson  String
+  confidenceBand          String?
+  createdAt               DateTime @default(now())
+
+  dossier RecommendationDossier @relation(fields: [recommendationDossierId], references: [id], onDelete: Cascade)
+
+  @@index([recommendationDossierId])
+  @@index([sourceLayer])
+}
+
+/// Execution-oriented slice linked 1:1 to a dossier (installer-facing).
+model InstallerExecutionSummary {
+  id                      String   @id @default(cuid())
+  recommendationDossierId String   @unique
+  projectId               String
+  installJobId            String?
+  executionPayloadJson    String
+  readinessChecklistJson  String?
+  metadataJson            String?
+  createdAt               DateTime @default(now())
+
+  dossier    RecommendationDossier  @relation(fields: [recommendationDossierId], references: [id], onDelete: Cascade)
+  project    Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  installJob InstallerInstallJob?  @relation(fields: [installJobId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([installJobId])
+}
+
+/// Admin risk / audit slice linked 1:1 to a dossier.
+model AdminReviewDossier {
+  id                      String   @id @default(cuid())
+  recommendationDossierId String   @unique
+  reviewPayloadJson       String
+  riskAssessmentJson      String?
+  provenanceAuditJson     String?
+  metadataJson            String?
+  createdAt               DateTime @default(now())
+
+  dossier RecommendationDossier @relation(fields: [recommendationDossierId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+}
+
+/// Aggregated learning / KPI snapshot for a time window (admin & retraining signals).
+model RecommendationInsight {
+  id                      String   @id @default(cuid())
+  windowStart             DateTime
+  windowEnd               DateTime
+  insightType             String
+  scopeJson               String
+  metricsJson             String
+  evidenceRefsJson        String
+  sourceLayersJson        String
+  recommendationDossierId String?
+  createdAt               DateTime @default(now())
+  metadataJson            String?
+
+  @@index([windowStart, windowEnd])
+  @@index([insightType])
+}
+
+/// Rollup by generator/rules/model and optional experiment / variant labels.
+model VariantPerformance {
+  id                       String   @id @default(cuid())
+  windowStart              DateTime
+  windowEnd                DateTime
+  experimentId             String?
+  rolloutVariant           String?
+  recommendationType       String?
+  scenarioUsageTag         String?
+  reportDossierType        String?
+  generatorSource          String?
+  rulesVersion             String?
+  modelVersion             String?
+  sessionCount             Int      @default(0)
+  candidateCount           Int      @default(0)
+  avgBlendedScore          Float?
+  avgLatencyMs             Float?
+  verifiedInstallCount     Int      @default(0)
+  dossierCreatedCount      Int      @default(0)
+  followupCompletedCount   Int      @default(0)
+  commercialInstalledCount Int      @default(0)
+  createdAt                DateTime @default(now())
+  metadataJson             String?
+
+  @@index([windowStart, windowEnd])
+  @@index([experimentId, rolloutVariant])
+  @@index([generatorSource, rulesVersion])
+}
+
+/// Performance slice by coarse product / market / personalization dimensions.
+model SegmentPerformance {
+  id                            String   @id @default(cuid())
+  windowStart                   DateTime
+  windowEnd                     DateTime
+  segmentKey                    String
+  projectType                   String?
+  climateZone                   String?
+  budgetBand                    String?
+  region                        String?
+  userType                      String?
+  installerAvailabilityBand     String?
+  personalizationConfidenceBand String?
+  metricsJson                   String
+  sampleSize                    Int
+  createdAt                     DateTime @default(now())
+  metadataJson                  String?
+
+  @@index([windowStart, windowEnd])
+  @@index([segmentKey])
+}
+
+/// Auditable structured lesson memory (evidence-backed; not generative doctrine).
+model LessonMemory {
+  id                                String    @id @default(cuid())
+  lessonKey                         String    @unique
+  polarity                          String
+  confidenceBand                    String
+  summaryStructuredJson             String
+  evidenceRefsJson                  String
+  relatedSegmentKey                 String?
+  relatedRecommendationPatternsJson String?
+  effectiveFrom                     DateTime?
+  effectiveTo                       DateTime?
+  createdBy                         String    @default("system")
+  createdAt                         DateTime  @default(now())
+  updatedAt                         DateTime  @updatedAt
+  metadataJson                      String?
+
+  @@index([polarity])
+  @@index([confidenceBand])
+}
+
+/// Append-only integration audit event (CRM, partners, payments, analytics sinks, etc.).
+model IntegrationEvent {
+  id              String   @id @default(cuid())
+  eventType       String
+  domain          String
+  sourceSystem    String?
+  targetSystem    String?
+  entityType      String?
+  entityId        String?
+  payloadJson     String
+  correlationId   String?
+  createdAt       DateTime @default(now())
+  metadataJson    String?
+
+  @@index([domain, createdAt])
+  @@index([eventType])
+  @@index([correlationId])
+  @@index([entityType, entityId])
+}
+
+/// Outbound sync job to an external system (retry-friendly, not append-only row updates).
+model OutboundSync {
+  id                 String    @id @default(cuid())
+  targetSystem       String
+  entityType         String
+  entityId           String
+  payloadSnapshotJson String
+  syncStatus         String    @default("pending")
+  attemptCount       Int       @default(0)
+  lastAttemptAt      DateTime?
+  nextRetryAt        DateTime?
+  errorCode          String?
+  errorDetailJson    String?
+  idempotencyKey     String?   @unique
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  metadataJson       String?
+
+  @@index([targetSystem, syncStatus])
+  @@index([entityType, entityId])
+  @@index([nextRetryAt])
+}
+
+/// Inbound webhook envelope (append-only; duplicate detection via source + external id).
+model InboundWebhook {
+  id                          String    @id @default(cuid())
+  sourceSystem                String
+  externalEventId             String?
+  eventType                   String
+  payloadJson                 String
+  validationStatus            String    @default("received")
+  receivedAt                  DateTime  @default(now())
+  processedAt                 DateTime?
+  linkageProjectId            String?
+  linkageUserId               String?
+  linkageRecommendationSessionId String?
+  duplicateOfWebhookId        String?
+  metadataJson                String?
+
+  @@unique([sourceSystem, externalEventId])
+  @@index([sourceSystem, receivedAt])
+  @@index([validationStatus])
+}
+
+/// Delivery lifecycle for reports, notifications, and partner pushes.
+model DeliveryTracking {
+  id                   String    @id @default(cuid())
+  deliveryType         String
+  channel              String
+  targetRef            String
+  relatedEntityType    String?
+  relatedEntityId      String?
+  deliveryStatus       String    @default("queued")
+  attemptCount         Int       @default(0)
+  lastAttemptAt        DateTime?
+  lastStatusDetailJson String?
+  correlationId        String?
+  outboundSyncId       String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  metadataJson         String?
+
+  @@index([deliveryType, deliveryStatus])
+  @@index([correlationId])
+  @@index([outboundSyncId])
+}
+
+/// Append-only platform audit trail for sensitive / business-critical actions.
+model PlatformAuditEvent {
+  id              String   @id @default(cuid())
+  auditEventType  String
+  subsystem       String
+  actorType       String
+  actorId         String?
+  entityType      String?
+  entityId        String?
+  action          String
+  outcome         String
+  severity        String   @default("info")
+  payloadJson     String
+  correlationId   String?
+  createdAt       DateTime @default(now())
+  metadataJson    String?
+
+  @@index([subsystem, createdAt])
+  @@index([auditEventType])
+  @@index([entityType, entityId])
+  @@index([correlationId])
+  @@index([actorType, actorId])
+}
+
+/// Idempotency reservations for critical writes (telemetry, quotes, installs, outcomes, revenue).
+model IdempotencyRecord {
+  id               String    @id @default(cuid())
+  scope            String
+  idempotencyKey   String
+  requestHash      String?
+  status           String    @default("in_flight")
+  httpStatus       Int?
+  responseBodyJson String?
+  createdAt        DateTime  @default(now())
+  completedAt      DateTime?
+
+  @@unique([scope, idempotencyKey])
+  @@index([scope, createdAt])
+  @@index([status])
+}
+
+/// User consent for sensitive workflows (media, telemetry sharing, installer data, follow-ups, analytics).
+model UserConsentRecord {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  consentScope   String
+  consentStatus  String    @default("granted")
+  sourceChannel  String?
+  grantedAt      DateTime?
+  withdrawnAt    DateTime?
+  expiresAt      DateTime?
+  legalBasis     String?
+  metadataJson   String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([userId, consentScope])
+  @@index([consentScope, consentStatus])
+}
+
+/// Risk / quality / anomaly flags for governance workflows.
+model GovernancePolicyFlag {
+  id           String    @id @default(cuid())
+  flagType     String
+  severity     String
+  status       String    @default("open")
+  entityType   String?
+  entityId     String?
+  userId       String?
+  user         User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  projectId    String?
+  project      Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  title        String
+  detailJson   String?
+  raisedAt     DateTime  @default(now())
+  resolvedAt   DateTime?
+  resolvedBy   String?
+  metadataJson String?
+
+  @@index([status, severity])
+  @@index([flagType])
+  @@index([entityType, entityId])
+}
+
+/// Configurable retention parameters per major entity category (summary rows for ops / DPA appendices).
+model DataRetentionCategoryPolicy {
+  id                   String   @id @default(cuid())
+  entityCategory       String   @unique
+  defaultRetentionDays Int
+  archiveAfterDays     Int?
+  hardDeleteAfterDays  Int?
+  notesJson            String?
+  policyVersion        String   @default("v1")
+  updatedAt            DateTime @updatedAt
+
+  @@index([entityCategory])
+}
+
+/// Internal governance review queue for sensitive or high-risk cases.
+model GovernanceReviewRecord {
+  id                String    @id @default(cuid())
+  reviewType        String
+  status            String    @default("queued")
+  priority          String    @default("normal")
+  subjectEntityType String
+  subjectEntityId   String
+  relatedUserId     String?
+  relatedUser       User?     @relation("GovernanceReviewRelatedUser", fields: [relatedUserId], references: [id], onDelete: SetNull)
+  relatedProjectId  String?
+  relatedProject    Project?  @relation("GovernanceReviewRelatedProject", fields: [relatedProjectId], references: [id], onDelete: SetNull)
+  openedByActorId   String?
+  openedByActorType String?
+  findingsJson      String?
+  resolutionSummary String?
+  assignedToActorId String?
+  openedAt          DateTime  @default(now())
+  closedAt          DateTime?
+  metadataJson      String?
+
+  @@index([status, priority])
+  @@index([subjectEntityType, subjectEntityId])
+  @@index([openedAt])
+}

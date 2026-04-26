@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HeatWise
 
-## Getting Started
+Next.js (pages router) + Prisma + NextAuth + Capacitor Android shell.
 
-First, run the development server:
+## Species catalog mapping (generated)
+
+Canonical species aliases and CSV key overrides live in **`data/species/species_catalog_mapping.v1.json`**, built from `prisma/data/species_catalog_seed.mjs` and `prisma/data/species_alias_extensions.json`.
+
+- After changing the seed or alias extensions: run **`npm run gen:species-mapping`** and commit the updated JSON.
+- Verify **`npm run check:species-mapping`** (also part of **`npm run check:workflow`**): fails if the committed artifact is missing or stale.
+- Python **`python -m serving`** requires that file under the HeatWise app root (or set **`HEATWISE_SPECIES_MAPPING_JSON`**). Include `data/species/` in deployment artifacts.
+
+### Recommendation runtime tests
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+export DATABASE_URL="file:./prisma/dev.db"
+npm run db:seed   # ensures SpeciesCatalog rows for catalog-hybrid tests
+npm run test:recommendation
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Includes **API/orchestration E2E** for `POST /api/recommendations/generate` (handler in-process, layout slate + fallback assertions). Details: **[lib/recommendation/testing/README.md](./lib/recommendation/testing/README.md)**
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Web (local)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npx prisma migrate deploy
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+## Android Studio
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+See **[ANDROID.md](./ANDROID.md)** for USB / emulator / Wi‑Fi, `adb reverse`, `CAP_SERVER_URL`, and `NEXTAUTH_URL`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Terminal 1
+npm run dev:android
 
-## Deploy on Vercel
+# Terminal 2 — physical device over USB: adb reverse tcp:3000 tcp:3000
+npm run android:studio
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open the project Android Studio loads: `heatwise-native/android` → Run ▶.

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/geospatial_feature_row_v1.json",
+  "title": "geospatial_feature_row",
+  "type": "object",
+  "required": ["feature_row_id"],
+  "properties": {
+    "feature_row_id": { "type": "string" },
+    "geo_cooling_need_score": { "type": "number" },
+    "geo_heat_absorption_risk_score": { "type": "number" },
+    "geo_seasonal_heat_stress_score": { "type": "number" },
+    "geo_overall_confidence": { "type": "number" }
+  },
+  "additionalProperties": true
+}

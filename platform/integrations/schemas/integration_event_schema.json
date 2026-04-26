@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/integration_event_v1.json",
+  "title": "IntegrationEventV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_type", "domain", "payload"],
+  "properties": {
+    "event_type": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "domain": {
+      "type": "string",
+      "enum": [
+        "crm",
+        "installer_partner",
+        "notification",
+        "payment",
+        "analytics_sink",
+        "report_delivery",
+        "internal"
+      ]
+    },
+    "source_system": {
+      "type": "string",
+      "enum": [
+        "heatwise_core",
+        "generic_rest_partner",
+        "generic_webhook_source",
+        "crm_sink",
+        "installer_partner_api",
+        "notification_provider",
+        "payment_provider",
+        "analytics_sink",
+        "report_delivery",
+        "user_device"
+      ]
+    },
+    "target_system": {
+      "type": "string",
+      "enum": [
+        "heatwise_core",
+        "generic_rest_partner",
+        "generic_webhook_source",
+        "crm_sink",
+        "installer_partner_api",
+        "notification_provider",
+        "payment_provider",
+        "analytics_sink",
+        "report_delivery",
+        "user_device"
+      ]
+    },
+    "entity_type": { "type": "string", "maxLength": 128 },
+    "entity_id": { "type": "string", "maxLength": 128 },
+    "payload": { "type": "object" },
+    "correlation_id": { "type": "string", "maxLength": 128 },
+    "metadata": { "type": "object" }
+  }
+}

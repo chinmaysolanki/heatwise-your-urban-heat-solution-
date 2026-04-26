@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/installer_commercial_metrics_v1.json",
+  "title": "installer_commercial_metrics",
+  "type": "object",
+  "required": [
+    "installer_commercial_metrics_id",
+    "installer_id",
+    "window_start",
+    "window_end",
+    "quotes_submitted",
+    "quotes_accepted",
+    "installs_completed",
+    "created_at"
+  ],
+  "properties": {
+    "installer_commercial_metrics_id": { "type": "string" },
+    "installer_id": { "type": "string" },
+    "window_start": { "type": "string", "format": "date-time" },
+    "window_end": { "type": "string", "format": "date-time" },
+    "region": { "type": ["string", "null"] },
+    "quotes_submitted": { "type": "integer", "minimum": 0 },
+    "quotes_accepted": { "type": "integer", "minimum": 0 },
+    "installs_completed": { "type": "integer", "minimum": 0 },
+    "quote_acceptance_rate": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "install_completion_rate": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "avg_quote_amount_inr": { "type": ["number", "null"], "minimum": 0 },
+    "avg_final_install_amount_inr": { "type": ["number", "null"], "minimum": 0 },
+    "avg_quote_to_final_delta_pct": { "type": ["number", "null"] },
+    "total_installer_revenue_inr": { "type": ["number", "null"] },
+    "total_platform_commission_inr": { "type": ["number", "null"], "minimum": 0 },
+    "cancellation_rate": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "refund_rate": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "metadata_json": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

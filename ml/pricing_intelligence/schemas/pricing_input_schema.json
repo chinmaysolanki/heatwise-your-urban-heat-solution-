@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/pricing_input_v1.json",
+  "title": "pricing_input",
+  "type": "object",
+  "required": ["project_snapshot", "candidate_snapshot"],
+  "properties": {
+    "project_snapshot": { "type": "object", "additionalProperties": true },
+    "environment_snapshot": { "type": "object", "additionalProperties": true },
+    "preference_snapshot": { "type": "object", "additionalProperties": true },
+    "candidate_snapshot": { "type": "object", "additionalProperties": true },
+    "region": { "type": "string" },
+    "climate_zone": { "type": "string" },
+    "supply_readiness_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "installer_readiness_score": { "type": "number", "minimum": 0, "maximum": 1 }
+  },
+  "additionalProperties": false
+}

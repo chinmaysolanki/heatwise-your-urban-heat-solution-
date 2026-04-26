@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "installer_quote_request",
+  "type": "object",
+  "required": [
+    "quote_request_id",
+    "project_id",
+    "request_status",
+    "requested_at",
+    "user_location_region",
+    "project_snapshot_json"
+  ],
+  "properties": {
+    "quote_request_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "user_id": { "type": ["string", "null"] },
+    "recommendation_session_id": { "type": ["string", "null"] },
+    "selected_candidate_snapshot_id": { "type": ["string", "null"] },
+    "assigned_installer_id": { "type": ["string", "null"] },
+    "request_status": { "type": "string" },
+    "requested_at": { "type": "string" },
+    "user_location_region": { "type": "string" },
+    "project_snapshot_json": { "type": "object" },
+    "candidate_snapshot_json": {},
+    "notes": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

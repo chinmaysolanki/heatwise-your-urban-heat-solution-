@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "candidates_per_project": { "min": 3, "max": 5 },
+  "missing_rate": 0.0,
+  "missing_columns": [
+    "railing_height_ft",
+    "usable_area_pct",
+    "orientation",
+    "native_species_preference"
+  ],
+  "split": {
+    "train_ratio": 0.7,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15
+  },
+  "sampling": {
+    "balcony_area_log_mean": 95,
+    "balcony_area_log_sigma": 0.45,
+    "terrace_area_log_mean": 420,
+    "rooftop_area_log_mean": 1400
+  },
+  "validation": {
+    "dense_greenery_area_sqft_max": 70,
+    "very_dense_greenery_area_sqft_max": 90,
+    "tiny_space_area_sqft": 50,
+    "balcony_tiny_area_sqft": 120,
+    "max_null_fraction_per_column": 0.12,
+    "install_cost_to_budget_ratio_warn": 1.35,
+    "irrigation_drip_water_stress_min": 0.55,
+    "low_load_heavy_rec_types": ["intensive_green_roof_lite"],
+    "unsafe_species_substrings": ["oleander", "dieffenbachia", "euphorbia_milii"],
+    "heavy_greenery_levels": ["dense", "very_dense"]
+  }
+}

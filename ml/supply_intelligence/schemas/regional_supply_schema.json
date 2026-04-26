@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/regional_supply_readiness_v1.json",
+  "title": "regional_supply_readiness",
+  "type": "object",
+  "required": [
+    "readiness_id",
+    "region",
+    "project_type",
+    "solution_type",
+    "installer_coverage_score",
+    "species_availability_score",
+    "materials_availability_score",
+    "irrigation_readiness_score",
+    "structural_execution_readiness_score",
+    "seasonal_readiness_score",
+    "overall_supply_readiness_score",
+    "updated_at"
+  ],
+  "properties": {
+    "readiness_id": { "type": "string", "minLength": 1 },
+    "region": { "type": "string", "minLength": 1 },
+    "project_type": { "type": "string", "minLength": 1 },
+    "solution_type": { "type": "string", "minLength": 1 },
+    "installer_coverage_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "species_availability_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "materials_availability_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "irrigation_readiness_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "structural_execution_readiness_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "seasonal_readiness_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "overall_supply_readiness_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

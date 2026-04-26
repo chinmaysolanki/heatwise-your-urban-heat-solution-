@@ -1,0 +1,2 @@
+{"entity_category":"recommendation_telemetry","default_retention_days":1095,"archive_after_days":90,"hard_delete_after_days":1095,"policy_version":"v1","notes":{"basis":"product"}}
+{"entity_category":"user_profile","default_retention_days":2555,"archive_after_days":730,"policy_version":"v1"}

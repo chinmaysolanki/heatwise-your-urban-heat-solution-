@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/recommendation_dossier_v1.json",
+  "title": "recommendation_dossier",
+  "type": "object",
+  "required": [
+    "recommendation_dossier_id",
+    "project_id",
+    "recommendation_session_id",
+    "candidate_snapshot_ids_json",
+    "generated_at",
+    "dossier_type",
+    "dossier_version",
+    "project_context_snapshot_json",
+    "recommendation_summary_json",
+    "explanation_provenance_json"
+  ],
+  "properties": {
+    "recommendation_dossier_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "user_id": { "type": ["string", "null"] },
+    "recommendation_session_id": { "type": "string" },
+    "candidate_snapshot_ids_json": { "type": "string" },
+    "selected_candidate_snapshot_id": { "type": ["string", "null"] },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "dossier_type": {
+      "type": "string",
+      "enum": [
+        "user_final_recommendation",
+        "installer_execution_summary",
+        "admin_internal_review",
+        "scenario_comparison_pack"
+      ]
+    },
+    "dossier_version": { "type": "string" },
+    "project_context_snapshot_json": { "type": "string" },
+    "recommendation_summary_json": { "type": "string" },
+    "pricing_summary_json": { "type": ["string", "null"] },
+    "supply_summary_json": { "type": ["string", "null"] },
+    "personalization_summary_json": { "type": ["string", "null"] },
+    "geospatial_summary_json": { "type": ["string", "null"] },
+    "feasibility_summary_json": { "type": ["string", "null"] },
+    "scenario_summary_json": { "type": ["string", "null"] },
+    "installer_readiness_summary_json": { "type": ["string", "null"] },
+    "execution_notes_json": { "type": ["string", "null"] },
+    "explanation_provenance_json": { "type": "string" },
+    "metadata_json": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

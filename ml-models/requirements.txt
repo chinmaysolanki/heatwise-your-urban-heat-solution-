@@ -1,0 +1,14 @@
+# HeatWise ML workspace — tabular baseline training
+# Python 3.10+ recommended
+
+numpy>=1.26.0,<3
+pandas>=2.1.0,<3
+scikit-learn>=1.4.0,<2
+joblib>=1.3.0,<2
+
+# Notebooks (optional)
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# Optional: faster I/O / parquet export from app later
+# pyarrow>=15.0.0

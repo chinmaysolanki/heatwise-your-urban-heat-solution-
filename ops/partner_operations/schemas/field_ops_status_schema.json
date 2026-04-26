@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/field_ops_status_v1.json",
+  "title": "FieldOpsStatusV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["installer_id"],
+  "properties": {
+    "installer_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "availability_state": {
+      "type": "string",
+      "enum": ["available", "limited", "paused", "overloaded"]
+    },
+    "pause_state": {
+      "type": "string",
+      "enum": ["user_initiated", "seasonal", "compliance", "capacity", "platform_hold"]
+    },
+    "overload_signal": { "type": "string", "enum": ["none", "soft", "hard"] },
+    "coverage_gaps": { "type": "array", "maxItems": 200 },
+    "regional_readiness": { "type": "object" },
+    "signal_notes": { "type": "object" }
+  }
+}

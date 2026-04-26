@@ -2,19 +2,79 @@
   "name": "heatwise",
   "version": "0.1.0",
   "private": true,
+  "prisma": {
+    "seed": "node prisma/seed.mjs"
+  },
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "next dev",
+    "dev:android": "node scripts/android-dev.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "start:android": "next start --hostname 0.0.0.0 --port 3000",
+    "android:sync": "cd heatwise-native && npm install && npx cap sync android",
+    "android:open": "cd heatwise-native && npx cap open android",
+    "android:studio": "npm run android:sync && npm run android:open",
+    "android:build": "node scripts/build-android.mjs",
+    "android:build:usb": "node scripts/build-android.mjs --usb --install",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "ml:serving-smoke": "bash ml/scripts/run_serving_smoke.sh",
+    "ml:serving-readiness": "bash ml/scripts/run_serving_readiness.sh",
+    "e2e:workflow": "npx tsx scripts/e2e-recommendation-workflow.ts",
+    "check:species-mapping": "node scripts/generate-species-catalog-mapping.mjs --check",
+    "check:catalog-traits": "npx tsx scripts/check-species-catalog-traits.ts",
+    "audit:catalog-hybrid-coverage": "npx tsx scripts/catalog-hybrid-trait-coverage-audit.ts",
+    "check:workflow": "npm run check:species-mapping && npm run check:catalog-traits && npm run typecheck && npm run test:enrichment && npm run test:catalog-traits && npm run ml:serving-smoke && npm run ml:serving-readiness",
+    "test:enrichment": "node --import tsx --test lib/enrichmentResponseMeta.test.ts",
+    "test:catalog-traits": "node --import tsx --test lib/species/speciesCatalogTraitQuality.test.ts lib/recommendation/catalogHybridCsvExclude.test.ts",
+    "test:recommendation": "node --import tsx --test lib/recommendation/testing/ml-runtime.contract.test.ts lib/recommendation/testing/rules-only.scenarios.test.ts lib/recommendation/testing/catalog-hybrid.scenarios.test.ts lib/recommendation/testing/layout-eligibility.scenarios.test.ts lib/recommendation/testing/identity.scenarios.test.ts lib/recommendation/testing/runtime-emergency.shape.test.ts lib/recommendation/testing/recommendation-ml.integration.test.ts lib/recommendation/testing/generate-api.e2e.test.ts",
+    "workflow:checks": "npm run check:workflow",
+    "ml:export-training": "node scripts/export-ml-training.mjs",
+    "db:migrate": "prisma migrate deploy",
+    "ml:telemetry-audit": "npx tsx scripts/telemetry-training-audit.ts",
+    "ml:export-telemetry-pipeline": "npx tsx scripts/export-telemetry-for-ml.ts --out ml/live_data/dumps/latest",
+    "ml:bootstrap-species": "cd ml-models && python3 scripts/generate_bootstrap_species_dataset.py",
+    "ml:validate-training": "cd ml-models && python3 scripts/validate_species_training_export.py",
+    "ml:bootstrap-synthetic": "cd ml/data/bootstrap && python3 generate_synthetic_dataset.py",
+    "db:seed": "prisma db seed",
+    "demo:seed": "node scripts/seed-demo.mjs",
+    "demo:check": "node --import tsx scripts/demo-smoke.ts",
+    "report:recommendation-eval": "npx tsx scripts/recommendation-evaluation-report.ts",
+    "gen:species-mapping": "node scripts/generate-species-catalog-mapping.mjs",
+    "demo:setup": "npm run db:seed && npm run demo:seed",
+    "demo:start": "npm run dev",
+    "postinstall": "prisma generate",
+    "vercel-build": "prisma generate && next build"
   },
   "dependencies": {
+    "@capacitor/geolocation": "^8.2.0",
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^3.0.3",
+    "framer-motion": "^12.36.0",
+    "heic2any": "^0.0.4",
+    "js-aruco": "^0.1.0",
     "next": "16.1.6",
+    "next-auth": "^4.24.13",
+    "openai": "^6.27.0",
+    "prisma": "^5.22.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "three": "^0.183.2"
   },
   "devDependencies": {
+    "@types/node": "25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.27",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6"
+    "eslint-config-next": "16.1.6",
+    "playwright": "^1.59.1",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.0"
   }
 }

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "remeasurement",
+  "type": "object",
+  "required": ["remeasurement_id", "project_id", "measured_at", "window_label"],
+  "properties": {
+    "remeasurement_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "followup_schedule_id": { "type": ["string", "null"] },
+    "checkpoint_id": { "type": ["string", "null"] },
+    "measured_at": { "type": "string", "format": "date-time" },
+    "window_label": { "type": "string", "pattern": "^[0-9]+d$|^ad_hoc$" },
+    "plant_survival_rate": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "surface_temp_delta_c": { "type": ["number", "null"], "minimum": -25, "maximum": 25 },
+    "user_satisfaction_score": { "type": ["number", "null"], "minimum": 0, "maximum": 5 },
+    "maintenance_adherence_score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "heat_mitigation_stability_score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "qualitative_notes": { "type": ["string", "null"] },
+    "evidence_refs_json": {},
+    "ambient_context_json": {}
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/governance_review_v1.json",
+  "title": "GovernanceReviewRecordV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["review_type", "subject_entity_type", "subject_entity_id"],
+  "properties": {
+    "review_type": {
+      "type": "string",
+      "enum": [
+        "high_risk_dossier",
+        "pricing_dispute",
+        "data_subject_request",
+        "anomaly_escalation",
+        "policy_exception"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["queued", "in_review", "approved", "rejected", "escalated"]
+    },
+    "priority": { "type": "string", "enum": ["low", "normal", "high", "urgent"] },
+    "subject_entity_type": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "subject_entity_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "related_user_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "related_project_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "opened_by_actor_id": { "type": "string", "maxLength": 128 },
+    "opened_by_actor_type": { "type": "string", "maxLength": 64 },
+    "findings": { "type": "object" },
+    "resolution_summary": { "type": "string", "maxLength": 4096 },
+    "assigned_to_actor_id": { "type": "string", "maxLength": 128 },
+    "metadata": { "type": "object" }
+  }
+}

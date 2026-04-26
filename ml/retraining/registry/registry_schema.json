@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/model_registry_entry.json",
+  "title": "HeatWise model registry entry",
+  "type": "object",
+  "required": [
+    "model_id",
+    "model_name",
+    "task",
+    "version",
+    "status",
+    "trained_at",
+    "training_snapshot_id",
+    "artifact_paths",
+    "training_code_version"
+  ],
+  "properties": {
+    "model_id": { "type": "string", "minLength": 4 },
+    "model_name": { "type": "string" },
+    "task": { "type": "string", "enum": ["feasibility", "heat_score", "ranking"] },
+    "version": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["candidate", "staging", "production", "archived", "failed"]
+    },
+    "trained_at": { "type": "string", "format": "date-time" },
+    "training_snapshot_id": { "type": "string" },
+    "data_sources_used": { "type": "array", "items": { "type": "string" } },
+    "source_mix_summary": { "type": "object" },
+    "feature_manifest_path": { "type": ["string", "null"] },
+    "metrics_summary_path": { "type": ["string", "null"] },
+    "hyperparams": { "type": "object" },
+    "training_code_version": { "type": "string" },
+    "artifact_paths": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "inference_manifest_path": { "type": ["string", "null"] },
+    "parent_model_id": { "type": ["string", "null"] },
+    "notes": { "type": ["string", "null"] },
+    "promoted_at": { "type": ["string", "null"] },
+    "retired_at": { "type": ["string", "null"] },
+    "candidate_model_type": { "type": ["string", "null"] },
+    "experiment_name": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

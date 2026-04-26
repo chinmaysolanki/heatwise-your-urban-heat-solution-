@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/recommendation_insight_v1.json",
+  "title": "recommendation_insight",
+  "type": "object",
+  "required": [
+    "recommendation_insight_id",
+    "window_start",
+    "window_end",
+    "insight_type",
+    "scope_json",
+    "metrics_json",
+    "evidence_refs_json",
+    "source_layers_json",
+    "created_at"
+  ],
+  "properties": {
+    "recommendation_insight_id": { "type": "string" },
+    "window_start": { "type": "string", "format": "date-time" },
+    "window_end": { "type": "string", "format": "date-time" },
+    "insight_type": { "type": "string" },
+    "scope_json": { "type": "string" },
+    "metrics_json": { "type": "string" },
+    "evidence_refs_json": { "type": "string" },
+    "source_layers_json": { "type": "string" },
+    "recommendation_dossier_id": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "metadata_json": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

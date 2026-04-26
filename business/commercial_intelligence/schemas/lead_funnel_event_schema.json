@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/lead_funnel_event_v1.json",
+  "title": "lead_funnel_event",
+  "type": "object",
+  "required": ["lead_funnel_event_id", "event_type", "event_timestamp", "project_id", "funnel_stage"],
+  "properties": {
+    "lead_funnel_event_id": { "type": "string" },
+    "event_type": { "type": "string", "minLength": 1 },
+    "event_timestamp": { "type": "string", "format": "date-time" },
+    "user_id": { "type": ["string", "null"] },
+    "project_id": { "type": "string" },
+    "recommendation_session_id": { "type": ["string", "null"] },
+    "quote_request_id": { "type": ["string", "null"] },
+    "installer_quote_id": { "type": ["string", "null"] },
+    "install_job_id": { "type": ["string", "null"] },
+    "installer_id": { "type": ["string", "null"] },
+    "funnel_stage": {
+      "type": "string",
+      "enum": [
+        "project_created",
+        "recommendation_generated",
+        "recommendation_saved",
+        "installer_requested",
+        "quote_requested",
+        "quote_received",
+        "quote_accepted",
+        "site_visit_scheduled",
+        "install_started",
+        "install_completed",
+        "followup_completed",
+        "maintenance_plan_started"
+      ]
+    },
+    "source_channel": { "type": ["string", "null"] },
+    "campaign_id": { "type": ["string", "null"] },
+    "region": { "type": ["string", "null"] },
+    "project_type": { "type": ["string", "null"] },
+    "budget_band": { "type": ["string", "null"] },
+    "metadata_json": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

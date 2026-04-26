@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/delivery_status_v1.json",
+  "title": "DeliveryStatusV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["delivery_type", "channel", "target_ref", "delivery_status"],
+  "properties": {
+    "delivery_type": {
+      "type": "string",
+      "enum": ["report", "summary_digest", "notification", "external_sync_outcome", "partner_payload"]
+    },
+    "channel": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "target_ref": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "related_entity_type": { "type": "string", "maxLength": 128 },
+    "related_entity_id": { "type": "string", "maxLength": 128 },
+    "delivery_status": {
+      "type": "string",
+      "enum": ["queued", "sending", "delivered", "bounced", "failed", "cancelled"]
+    },
+    "attempt_count": { "type": "integer", "minimum": 0 },
+    "correlation_id": { "type": "string", "maxLength": 128 },
+    "outbound_sync_id": { "type": "string", "maxLength": 128 },
+    "last_status_detail": { "type": "object" },
+    "metadata": { "type": "object" }
+  }
+}

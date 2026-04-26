@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/pricing_feature_row_v1.json",
+  "title": "pricing_feature_row",
+  "type": "object",
+  "required": ["feature_row_id", "region"],
+  "properties": {
+    "feature_row_id": { "type": "string" },
+    "region": { "type": "string" },
+    "climate_zone": { "type": "string" },
+    "project_type": { "type": "string" },
+    "area_sqm": { "type": "number", "minimum": 0 },
+    "greenery_density": { "type": "string" },
+    "planter_type": { "type": "string" },
+    "irrigation_type": { "type": "string" },
+    "shade_solution": { "type": "string" },
+    "supply_readiness_score": { "type": "number" },
+    "installer_readiness_score": { "type": "number" },
+    "lead_time_risk": { "type": "number" },
+    "budget_ratio": { "type": "number" },
+    "structural_complexity_proxy": { "type": "number" }
+  },
+  "additionalProperties": true
+}

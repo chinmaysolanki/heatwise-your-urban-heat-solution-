@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/project_ingestion.json",
+  "title": "Project / environment / preference snapshots (live ingestion)",
+  "type": "object",
+  "required": ["project_snapshot", "environment_snapshot", "preference_snapshot"],
+  "additionalProperties": true,
+  "properties": {
+    "project_snapshot": { "type": "object", "minProperties": 1 },
+    "environment_snapshot": { "type": "object" },
+    "preference_snapshot": { "type": "object" }
+  }
+}

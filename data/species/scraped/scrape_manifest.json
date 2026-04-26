@@ -1,0 +1,613 @@
+{
+  "generated_at": "2026-04-02T08:10:44.641Z",
+  "total_species": 51,
+  "sources_used": [
+    "perenual",
+    "gbif",
+    "wikipedia",
+    "wikimedia",
+    "seed"
+  ],
+  "api_keys_present": {
+    "perenual": false,
+    "trefle": false
+  },
+  "images_downloaded": 0,
+  "avg_confidence": "0.41",
+  "species": [
+    {
+      "code": "tulsi_holy",
+      "display_name": "Holy basil (Tulsi)",
+      "scientific_name": "Ocimum tenuiflorum",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "basil_sweet",
+      "display_name": "Sweet basil",
+      "scientific_name": "Ocimum basilicum",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "mint",
+      "display_name": "Mint",
+      "scientific_name": "Mentha spp.",
+      "sources": "seed",
+      "confidence": 0.1,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual",
+        "no_gbif",
+        "no_wikipedia",
+        "no_image"
+      ]
+    },
+    {
+      "code": "coriander",
+      "display_name": "Coriander (Cilantro)",
+      "scientific_name": "Coriandrum sativum",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "curry_leaf",
+      "display_name": "Curry leaf tree (Kadi patta)",
+      "scientific_name": "Murraya koenigii",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "lemongrass",
+      "display_name": "Lemongrass",
+      "scientific_name": "Cymbopogon citratus",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "cherry_tomato",
+      "display_name": "Cherry tomato",
+      "scientific_name": "Solanum lycopersicum",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "chilli",
+      "display_name": "Chilli pepper",
+      "scientific_name": "Capsicum annuum",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "malabar_spinach",
+      "display_name": "Malabar spinach",
+      "scientific_name": "Basella alba",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "aloe_vera",
+      "display_name": "Aloe vera",
+      "scientific_name": "Aloe barbadensis miller",
+      "sources": "seed",
+      "confidence": 0.1,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual",
+        "no_gbif",
+        "no_wikipedia",
+        "no_image"
+      ]
+    },
+    {
+      "code": "jade_plant",
+      "display_name": "Jade plant",
+      "scientific_name": "Crassula ovata",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "sedum",
+      "display_name": "Sedum (stonecrop)",
+      "scientific_name": "Sedum spp.",
+      "sources": "seed",
+      "confidence": 0.1,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual",
+        "no_gbif",
+        "no_wikipedia",
+        "no_image"
+      ]
+    },
+    {
+      "code": "prickly_pear",
+      "display_name": "Prickly pear cactus",
+      "scientific_name": "Opuntia spp.",
+      "sources": "seed",
+      "confidence": 0.1,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual",
+        "no_gbif",
+        "no_wikipedia",
+        "no_image"
+      ]
+    },
+    {
+      "code": "bougainvillea",
+      "display_name": "Bougainvillea",
+      "scientific_name": "Bougainvillea spp.",
+      "sources": "seed",
+      "confidence": 0.1,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual",
+        "no_gbif",
+        "no_wikipedia",
+        "no_image"
+      ]
+    },
+    {
+      "code": "hibiscus",
+      "display_name": "Chinese hibiscus",
+      "scientific_name": "Hibiscus rosa-sinensis",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "marigold",
+      "display_name": "Marigold (Genda)",
+      "scientific_name": "Tagetes spp.",
+      "sources": "seed",
+      "confidence": 0.1,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual",
+        "no_gbif",
+        "no_wikipedia",
+        "no_image"
+      ]
+    },
+    {
+      "code": "portulaca",
+      "display_name": "Portulaca (moss rose)",
+      "scientific_name": "Portulaca grandiflora",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "vinca",
+      "display_name": "Periwinkle (Vinca)",
+      "scientific_name": "Catharanthus roseus",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "zinnia",
+      "display_name": "Zinnia",
+      "scientific_name": "Zinnia elegans",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "pothos",
+      "display_name": "Money plant (Pothos)",
+      "scientific_name": "Epipremnum aureum",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "snake_plant",
+      "display_name": "Snake plant",
+      "scientific_name": "Dracaena trifasciata",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "spider_plant",
+      "display_name": "Spider plant",
+      "scientific_name": "Chlorophytum comosum",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "geranium_pelargonium",
+      "display_name": "Scented geranium",
+      "scientific_name": "Pelargonium spp.",
+      "sources": "seed",
+      "confidence": 0.1,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual",
+        "no_gbif",
+        "no_wikipedia",
+        "no_image"
+      ]
+    },
+    {
+      "code": "plumeria",
+      "display_name": "Plumeria (Frangipani)",
+      "scientific_name": "Plumeria spp.",
+      "sources": "seed",
+      "confidence": 0.1,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual",
+        "no_gbif",
+        "no_wikipedia",
+        "no_image"
+      ]
+    },
+    {
+      "code": "okra",
+      "display_name": "Okra (Bhindi)",
+      "scientific_name": "Abelmoschus esculentus",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "spinach_indian",
+      "display_name": "Indian spinach (Palak)",
+      "scientific_name": "Spinacia oleracea",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "eggplant_mini",
+      "display_name": "Mini brinjal (eggplant)",
+      "scientific_name": "Solanum melongena",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "luffa",
+      "display_name": "Ridge gourd (Turai)",
+      "scientific_name": "Luffa acutangula",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "peace_lily",
+      "display_name": "Peace lily",
+      "scientific_name": "Spathiphyllum spp.",
+      "sources": "seed",
+      "confidence": 0.1,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual",
+        "no_gbif",
+        "no_wikipedia",
+        "no_image"
+      ]
+    },
+    {
+      "code": "jasmine_mogra",
+      "display_name": "Mogra jasmine",
+      "scientific_name": "Jasminum sambac",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "vetiver",
+      "display_name": "Vetiver grass",
+      "scientific_name": "Chrysopogon zizanioides",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "sweet_potato_vine",
+      "display_name": "Sweet potato vine",
+      "scientific_name": "Ipomoea batatas",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "dracaena_marginata",
+      "display_name": "Dragon tree (Dracaena)",
+      "scientific_name": "Dracaena marginata",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "coleus",
+      "display_name": "Coleus",
+      "scientific_name": "Plectranthus scutellarioides",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "ficus_pumila",
+      "display_name": "Creeping fig",
+      "scientific_name": "Ficus pumila",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "adenium",
+      "display_name": "Desert rose (Adenium)",
+      "scientific_name": "Adenium obesum",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "bamboo_dwarf",
+      "display_name": "Dwarf bamboo",
+      "scientific_name": "Pleioblastus spp.",
+      "sources": "seed",
+      "confidence": 0.1,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual",
+        "no_gbif",
+        "no_wikipedia",
+        "no_image"
+      ]
+    },
+    {
+      "code": "areca_palm_dwarf",
+      "display_name": "Areca palm (dwarf)",
+      "scientific_name": "Dypsis lutescens",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "caladium",
+      "display_name": "Caladium",
+      "scientific_name": "Caladium bicolor",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "brahmi",
+      "display_name": "Brahmi (Bacopa)",
+      "scientific_name": "Bacopa monnieri",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "fenugreek",
+      "display_name": "Methi / Fenugreek",
+      "scientific_name": "Trigonella foenum-graecum",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "bitter_gourd",
+      "display_name": "Bitter gourd (Karela)",
+      "scientific_name": "Momordica charantia",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "morning_glory",
+      "display_name": "Morning glory",
+      "scientific_name": "Ipomoea purpurea",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "chrysanthemum",
+      "display_name": "Chrysanthemum (Guldaudi)",
+      "scientific_name": "Chrysanthemum morifolium",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "crossandra",
+      "display_name": "Crossandra (Aboli)",
+      "scientific_name": "Crossandra infundibuliformis",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "duranta",
+      "display_name": "Golden dewdrop (Duranta)",
+      "scientific_name": "Duranta erecta",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "wandering_jew",
+      "display_name": "Tradescantia (Wandering jew)",
+      "scientific_name": "Tradescantia zebrina",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "henna",
+      "display_name": "Henna (Mehndi)",
+      "scientific_name": "Lawsonia inermis",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "lemongrass_dense",
+      "display_name": "Dense lemongrass screen",
+      "scientific_name": "Cymbopogon flexuosus",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    },
+    {
+      "code": "neem_dwarf",
+      "display_name": "Dwarf neem",
+      "scientific_name": "Azadirachta indica (dwarf cv.)",
+      "sources": "seed",
+      "confidence": 0.1,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual",
+        "no_gbif",
+        "no_wikipedia",
+        "no_image"
+      ]
+    },
+    {
+      "code": "impatiens",
+      "display_name": "Impatiens (Touch-me-not)",
+      "scientific_name": "Impatiens walleriana",
+      "sources": "gbif+wiki+seed",
+      "confidence": 0.5,
+      "image_ok": false,
+      "warnings": [
+        "no_perenual"
+      ]
+    }
+  ]
+}

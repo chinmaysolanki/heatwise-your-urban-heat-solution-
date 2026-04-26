@@ -1,0 +1,461 @@
+{
+  "schema_version": "heatwise.recommendation_eval.v1",
+  "generated_at": "2026-03-31T07:11:25.513Z",
+  "python_stubbed": true,
+  "rows": [
+    {
+      "scenario_id": "sunny_balcony_low_maintenance",
+      "scenario_title": "Sunny balcony, low maintenance",
+      "http_status": 200,
+      "ml_errors_preview": [
+        "python_runtime_unavailable_catalog_hybrid",
+        "catalog_fallback_reason:python_nonzero_exit",
+        "python_no_stdout_exit_1",
+        "python_exit_1"
+      ],
+      "top_open_species": [
+        {
+          "rank": 1,
+          "name": "Curry leaf screen",
+          "catalog_code": "curry_leaf"
+        },
+        {
+          "rank": 2,
+          "name": "Vetiver grass",
+          "catalog_code": "vetiver"
+        },
+        {
+          "rank": 3,
+          "name": "Lemongrass screen",
+          "catalog_code": "lemongrass"
+        },
+        {
+          "rank": 4,
+          "name": "Sedum mix",
+          "catalog_code": "sedum"
+        },
+        {
+          "rank": 5,
+          "name": "Frangipani (alt cultivar)",
+          "catalog_code": "plumeria"
+        },
+        {
+          "rank": 6,
+          "name": "Holy basil (tulsi)",
+          "catalog_code": "tulsi_holy"
+        }
+      ],
+      "layout_attached": true,
+      "candidate_counts": {
+        "total": 6,
+        "open": 6,
+        "blocked": 0
+      },
+      "species_catalog_code_coverage_open": 1,
+      "unresolved_open_count": 0,
+      "hard_constraint_summary": {
+        "open_with_hard_reasons": 0,
+        "blocked_with_hard_reasons": 0,
+        "pass": true
+      },
+      "mode": "partial_ml",
+      "generator_source": "catalog_hybrid_ts",
+      "rules_version": "hw-rules-v1.2-catalog-hybrid-ts",
+      "layout_eligible": true,
+      "layout_slate_status": "attached",
+      "layout_failure_code": null
+    },
+    {
+      "scenario_id": "hot_terrace_cooling",
+      "scenario_title": "Hot terrace, cooling-first",
+      "http_status": 200,
+      "ml_errors_preview": [
+        "python_runtime_unavailable_catalog_hybrid",
+        "catalog_fallback_reason:python_nonzero_exit",
+        "python_no_stdout_exit_1",
+        "python_exit_1"
+      ],
+      "top_open_species": [
+        {
+          "rank": 1,
+          "name": "Sedum mix",
+          "catalog_code": "sedum"
+        },
+        {
+          "rank": 2,
+          "name": "Holy basil (tulsi)",
+          "catalog_code": "tulsi_holy"
+        },
+        {
+          "rank": 3,
+          "name": "Curry leaf screen",
+          "catalog_code": "curry_leaf"
+        },
+        {
+          "rank": 4,
+          "name": "Prickly pear",
+          "catalog_code": "prickly_pear"
+        },
+        {
+          "rank": 5,
+          "name": "Money plant (dense)",
+          "catalog_code": "pothos"
+        },
+        {
+          "rank": 6,
+          "name": "Lemongrass screen",
+          "catalog_code": "lemongrass"
+        },
+        {
+          "rank": 7,
+          "name": "Frangipani (alt cultivar)",
+          "catalog_code": "plumeria"
+        },
+        {
+          "rank": 8,
+          "name": "Bougainvillea",
+          "catalog_code": "bougainvillea"
+        }
+      ],
+      "layout_attached": true,
+      "candidate_counts": {
+        "total": 8,
+        "open": 8,
+        "blocked": 0
+      },
+      "species_catalog_code_coverage_open": 1,
+      "unresolved_open_count": 0,
+      "hard_constraint_summary": {
+        "open_with_hard_reasons": 0,
+        "blocked_with_hard_reasons": 0,
+        "pass": true
+      },
+      "mode": "partial_ml",
+      "generator_source": "catalog_hybrid_ts",
+      "rules_version": "hw-rules-v1.2-catalog-hybrid-ts",
+      "layout_eligible": true,
+      "layout_slate_status": "attached",
+      "layout_failure_code": null
+    },
+    {
+      "scenario_id": "shaded_balcony_aesthetic",
+      "scenario_title": "Shaded balcony, aesthetic goal",
+      "http_status": 200,
+      "ml_errors_preview": [
+        "python_runtime_unavailable_catalog_hybrid",
+        "catalog_fallback_reason:python_nonzero_exit",
+        "python_no_stdout_exit_1",
+        "python_exit_1"
+      ],
+      "top_open_species": [
+        {
+          "rank": 1,
+          "name": "Money plant (dense)",
+          "catalog_code": "pothos"
+        },
+        {
+          "rank": 2,
+          "name": "Dracaena marginata",
+          "catalog_code": "dracaena_marginata"
+        },
+        {
+          "rank": 3,
+          "name": "Creeping fig",
+          "catalog_code": "ficus_pumila"
+        },
+        {
+          "rank": 4,
+          "name": "Snake plant",
+          "catalog_code": "snake_plant"
+        },
+        {
+          "rank": 5,
+          "name": "Coleus",
+          "catalog_code": "coleus"
+        },
+        {
+          "rank": 6,
+          "name": "Spider plant",
+          "catalog_code": "spider_plant"
+        }
+      ],
+      "layout_attached": true,
+      "candidate_counts": {
+        "total": 6,
+        "open": 6,
+        "blocked": 0
+      },
+      "species_catalog_code_coverage_open": 1,
+      "unresolved_open_count": 0,
+      "hard_constraint_summary": {
+        "open_with_hard_reasons": 0,
+        "blocked_with_hard_reasons": 0,
+        "pass": true
+      },
+      "mode": "partial_ml",
+      "generator_source": "catalog_hybrid_ts",
+      "rules_version": "hw-rules-v1.2-catalog-hybrid-ts",
+      "layout_eligible": true,
+      "layout_slate_status": "attached",
+      "layout_failure_code": null
+    },
+    {
+      "scenario_id": "pet_safe_home_garden",
+      "scenario_title": "Pet-safe home garden",
+      "http_status": 200,
+      "ml_errors_preview": [
+        "python_runtime_unavailable_catalog_hybrid",
+        "catalog_fallback_reason:python_nonzero_exit",
+        "python_no_stdout_exit_1",
+        "python_exit_1"
+      ],
+      "top_open_species": [
+        {
+          "rank": 1,
+          "name": "Holy basil (tulsi)",
+          "catalog_code": "tulsi_holy"
+        },
+        {
+          "rank": 2,
+          "name": "Vetiver grass",
+          "catalog_code": "vetiver"
+        },
+        {
+          "rank": 3,
+          "name": "Lemongrass screen",
+          "catalog_code": "lemongrass"
+        },
+        {
+          "rank": 4,
+          "name": "Malabar spinach",
+          "catalog_code": "malabar_spinach"
+        },
+        {
+          "rank": 5,
+          "name": "Sedum mix",
+          "catalog_code": "sedum"
+        },
+        {
+          "rank": 6,
+          "name": "Sweet potato vine",
+          "catalog_code": "sweet_potato_vine"
+        },
+        {
+          "rank": 7,
+          "name": "Mint",
+          "catalog_code": "mint"
+        },
+        {
+          "rank": 8,
+          "name": "Marigold",
+          "catalog_code": "marigold"
+        }
+      ],
+      "layout_attached": true,
+      "candidate_counts": {
+        "total": 8,
+        "open": 8,
+        "blocked": 0
+      },
+      "species_catalog_code_coverage_open": 1,
+      "unresolved_open_count": 0,
+      "hard_constraint_summary": {
+        "open_with_hard_reasons": 0,
+        "blocked_with_hard_reasons": 0,
+        "pass": true
+      },
+      "mode": "partial_ml",
+      "generator_source": "catalog_hybrid_ts",
+      "rules_version": "hw-rules-v1.2-catalog-hybrid-ts",
+      "layout_eligible": true,
+      "layout_slate_status": "attached",
+      "layout_failure_code": null
+    },
+    {
+      "scenario_id": "edible_herb_setup",
+      "scenario_title": "Edible / herb-focused",
+      "http_status": 200,
+      "ml_errors_preview": [
+        "python_runtime_unavailable_catalog_hybrid",
+        "catalog_fallback_reason:python_nonzero_exit",
+        "python_no_stdout_exit_1",
+        "python_exit_1"
+      ],
+      "top_open_species": [
+        {
+          "rank": 1,
+          "name": "Lemongrass screen",
+          "catalog_code": "lemongrass"
+        },
+        {
+          "rank": 2,
+          "name": "Curry leaf screen",
+          "catalog_code": "curry_leaf"
+        },
+        {
+          "rank": 3,
+          "name": "Cherry tomato",
+          "catalog_code": "cherry_tomato"
+        },
+        {
+          "rank": 4,
+          "name": "Holy basil (tulsi)",
+          "catalog_code": "tulsi_holy"
+        },
+        {
+          "rank": 5,
+          "name": "Ridge gourd",
+          "catalog_code": "luffa"
+        },
+        {
+          "rank": 6,
+          "name": "Malabar spinach",
+          "catalog_code": "malabar_spinach"
+        },
+        {
+          "rank": 7,
+          "name": "Okra",
+          "catalog_code": "okra"
+        },
+        {
+          "rank": 8,
+          "name": "Prickly pear",
+          "catalog_code": "prickly_pear"
+        }
+      ],
+      "layout_attached": true,
+      "candidate_counts": {
+        "total": 8,
+        "open": 8,
+        "blocked": 0
+      },
+      "species_catalog_code_coverage_open": 1,
+      "unresolved_open_count": 0,
+      "hard_constraint_summary": {
+        "open_with_hard_reasons": 0,
+        "blocked_with_hard_reasons": 0,
+        "pass": true
+      },
+      "mode": "partial_ml",
+      "generator_source": "catalog_hybrid_ts",
+      "rules_version": "hw-rules-v1.2-catalog-hybrid-ts",
+      "layout_eligible": true,
+      "layout_slate_status": "attached",
+      "layout_failure_code": null
+    },
+    {
+      "scenario_id": "windy_highrise_balcony",
+      "scenario_title": "Windy high-rise balcony",
+      "http_status": 200,
+      "ml_errors_preview": [
+        "python_runtime_unavailable_catalog_hybrid",
+        "catalog_fallback_reason:python_nonzero_exit",
+        "python_no_stdout_exit_1",
+        "python_exit_1"
+      ],
+      "top_open_species": [
+        {
+          "rank": 1,
+          "name": "Holy basil (tulsi)",
+          "catalog_code": "tulsi_holy"
+        },
+        {
+          "rank": 2,
+          "name": "Vetiver grass",
+          "catalog_code": "vetiver"
+        },
+        {
+          "rank": 3,
+          "name": "Curry leaf screen",
+          "catalog_code": "curry_leaf"
+        },
+        {
+          "rank": 4,
+          "name": "Malabar spinach",
+          "catalog_code": "malabar_spinach"
+        }
+      ],
+      "layout_attached": true,
+      "candidate_counts": {
+        "total": 6,
+        "open": 4,
+        "blocked": 2
+      },
+      "species_catalog_code_coverage_open": 1,
+      "unresolved_open_count": 0,
+      "hard_constraint_summary": {
+        "open_with_hard_reasons": 0,
+        "blocked_with_hard_reasons": 2,
+        "pass": true
+      },
+      "mode": "partial_ml",
+      "generator_source": "catalog_hybrid_ts",
+      "rules_version": "hw-rules-v1.2-catalog-hybrid-ts",
+      "layout_eligible": true,
+      "layout_slate_status": "attached",
+      "layout_failure_code": null
+    },
+    {
+      "scenario_id": "water_scarce_terrace",
+      "scenario_title": "Scarce water — open candidates must not pair sprinkler/mist with scarce water",
+      "http_status": 200,
+      "ml_errors_preview": [
+        "python_runtime_unavailable_catalog_hybrid",
+        "catalog_fallback_reason:python_nonzero_exit",
+        "python_no_stdout_exit_1",
+        "python_exit_1"
+      ],
+      "top_open_species": [
+        {
+          "rank": 1,
+          "name": "Holy basil (tulsi)",
+          "catalog_code": "tulsi_holy"
+        },
+        {
+          "rank": 2,
+          "name": "Sedum mix",
+          "catalog_code": "sedum"
+        },
+        {
+          "rank": 3,
+          "name": "Prickly pear",
+          "catalog_code": "prickly_pear"
+        },
+        {
+          "rank": 4,
+          "name": "Money plant (dense)",
+          "catalog_code": "pothos"
+        },
+        {
+          "rank": 5,
+          "name": "Portulaca",
+          "catalog_code": "portulaca"
+        },
+        {
+          "rank": 6,
+          "name": "Snake plant",
+          "catalog_code": "snake_plant"
+        }
+      ],
+      "layout_attached": true,
+      "candidate_counts": {
+        "total": 6,
+        "open": 6,
+        "blocked": 0
+      },
+      "species_catalog_code_coverage_open": 1,
+      "unresolved_open_count": 0,
+      "hard_constraint_summary": {
+        "open_with_hard_reasons": 0,
+        "blocked_with_hard_reasons": 0,
+        "pass": true
+      },
+      "mode": "partial_ml",
+      "generator_source": "catalog_hybrid_ts",
+      "rules_version": "hw-rules-v1.2-catalog-hybrid-ts",
+      "layout_eligible": true,
+      "layout_slate_status": "attached",
+      "layout_failure_code": null
+    }
+  ]
+}

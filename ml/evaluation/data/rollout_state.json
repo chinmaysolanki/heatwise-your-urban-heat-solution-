@@ -1,0 +1,8 @@
+{
+  "active_experiment_id": null,
+  "current_phase": "rules_only",
+  "last_gate_outcome": "HOLD",
+  "last_evaluated_at": null,
+  "traffic_percent_for_treatment": 0,
+  "notes": "Updated by ops or rolloutControlService; gates read metrics_snapshot separately."
+}

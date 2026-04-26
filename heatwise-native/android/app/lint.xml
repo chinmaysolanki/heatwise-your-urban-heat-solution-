@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- WebView gallery + Capacitor; broad read is intentional (see ANDROID.md / Play policy later). -->
+    <issue id="SelectedPhotoAccess" severity="ignore" />
+</lint>

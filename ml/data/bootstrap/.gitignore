@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+synthetic_bootstrap/__pycache__/
+*.pyc
+# Regenerated artifacts (re-run generate_synthetic_dataset.py)
+sample_outputs/bootstrap_synthetic_full.csv
+sample_outputs/sample_full_rows.csv
+sample_outputs/sample_1000_rows.csv
+outputs/
+validation_report.md

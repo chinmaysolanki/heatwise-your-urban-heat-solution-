@@ -1,0 +1,1118 @@
+{
+  "version": 1,
+  "species": [
+    {
+      "key": "tulsi",
+      "species_name": "Holy basil (tulsi)",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "MONSOON_HEAVY"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 3,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 2,
+      "privacy_contribution": 0,
+      "growth_habit": "HERB"
+    },
+    {
+      "key": "basil_sweet",
+      "species_name": "Sweet basil",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 3,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "HERB"
+    },
+    {
+      "key": "mint",
+      "species_name": "Mint",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "MONSOON_HEAVY"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "HIGH",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "HIGH",
+      "pollinator_value": 3,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "MED",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "HERB"
+    },
+    {
+      "key": "coriander",
+      "species_name": "Coriander",
+      "climate_suitability": [
+        "TEMPERATE_LITE",
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "HIGH",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 0,
+      "privacy_contribution": 0,
+      "growth_habit": "HERB"
+    },
+    {
+      "key": "curry_leaf",
+      "species_name": "Curry leaf",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "MONSOON_HEAVY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "CAUTION",
+      "native_support": "HIGH",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "SHRUB"
+    },
+    {
+      "key": "lemongrass",
+      "species_name": "Lemongrass",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "HIGH",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "MED",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 2,
+      "growth_habit": "GRASS"
+    },
+    {
+      "key": "cherry_tomato",
+      "species_name": "Cherry tomato",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "HIGH",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "chilli",
+      "species_name": "Chilli pepper",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "malabar_spinach",
+      "species_name": "Malabar spinach",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "MONSOON_HEAVY"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "VINE"
+    },
+    {
+      "key": "aloe_vera",
+      "species_name": "Aloe vera",
+      "climate_suitability": [
+        "HOT_DRY",
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 1,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "SUCCULENT"
+    },
+    {
+      "key": "jade_plant",
+      "species_name": "Jade plant",
+      "climate_suitability": [
+        "HOT_DRY",
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 1,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "SUCCULENT"
+    },
+    {
+      "key": "sedum_mix",
+      "species_name": "Sedum mix",
+      "climate_suitability": [
+        "HOT_DRY",
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 3,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 2,
+      "privacy_contribution": 0,
+      "growth_habit": "GROUND_COVER"
+    },
+    {
+      "key": "prickly_pear",
+      "species_name": "Prickly pear",
+      "climate_suitability": [
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "MED",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "SUCCULENT"
+    },
+    {
+      "key": "bougainvillea",
+      "species_name": "Bougainvillea",
+      "climate_suitability": [
+        "HOT_DRY",
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "LOW",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "HIGH",
+      "pollinator_value": 3,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "MED",
+      "container_suitability": "FAIR",
+      "cooling_contribution": 3,
+      "privacy_contribution": 3,
+      "growth_habit": "VINE"
+    },
+    {
+      "key": "hibiscus",
+      "species_name": "Hibiscus",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "MONSOON_HEAVY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "HIGH",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 3,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "MED",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "SHRUB"
+    },
+    {
+      "key": "marigold",
+      "species_name": "Marigold",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 3,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "portulaca",
+      "species_name": "Portulaca",
+      "climate_suitability": [
+        "HOT_DRY",
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "GROUND_COVER"
+    },
+    {
+      "key": "vinca",
+      "species_name": "Vinca",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "GROUND_COVER"
+    },
+    {
+      "key": "zinnia",
+      "species_name": "Zinnia",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 3,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "pothos",
+      "species_name": "Pothos",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "SHADE",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 0,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 1,
+      "growth_habit": "TRAILING"
+    },
+    {
+      "key": "snake_plant",
+      "species_name": "Snake plant",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "HIGH",
+      "pollinator_value": 0,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "spider_plant",
+      "species_name": "Spider plant",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "HIGH",
+      "pollinator_value": 1,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "TRAILING"
+    },
+    {
+      "key": "geranium",
+      "species_name": "Scented geranium",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 3,
+      "edible": true,
+      "child_pet_safety": "CAUTION",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "plumeria",
+      "species_name": "Plumeria",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 3,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "MED",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "SHRUB"
+    },
+    {
+      "key": "bamboo_dwarf",
+      "species_name": "Dwarf bamboo",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "MONSOON_HEAVY"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "HIGH",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "HIGH",
+      "pollinator_value": 1,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "MED",
+      "container_suitability": "FAIR",
+      "cooling_contribution": 3,
+      "privacy_contribution": 3,
+      "growth_habit": "GRASS"
+    },
+    {
+      "key": "ficus_pumila",
+      "species_name": "Creeping fig",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "MED",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "HIGH",
+      "pollinator_value": 2,
+      "edible": false,
+      "child_pet_safety": "CAUTION",
+      "native_support": "LOW",
+      "container_suitability": "FAIR",
+      "cooling_contribution": 2,
+      "privacy_contribution": 2,
+      "growth_habit": "VINE"
+    },
+    {
+      "key": "ixora",
+      "species_name": "Ixora",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 3,
+      "edible": false,
+      "child_pet_safety": "CAUTION",
+      "native_support": "MED",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "SHRUB"
+    },
+    {
+      "key": "adenium",
+      "species_name": "Adenium",
+      "climate_suitability": [
+        "HOT_DRY",
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "SHRUB"
+    },
+    {
+      "key": "frangipani_alt",
+      "species_name": "Frangipani (alt cultivar)",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 3,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "MED",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "SHRUB"
+    },
+    {
+      "key": "money_plant_full",
+      "species_name": "Money plant (dense)",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "SHADE",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 0,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 2,
+      "privacy_contribution": 2,
+      "growth_habit": "VINE"
+    },
+    {
+      "key": "caladium",
+      "species_name": "Caladium",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "MONSOON_HEAVY"
+      ],
+      "sunlight_preference": "SHADE",
+      "water_demand": "HIGH",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 1,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "HERB"
+    },
+    {
+      "key": "coleus",
+      "species_name": "Coleus",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "periwinkle_alt",
+      "species_name": "Periwinkle (ground)",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "GROUND_COVER"
+    },
+    {
+      "key": "lemongrass_dense",
+      "species_name": "Lemongrass screen",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "HIGH",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "MED",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 3,
+      "privacy_contribution": 3,
+      "growth_habit": "GRASS"
+    },
+    {
+      "key": "curry_screen",
+      "species_name": "Curry leaf screen",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "CAUTION",
+      "native_support": "HIGH",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 3,
+      "privacy_contribution": 3,
+      "growth_habit": "SHRUB"
+    },
+    {
+      "key": "tomato_dwarf",
+      "species_name": "Dwarf tomato",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "HIGH",
+      "maintenance_need": "HIGH",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "eggplant_mini",
+      "species_name": "Mini brinjal",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "HIGH",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "HIGH",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "okra",
+      "species_name": "Okra",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "beans_bush",
+      "species_name": "Bush beans",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "TEMPERATE_LITE"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "spinach_indian",
+      "species_name": "Indian spinach (palak-like)",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "MONSOON_HEAVY"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "HIGH",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 1,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "HERB"
+    },
+    {
+      "key": "luffa",
+      "species_name": "Ridge gourd",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "MONSOON_HEAVY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "HIGH",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 2,
+      "growth_habit": "VINE"
+    },
+    {
+      "key": "ridge_gourd_alt",
+      "species_name": "Bottle gourd (compact)",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "HIGH",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "FAIR",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "VINE"
+    },
+    {
+      "key": "jasmine_mogra",
+      "species_name": "Mogra jasmine",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 3,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "VINE"
+    },
+    {
+      "key": "rose_mini",
+      "species_name": "Miniature rose",
+      "climate_suitability": [
+        "TEMPERATE_LITE",
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "HIGH",
+      "maintenance_need": "HIGH",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 3,
+      "edible": false,
+      "child_pet_safety": "CAUTION",
+      "native_support": "LOW",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "SHRUB"
+    },
+    {
+      "key": "lantana_dwarf",
+      "species_name": "Dwarf lantana",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 3,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "SHRUB"
+    },
+    {
+      "key": "agave",
+      "species_name": "Agave",
+      "climate_suitability": [
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "MED",
+      "pollinator_value": 1,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "SUCCULENT"
+    },
+    {
+      "key": "fern_boston",
+      "species_name": "Boston fern",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "SHADE",
+      "water_demand": "HIGH",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 1,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "LOW",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "TRAILING"
+    },
+    {
+      "key": "areca_palm_dwarf",
+      "species_name": "Dwarf areca palm",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "HIGH",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "HIGH",
+      "pollinator_value": 1,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "MED",
+      "container_suitability": "FAIR",
+      "cooling_contribution": 3,
+      "privacy_contribution": 3,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "dracaena_marginata",
+      "species_name": "Dracaena marginata",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 0,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "peace_lily",
+      "species_name": "Peace lily",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "SHADE",
+      "water_demand": "HIGH",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 1,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "HERB"
+    },
+    {
+      "key": "tradescantia",
+      "species_name": "Tradescantia",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "PART",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "HIGH",
+      "pollinator_value": 1,
+      "edible": false,
+      "child_pet_safety": "CAUTION",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "TRAILING"
+    },
+    {
+      "key": "sweet_potato_vine",
+      "species_name": "Sweet potato vine",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": true,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 2,
+      "privacy_contribution": 1,
+      "growth_habit": "TRAILING"
+    },
+    {
+      "key": "dianthus",
+      "species_name": "Dianthus",
+      "climate_suitability": [
+        "TEMPERATE_LITE",
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 3,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 0,
+      "privacy_contribution": 0,
+      "growth_habit": "GROUND_COVER"
+    },
+    {
+      "key": "petunia",
+      "species_name": "Petunia",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 3,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "TRAILING"
+    },
+    {
+      "key": "impatiens",
+      "species_name": "Impatiens",
+      "climate_suitability": [
+        "HOT_HUMID"
+      ],
+      "sunlight_preference": "SHADE",
+      "water_demand": "HIGH",
+      "maintenance_need": "MED",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 2,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "UPRIGHT"
+    },
+    {
+      "key": "cactus_mix",
+      "species_name": "Mixed cactus tray",
+      "climate_suitability": [
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "LOW",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "LOW",
+      "pollinator_value": 1,
+      "edible": false,
+      "child_pet_safety": "UNSAFE",
+      "native_support": "LOW",
+      "container_suitability": "EXCELLENT",
+      "cooling_contribution": 1,
+      "privacy_contribution": 0,
+      "growth_habit": "SUCCULENT"
+    },
+    {
+      "key": "vetiver",
+      "species_name": "Vetiver grass",
+      "climate_suitability": [
+        "HOT_HUMID",
+        "HOT_DRY"
+      ],
+      "sunlight_preference": "FULL",
+      "water_demand": "MED",
+      "maintenance_need": "LOW",
+      "root_aggressiveness": "HIGH",
+      "pollinator_value": 2,
+      "edible": false,
+      "child_pet_safety": "SAFE",
+      "native_support": "HIGH",
+      "container_suitability": "GOOD",
+      "cooling_contribution": 3,
+      "privacy_contribution": 2,
+      "growth_habit": "GRASS"
+    }
+  ]
+}

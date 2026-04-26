@@ -1,0 +1,24 @@
+{
+  "name": "heatwise-native",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "sync": "cap sync android",
+    "open": "cap open android",
+    "android": "cap sync android && cap open android",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
+    "@capacitor/geolocation": "^8.2.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7"
+  }
+}

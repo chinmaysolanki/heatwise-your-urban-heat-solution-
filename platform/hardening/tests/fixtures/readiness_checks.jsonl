@@ -1,0 +1,2 @@
+{"check_id":"pricing.cost_estimates","subsystem":"pricing","status":"pass","latency_ms":12,"message":"ok","details":{"count":3}}
+{"check_id":"retraining_registry.path","subsystem":"retraining_registry","status":"fail","latency_ms":1,"message":"missing path","details":{"path":"/tmp/missing"}}

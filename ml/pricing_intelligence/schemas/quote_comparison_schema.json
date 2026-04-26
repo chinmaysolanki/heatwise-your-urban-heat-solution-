@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/quote_comparison_record_v1.json",
+  "title": "quote_comparison_record",
+  "type": "object",
+  "required": ["quote_comparison_id", "project_id", "comparison_generated_at"],
+  "properties": {
+    "quote_comparison_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string" },
+    "recommendation_session_id": { "type": ["string", "null"] },
+    "candidate_snapshot_id": { "type": ["string", "null"] },
+    "installer_quote_id": { "type": ["string", "null"] },
+    "install_job_id": { "type": ["string", "null"] },
+    "cost_estimate_id": { "type": ["string", "null"] },
+    "comparison_generated_at": { "type": "string", "format": "date-time" },
+    "predicted_install_cost_median_inr": { "type": ["number", "null"], "minimum": 0 },
+    "quoted_install_cost_inr": { "type": ["number", "null"], "minimum": 0 },
+    "final_install_cost_inr": { "type": ["number", "null"], "minimum": 0 },
+    "install_cost_error_abs_inr": { "type": ["number", "null"] },
+    "install_cost_error_pct": { "type": ["number", "null"] },
+    "quote_to_final_delta_inr": { "type": ["number", "null"] },
+    "quote_to_final_delta_pct": { "type": ["number", "null"] },
+    "maintenance_prediction_error_abs_inr": { "type": ["number", "null"] },
+    "maintenance_prediction_error_pct": { "type": ["number", "null"] },
+    "pricing_accuracy_band": { "type": ["string", "null"] },
+    "cost_risk_flags_json": { "type": ["string", "null"] },
+    "notes": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,795 @@
+{
+  "version": 1,
+  "generatedAt": "2026-04-02T13:27:35.209Z",
+  "source": {
+    "seedModule": "prisma/data/species_catalog_seed.mjs",
+    "extensionsFile": "prisma/data/species_alias_extensions.json"
+  },
+  "canonicalCodes": [
+    "adenium",
+    "aloe_vera",
+    "areca_palm_dwarf",
+    "bamboo_dwarf",
+    "basil_sweet",
+    "bitter_gourd",
+    "bougainvillea",
+    "brahmi",
+    "caladium",
+    "cherry_tomato",
+    "chilli",
+    "chrysanthemum",
+    "coleus",
+    "coriander",
+    "crossandra",
+    "curry_leaf",
+    "dracaena_marginata",
+    "duranta",
+    "eggplant_mini",
+    "fenugreek",
+    "ficus_pumila",
+    "geranium_pelargonium",
+    "henna",
+    "hibiscus",
+    "impatiens",
+    "jade_plant",
+    "jasmine_mogra",
+    "lemongrass",
+    "lemongrass_dense",
+    "luffa",
+    "malabar_spinach",
+    "marigold",
+    "mint",
+    "morning_glory",
+    "neem_dwarf",
+    "okra",
+    "peace_lily",
+    "plumeria",
+    "portulaca",
+    "pothos",
+    "prickly_pear",
+    "sedum",
+    "snake_plant",
+    "spider_plant",
+    "spinach_indian",
+    "sweet_potato_vine",
+    "tulsi_holy",
+    "vetiver",
+    "vinca",
+    "wandering_jew",
+    "zinnia"
+  ],
+  "aliasToCode": {
+    "abelmoschus esculentus": "okra",
+    "adenium": "adenium",
+    "adenium obesum": "adenium",
+    "aloe": "aloe_vera",
+    "aloe barbadensis": "aloe_vera",
+    "aloe barbadensis miller": "aloe_vera",
+    "aloe vera": "aloe_vera",
+    "areca palm": "areca_palm_dwarf",
+    "areca palm (dwarf)": "areca_palm_dwarf",
+    "areca palm dwarf": "areca_palm_dwarf",
+    "azadirachta indica (dwarf cv)": "neem_dwarf",
+    "bacopa monnieri": "brahmi",
+    "bamboo dwarf": "bamboo_dwarf",
+    "basella alba": "malabar_spinach",
+    "basil": "basil_sweet",
+    "basil sweet": "basil_sweet",
+    "bhindi": "okra",
+    "bitter gourd": "bitter_gourd",
+    "bitter gourd (karela)": "bitter_gourd",
+    "bougainvillea": "bougainvillea",
+    "bougainvillea spp": "bougainvillea",
+    "brahmi": "brahmi",
+    "brahmi (bacopa)": "brahmi",
+    "brinjal": "eggplant_mini",
+    "caladium": "caladium",
+    "caladium bicolor": "caladium",
+    "capsicum annuum": "chilli",
+    "catharanthus roseus": "vinca",
+    "cherry tomato": "cherry_tomato",
+    "cherrytomato": "cherry_tomato",
+    "chili": "chilli",
+    "chilli": "chilli",
+    "chilli pepper": "chilli",
+    "chinese hibiscus": "hibiscus",
+    "chlorophytum": "spider_plant",
+    "chlorophytum comosum": "spider_plant",
+    "chrysanthemum": "chrysanthemum",
+    "chrysanthemum (guldaudi)": "chrysanthemum",
+    "chrysanthemum morifolium": "chrysanthemum",
+    "chrysopogon zizanioides": "vetiver",
+    "cilantro": "coriander",
+    "coleus": "coleus",
+    "coriander": "coriander",
+    "coriander (cilantro)": "coriander",
+    "coriandrum sativum": "coriander",
+    "crassula ovata": "jade_plant",
+    "creeping fig": "ficus_pumila",
+    "crossandra": "crossandra",
+    "crossandra (aboli)": "crossandra",
+    "crossandra infundibuliformis": "crossandra",
+    "curry leaf": "curry_leaf",
+    "curry leaf tree": "curry_leaf",
+    "curry leaf tree (kadi patta)": "curry_leaf",
+    "curry leaves": "curry_leaf",
+    "cymbopogon": "lemongrass",
+    "cymbopogon citratus": "lemongrass",
+    "cymbopogon flexuosus": "lemongrass_dense",
+    "dense lemongrass screen": "lemongrass_dense",
+    "desert rose": "adenium",
+    "desert rose (adenium)": "adenium",
+    "dracaena marginata": "dracaena_marginata",
+    "dracaena trifasciata": "snake_plant",
+    "dragon tree": "dracaena_marginata",
+    "dragon tree (dracaena)": "dracaena_marginata",
+    "duranta": "duranta",
+    "duranta erecta": "duranta",
+    "dwarf bamboo": "bamboo_dwarf",
+    "dwarf neem": "neem_dwarf",
+    "dypsis lutescens": "areca_palm_dwarf",
+    "eggplant": "eggplant_mini",
+    "eggplant mini": "eggplant_mini",
+    "epipremnum aureum": "pothos",
+    "fenugreek": "fenugreek",
+    "ficus pumila": "ficus_pumila",
+    "frangipani": "plumeria",
+    "geranium": "geranium_pelargonium",
+    "geranium pelargonium": "geranium_pelargonium",
+    "golden dewdrop": "duranta",
+    "golden dewdrop (duranta)": "duranta",
+    "henna": "henna",
+    "henna (mehndi)": "henna",
+    "hibiscus": "hibiscus",
+    "hibiscus rosa-sinensis": "hibiscus",
+    "holy basil": "tulsi_holy",
+    "holy basil (tulsi)": "tulsi_holy",
+    "impatiens": "impatiens",
+    "impatiens (touch-me-not)": "impatiens",
+    "impatiens walleriana": "impatiens",
+    "indian spinach": "spinach_indian",
+    "indian spinach (palak)": "spinach_indian",
+    "ipomoea batatas": "sweet_potato_vine",
+    "ipomoea purpurea": "morning_glory",
+    "jade": "jade_plant",
+    "jade plant": "jade_plant",
+    "jasmine mogra": "jasmine_mogra",
+    "jasminum sambac": "jasmine_mogra",
+    "lawsonia inermis": "henna",
+    "lemongrass": "lemongrass",
+    "lemongrass dense": "lemongrass_dense",
+    "luffa": "luffa",
+    "luffa acutangula": "luffa",
+    "malabar spinach": "malabar_spinach",
+    "marigold": "marigold",
+    "marigold (genda)": "marigold",
+    "mentha spicata": "mint",
+    "mentha spp": "mint",
+    "methi fenugreek": "fenugreek",
+    "mini brinjal": "eggplant_mini",
+    "mini brinjal (eggplant)": "eggplant_mini",
+    "mint": "mint",
+    "mogra": "jasmine_mogra",
+    "mogra jasmine": "jasmine_mogra",
+    "momordica charantia": "bitter_gourd",
+    "money plant": "pothos",
+    "money plant (pothos)": "pothos",
+    "morning glory": "morning_glory",
+    "moss": "sedum",
+    "moss rose": "portulaca",
+    "murraya koenigii": "curry_leaf",
+    "neem dwarf": "neem_dwarf",
+    "ocimum basilicum": "basil_sweet",
+    "ocimum tenuiflorum": "tulsi_holy",
+    "okra": "okra",
+    "okra (bhindi)": "okra",
+    "opuntia": "prickly_pear",
+    "opuntia spp": "prickly_pear",
+    "palak": "spinach_indian",
+    "peace lily": "peace_lily",
+    "pelargonium": "geranium_pelargonium",
+    "pelargonium spp": "geranium_pelargonium",
+    "pepper": "chilli",
+    "periwinkle": "vinca",
+    "periwinkle (vinca)": "vinca",
+    "plectranthus scutellarioides": "coleus",
+    "pleioblastus spp": "bamboo_dwarf",
+    "plumeria": "plumeria",
+    "plumeria (frangipani)": "plumeria",
+    "plumeria spp": "plumeria",
+    "portulaca": "portulaca",
+    "portulaca (moss rose)": "portulaca",
+    "portulaca grandiflora": "portulaca",
+    "pothos": "pothos",
+    "prickly pear": "prickly_pear",
+    "prickly pear cactus": "prickly_pear",
+    "ridge gourd": "luffa",
+    "ridge gourd (turai)": "luffa",
+    "sansevieria": "snake_plant",
+    "scented geranium": "geranium_pelargonium",
+    "sedum": "sedum",
+    "sedum (stonecrop)": "sedum",
+    "sedum spp": "sedum",
+    "snake plant": "snake_plant",
+    "solanum lycopersicum": "cherry_tomato",
+    "solanum melongena": "eggplant_mini",
+    "spathiphyllum": "peace_lily",
+    "spathiphyllum spp": "peace_lily",
+    "spearmint": "mint",
+    "spider plant": "spider_plant",
+    "spinach indian": "spinach_indian",
+    "spinacia oleracea": "spinach_indian",
+    "stone crop": "sedum",
+    "stonecrop": "sedum",
+    "sweet basil": "basil_sweet",
+    "sweet potato vine": "sweet_potato_vine",
+    "tagetes spp": "marigold",
+    "tomato": "cherry_tomato",
+    "tradescantia": "wandering_jew",
+    "tradescantia (wandering jew)": "wandering_jew",
+    "tradescantia zebrina": "wandering_jew",
+    "trigonella foenum-graecum": "fenugreek",
+    "tulsi": "tulsi_holy",
+    "tulsi holy": "tulsi_holy",
+    "turai": "luffa",
+    "vetiver": "vetiver",
+    "vetiver grass": "vetiver",
+    "vinca": "vinca",
+    "wandering jew": "wandering_jew",
+    "zinnia": "zinnia",
+    "zinnia elegans": "zinnia"
+  },
+  "species": [
+    {
+      "code": "tulsi_holy",
+      "displayName": "Holy basil (Tulsi)",
+      "scientificName": "Ocimum tenuiflorum",
+      "aliases": [
+        "holy basil",
+        "holy basil (tulsi)",
+        "ocimum tenuiflorum",
+        "tulsi",
+        "tulsi holy"
+      ]
+    },
+    {
+      "code": "basil_sweet",
+      "displayName": "Sweet basil",
+      "scientificName": "Ocimum basilicum",
+      "aliases": [
+        "basil",
+        "basil sweet",
+        "ocimum basilicum",
+        "sweet basil"
+      ]
+    },
+    {
+      "code": "mint",
+      "displayName": "Mint",
+      "scientificName": "Mentha spp.",
+      "aliases": [
+        "mentha spicata",
+        "mentha spp",
+        "mint",
+        "spearmint"
+      ]
+    },
+    {
+      "code": "coriander",
+      "displayName": "Coriander (Cilantro)",
+      "scientificName": "Coriandrum sativum",
+      "aliases": [
+        "cilantro",
+        "coriander",
+        "coriander (cilantro)",
+        "coriandrum sativum"
+      ]
+    },
+    {
+      "code": "curry_leaf",
+      "displayName": "Curry leaf tree (Kadi patta)",
+      "scientificName": "Murraya koenigii",
+      "aliases": [
+        "curry leaf",
+        "curry leaf tree",
+        "curry leaf tree (kadi patta)",
+        "curry leaves",
+        "murraya koenigii"
+      ]
+    },
+    {
+      "code": "lemongrass",
+      "displayName": "Lemongrass",
+      "scientificName": "Cymbopogon citratus",
+      "aliases": [
+        "cymbopogon",
+        "cymbopogon citratus",
+        "lemongrass"
+      ]
+    },
+    {
+      "code": "cherry_tomato",
+      "displayName": "Cherry tomato",
+      "scientificName": "Solanum lycopersicum",
+      "aliases": [
+        "cherry tomato",
+        "cherrytomato",
+        "solanum lycopersicum",
+        "tomato"
+      ]
+    },
+    {
+      "code": "chilli",
+      "displayName": "Chilli pepper",
+      "scientificName": "Capsicum annuum",
+      "aliases": [
+        "capsicum annuum",
+        "chili",
+        "chilli",
+        "chilli pepper",
+        "pepper"
+      ]
+    },
+    {
+      "code": "malabar_spinach",
+      "displayName": "Malabar spinach",
+      "scientificName": "Basella alba",
+      "aliases": [
+        "basella alba",
+        "malabar spinach"
+      ]
+    },
+    {
+      "code": "aloe_vera",
+      "displayName": "Aloe vera",
+      "scientificName": "Aloe barbadensis miller",
+      "aliases": [
+        "aloe",
+        "aloe barbadensis",
+        "aloe barbadensis miller",
+        "aloe vera"
+      ]
+    },
+    {
+      "code": "jade_plant",
+      "displayName": "Jade plant",
+      "scientificName": "Crassula ovata",
+      "aliases": [
+        "crassula ovata",
+        "jade",
+        "jade plant"
+      ]
+    },
+    {
+      "code": "sedum",
+      "displayName": "Sedum (stonecrop)",
+      "scientificName": "Sedum spp.",
+      "aliases": [
+        "moss",
+        "sedum",
+        "sedum (stonecrop)",
+        "sedum spp",
+        "stone crop",
+        "stonecrop"
+      ]
+    },
+    {
+      "code": "prickly_pear",
+      "displayName": "Prickly pear cactus",
+      "scientificName": "Opuntia spp.",
+      "aliases": [
+        "opuntia",
+        "opuntia spp",
+        "prickly pear",
+        "prickly pear cactus"
+      ]
+    },
+    {
+      "code": "bougainvillea",
+      "displayName": "Bougainvillea",
+      "scientificName": "Bougainvillea spp.",
+      "aliases": [
+        "bougainvillea",
+        "bougainvillea spp"
+      ]
+    },
+    {
+      "code": "hibiscus",
+      "displayName": "Chinese hibiscus",
+      "scientificName": "Hibiscus rosa-sinensis",
+      "aliases": [
+        "chinese hibiscus",
+        "hibiscus",
+        "hibiscus rosa-sinensis"
+      ]
+    },
+    {
+      "code": "marigold",
+      "displayName": "Marigold (Genda)",
+      "scientificName": "Tagetes spp.",
+      "aliases": [
+        "marigold",
+        "marigold (genda)",
+        "tagetes spp"
+      ]
+    },
+    {
+      "code": "portulaca",
+      "displayName": "Portulaca (moss rose)",
+      "scientificName": "Portulaca grandiflora",
+      "aliases": [
+        "moss rose",
+        "portulaca",
+        "portulaca (moss rose)",
+        "portulaca grandiflora"
+      ]
+    },
+    {
+      "code": "vinca",
+      "displayName": "Periwinkle (Vinca)",
+      "scientificName": "Catharanthus roseus",
+      "aliases": [
+        "catharanthus roseus",
+        "periwinkle",
+        "periwinkle (vinca)",
+        "vinca"
+      ]
+    },
+    {
+      "code": "zinnia",
+      "displayName": "Zinnia",
+      "scientificName": "Zinnia elegans",
+      "aliases": [
+        "zinnia",
+        "zinnia elegans"
+      ]
+    },
+    {
+      "code": "pothos",
+      "displayName": "Money plant (Pothos)",
+      "scientificName": "Epipremnum aureum",
+      "aliases": [
+        "epipremnum aureum",
+        "money plant",
+        "money plant (pothos)",
+        "pothos"
+      ]
+    },
+    {
+      "code": "snake_plant",
+      "displayName": "Snake plant",
+      "scientificName": "Dracaena trifasciata",
+      "aliases": [
+        "dracaena trifasciata",
+        "sansevieria",
+        "snake plant"
+      ]
+    },
+    {
+      "code": "spider_plant",
+      "displayName": "Spider plant",
+      "scientificName": "Chlorophytum comosum",
+      "aliases": [
+        "chlorophytum",
+        "chlorophytum comosum",
+        "spider plant"
+      ]
+    },
+    {
+      "code": "geranium_pelargonium",
+      "displayName": "Scented geranium",
+      "scientificName": "Pelargonium spp.",
+      "aliases": [
+        "geranium",
+        "geranium pelargonium",
+        "pelargonium",
+        "pelargonium spp",
+        "scented geranium"
+      ]
+    },
+    {
+      "code": "plumeria",
+      "displayName": "Plumeria (Frangipani)",
+      "scientificName": "Plumeria spp.",
+      "aliases": [
+        "frangipani",
+        "plumeria",
+        "plumeria (frangipani)",
+        "plumeria spp"
+      ]
+    },
+    {
+      "code": "okra",
+      "displayName": "Okra (Bhindi)",
+      "scientificName": "Abelmoschus esculentus",
+      "aliases": [
+        "abelmoschus esculentus",
+        "bhindi",
+        "okra",
+        "okra (bhindi)"
+      ]
+    },
+    {
+      "code": "spinach_indian",
+      "displayName": "Indian spinach (Palak)",
+      "scientificName": "Spinacia oleracea",
+      "aliases": [
+        "indian spinach",
+        "indian spinach (palak)",
+        "palak",
+        "spinach indian",
+        "spinacia oleracea"
+      ]
+    },
+    {
+      "code": "eggplant_mini",
+      "displayName": "Mini brinjal (eggplant)",
+      "scientificName": "Solanum melongena",
+      "aliases": [
+        "brinjal",
+        "eggplant",
+        "eggplant mini",
+        "mini brinjal",
+        "mini brinjal (eggplant)",
+        "solanum melongena"
+      ]
+    },
+    {
+      "code": "luffa",
+      "displayName": "Ridge gourd (Turai)",
+      "scientificName": "Luffa acutangula",
+      "aliases": [
+        "luffa",
+        "luffa acutangula",
+        "ridge gourd",
+        "ridge gourd (turai)",
+        "turai"
+      ]
+    },
+    {
+      "code": "peace_lily",
+      "displayName": "Peace lily",
+      "scientificName": "Spathiphyllum spp.",
+      "aliases": [
+        "peace lily",
+        "spathiphyllum",
+        "spathiphyllum spp"
+      ]
+    },
+    {
+      "code": "jasmine_mogra",
+      "displayName": "Mogra jasmine",
+      "scientificName": "Jasminum sambac",
+      "aliases": [
+        "jasmine mogra",
+        "jasminum sambac",
+        "mogra",
+        "mogra jasmine"
+      ]
+    },
+    {
+      "code": "vetiver",
+      "displayName": "Vetiver grass",
+      "scientificName": "Chrysopogon zizanioides",
+      "aliases": [
+        "chrysopogon zizanioides",
+        "vetiver",
+        "vetiver grass"
+      ]
+    },
+    {
+      "code": "sweet_potato_vine",
+      "displayName": "Sweet potato vine",
+      "scientificName": "Ipomoea batatas",
+      "aliases": [
+        "ipomoea batatas",
+        "sweet potato vine"
+      ]
+    },
+    {
+      "code": "dracaena_marginata",
+      "displayName": "Dragon tree (Dracaena)",
+      "scientificName": "Dracaena marginata",
+      "aliases": [
+        "dracaena marginata",
+        "dragon tree",
+        "dragon tree (dracaena)"
+      ]
+    },
+    {
+      "code": "coleus",
+      "displayName": "Coleus",
+      "scientificName": "Plectranthus scutellarioides",
+      "aliases": [
+        "coleus",
+        "plectranthus scutellarioides"
+      ]
+    },
+    {
+      "code": "ficus_pumila",
+      "displayName": "Creeping fig",
+      "scientificName": "Ficus pumila",
+      "aliases": [
+        "creeping fig",
+        "ficus pumila"
+      ]
+    },
+    {
+      "code": "adenium",
+      "displayName": "Desert rose (Adenium)",
+      "scientificName": "Adenium obesum",
+      "aliases": [
+        "adenium",
+        "adenium obesum",
+        "desert rose",
+        "desert rose (adenium)"
+      ]
+    },
+    {
+      "code": "bamboo_dwarf",
+      "displayName": "Dwarf bamboo",
+      "scientificName": "Pleioblastus spp.",
+      "aliases": [
+        "bamboo dwarf",
+        "dwarf bamboo",
+        "pleioblastus spp"
+      ]
+    },
+    {
+      "code": "areca_palm_dwarf",
+      "displayName": "Areca palm (dwarf)",
+      "scientificName": "Dypsis lutescens",
+      "aliases": [
+        "areca palm",
+        "areca palm (dwarf)",
+        "areca palm dwarf",
+        "dypsis lutescens"
+      ]
+    },
+    {
+      "code": "caladium",
+      "displayName": "Caladium",
+      "scientificName": "Caladium bicolor",
+      "aliases": [
+        "caladium",
+        "caladium bicolor"
+      ]
+    },
+    {
+      "code": "brahmi",
+      "displayName": "Brahmi (Bacopa)",
+      "scientificName": "Bacopa monnieri",
+      "aliases": [
+        "bacopa monnieri",
+        "brahmi",
+        "brahmi (bacopa)"
+      ]
+    },
+    {
+      "code": "fenugreek",
+      "displayName": "Methi / Fenugreek",
+      "scientificName": "Trigonella foenum-graecum",
+      "aliases": [
+        "fenugreek",
+        "methi fenugreek",
+        "trigonella foenum-graecum"
+      ]
+    },
+    {
+      "code": "bitter_gourd",
+      "displayName": "Bitter gourd (Karela)",
+      "scientificName": "Momordica charantia",
+      "aliases": [
+        "bitter gourd",
+        "bitter gourd (karela)",
+        "momordica charantia"
+      ]
+    },
+    {
+      "code": "morning_glory",
+      "displayName": "Morning glory",
+      "scientificName": "Ipomoea purpurea",
+      "aliases": [
+        "ipomoea purpurea",
+        "morning glory"
+      ]
+    },
+    {
+      "code": "chrysanthemum",
+      "displayName": "Chrysanthemum (Guldaudi)",
+      "scientificName": "Chrysanthemum morifolium",
+      "aliases": [
+        "chrysanthemum",
+        "chrysanthemum (guldaudi)",
+        "chrysanthemum morifolium"
+      ]
+    },
+    {
+      "code": "crossandra",
+      "displayName": "Crossandra (Aboli)",
+      "scientificName": "Crossandra infundibuliformis",
+      "aliases": [
+        "crossandra",
+        "crossandra (aboli)",
+        "crossandra infundibuliformis"
+      ]
+    },
+    {
+      "code": "duranta",
+      "displayName": "Golden dewdrop (Duranta)",
+      "scientificName": "Duranta erecta",
+      "aliases": [
+        "duranta",
+        "duranta erecta",
+        "golden dewdrop",
+        "golden dewdrop (duranta)"
+      ]
+    },
+    {
+      "code": "wandering_jew",
+      "displayName": "Tradescantia (Wandering jew)",
+      "scientificName": "Tradescantia zebrina",
+      "aliases": [
+        "tradescantia",
+        "tradescantia (wandering jew)",
+        "tradescantia zebrina",
+        "wandering jew"
+      ]
+    },
+    {
+      "code": "henna",
+      "displayName": "Henna (Mehndi)",
+      "scientificName": "Lawsonia inermis",
+      "aliases": [
+        "henna",
+        "henna (mehndi)",
+        "lawsonia inermis"
+      ]
+    },
+    {
+      "code": "lemongrass_dense",
+      "displayName": "Dense lemongrass screen",
+      "scientificName": "Cymbopogon flexuosus",
+      "aliases": [
+        "cymbopogon flexuosus",
+        "dense lemongrass screen",
+        "lemongrass dense"
+      ]
+    },
+    {
+      "code": "neem_dwarf",
+      "displayName": "Dwarf neem",
+      "scientificName": "Azadirachta indica (dwarf cv.)",
+      "aliases": [
+        "azadirachta indica (dwarf cv)",
+        "dwarf neem",
+        "neem dwarf"
+      ]
+    },
+    {
+      "code": "impatiens",
+      "displayName": "Impatiens (Touch-me-not)",
+      "scientificName": "Impatiens walleriana",
+      "aliases": [
+        "impatiens",
+        "impatiens (touch-me-not)",
+        "impatiens walleriana"
+      ]
+    }
+  ],
+  "speciesFeatureKeyAliases": {
+    "curry_screen": "curry_leaf",
+    "frangipani_alt": "plumeria",
+    "geranium": "geranium_pelargonium",
+    "lemongrass_dense": "lemongrass",
+    "money_plant_full": "pothos",
+    "periwinkle_alt": "vinca",
+    "sedum_mix": "sedum",
+    "tomato_dwarf": "cherry_tomato",
+    "tulsi": "tulsi_holy"
+  },
+  "speciesFeatureKeysExcludeFromCatalogHybrid": [
+    "cactus_mix",
+    "ridge_gourd_alt"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "install_job",
+  "type": "object",
+  "required": ["install_job_id", "project_id", "installer_id", "job_status", "install_plan_json"],
+  "properties": {
+    "install_job_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "user_id": { "type": ["string", "null"] },
+    "installer_id": { "type": "string" },
+    "source_quote_id": { "type": ["string", "null"] },
+    "selected_candidate_snapshot_id": { "type": ["string", "null"] },
+    "job_status": { "type": "string" },
+    "scheduled_date": { "type": ["string", "null"] },
+    "started_at": { "type": ["string", "null"] },
+    "completed_at": { "type": ["string", "null"] },
+    "cancelled_at": { "type": ["string", "null"] },
+    "cancellation_reason": { "type": ["string", "null"] },
+    "cancellation_reason_codes_json": { "type": "array", "items": { "type": "string" } },
+    "estimated_cost_inr": { "type": ["number", "null"] },
+    "final_cost_inr": { "type": ["number", "null"] },
+    "install_plan_json": { "type": "object" },
+    "job_notes": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

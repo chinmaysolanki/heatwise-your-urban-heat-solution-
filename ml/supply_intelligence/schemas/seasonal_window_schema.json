@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/seasonal_window_v1.json",
+  "title": "seasonal_window",
+  "type": "object",
+  "required": [
+    "seasonal_window_id",
+    "region",
+    "climate_zone",
+    "start_month",
+    "end_month",
+    "suitability_level"
+  ],
+  "properties": {
+    "seasonal_window_id": { "type": "string", "minLength": 1 },
+    "region": { "type": "string", "minLength": 1 },
+    "climate_zone": { "type": "string", "minLength": 1 },
+    "project_type": { "type": ["string", "null"] },
+    "species_name": { "type": ["string", "null"] },
+    "solution_type": { "type": ["string", "null"] },
+    "start_month": { "type": "integer", "minimum": 1, "maximum": 12 },
+    "end_month": { "type": "integer", "minimum": 1, "maximum": 12 },
+    "suitability_level": {
+      "type": "string",
+      "enum": ["optimal", "acceptable", "marginal", "unsuitable"]
+    },
+    "risk_flags_json": { "type": ["string", "null"] },
+    "notes": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

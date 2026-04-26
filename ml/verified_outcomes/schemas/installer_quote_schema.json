@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "installer_quote",
+  "type": "object",
+  "required": [
+    "installer_quote_id",
+    "quote_request_id",
+    "installer_id",
+    "quoted_at",
+    "quote_status",
+    "quote_amount_inr",
+    "estimated_timeline_days",
+    "included_scope_json"
+  ],
+  "properties": {
+    "installer_quote_id": { "type": "string" },
+    "quote_request_id": { "type": "string" },
+    "installer_id": { "type": "string" },
+    "quoted_at": { "type": "string" },
+    "quote_status": { "type": "string" },
+    "quote_amount_inr": { "type": "number", "exclusiveMinimum": 0 },
+    "estimated_timeline_days": { "type": "integer", "minimum": 1, "maximum": 730 },
+    "included_scope_json": { "type": "object" },
+    "excluded_scope_json": {},
+    "proposed_species_json": {},
+    "proposed_materials_json": {},
+    "notes": { "type": ["string", "null"] },
+    "deviation_from_recommendation_flags_json": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}

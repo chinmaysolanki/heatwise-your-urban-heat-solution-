@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/feedback_event.json",
+  "title": "Recommendation telemetry / feedback event",
+  "type": "object",
+  "required": [
+    "feedback_event_id",
+    "recommendation_session_id",
+    "project_id",
+    "event_type",
+    "event_source"
+  ],
+  "properties": {
+    "feedback_event_id": { "type": "string", "minLength": 1 },
+    "recommendation_session_id": { "type": "string", "minLength": 1 },
+    "candidate_snapshot_id": { "type": ["string", "null"] },
+    "project_id": { "type": "string", "minLength": 1 },
+    "user_id": { "type": ["string", "null"] },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "recommendation_impression",
+        "recommendation_view",
+        "recommendation_expand",
+        "recommendation_compare",
+        "recommendation_save",
+        "recommendation_unsave",
+        "recommendation_share",
+        "recommendation_dismiss",
+        "recommendation_select",
+        "recommendation_request_regenerate",
+        "recommendation_request_ar_preview",
+        "recommendation_request_before_after",
+        "recommendation_request_installer",
+        "recommendation_feedback_positive",
+        "recommendation_feedback_negative",
+        "recommendation_run_viewed",
+        "candidate_viewed",
+        "candidate_selected",
+        "candidate_dismissed",
+        "candidate_rated_positive",
+        "candidate_rated_negative",
+        "visualization_requested",
+        "report_opened",
+        "installer_export_requested",
+        "installation_request_started"
+      ]
+    },
+    "event_timestamp": { "type": ["string", "null"], "format": "date-time" },
+    "event_source": { "type": "string", "minLength": 1 },
+    "screen_name": { "type": ["string", "null"] },
+    "ui_position": { "type": ["integer", "null"], "minimum": 0 },
+    "dwell_time_ms": { "type": ["integer", "null"], "minimum": 0 },
+    "event_value": { "type": ["string", "null"] },
+    "metadata": { "type": ["object", "null"] }
+  },
+  "additionalProperties": true
+}

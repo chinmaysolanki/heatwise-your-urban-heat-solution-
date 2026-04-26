@@ -1,0 +1,8 @@
+scenario_id,scenario_title,http_status,generator_source,mode,layout_slate_status,layout_attached,open_count,blocked_count,species_code_coverage_open,unresolved_open_count,hard_pass,open_with_hard_reasons,blocked_with_hard_reasons,top_species_codes
+"sunny_balcony_low_maintenance","Sunny balcony, low maintenance",200,"catalog_hybrid_ts","partial_ml","attached",1,6,0,1.0000,0,1,0,0,"curry_leaf|vetiver|lemongrass|sedum|plumeria|tulsi_holy"
+"hot_terrace_cooling","Hot terrace, cooling-first",200,"catalog_hybrid_ts","partial_ml","attached",1,8,0,1.0000,0,1,0,0,"sedum|tulsi_holy|curry_leaf|prickly_pear|pothos|lemongrass|plumeria|bougainvillea"
+"shaded_balcony_aesthetic","Shaded balcony, aesthetic goal",200,"catalog_hybrid_ts","partial_ml","attached",1,6,0,1.0000,0,1,0,0,"pothos|dracaena_marginata|ficus_pumila|snake_plant|coleus|spider_plant"
+"pet_safe_home_garden","Pet-safe home garden",200,"catalog_hybrid_ts","partial_ml","attached",1,8,0,1.0000,0,1,0,0,"tulsi_holy|vetiver|lemongrass|malabar_spinach|sedum|sweet_potato_vine|mint|marigold"
+"edible_herb_setup","Edible / herb-focused",200,"catalog_hybrid_ts","partial_ml","attached",1,8,0,1.0000,0,1,0,0,"lemongrass|curry_leaf|cherry_tomato|tulsi_holy|luffa|malabar_spinach|okra|prickly_pear"
+"windy_highrise_balcony","Windy high-rise balcony",200,"catalog_hybrid_ts","partial_ml","attached",1,4,2,1.0000,0,1,0,2,"tulsi_holy|vetiver|curry_leaf|malabar_spinach"
+"water_scarce_terrace","Scarce water — open candidates must not pair sprinkler/mist with scarce water",200,"catalog_hybrid_ts","partial_ml","attached",1,6,0,1.0000,0,1,0,0,"tulsi_holy|sedum|prickly_pear|pothos|portulaca|snake_plant"

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/hybrid_training_pointwise.json",
+  "title": "HeatWise hybrid pointwise training row (unified)",
+  "type": "object",
+  "required": [
+    "record_id",
+    "data_source",
+    "label_confidence_tier",
+    "leakage_group_id",
+    "candidate_key",
+    "row_weight",
+    "label_policy_version",
+    "weighting_policy_version"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "minLength": 8,
+      "description": "Stable dedupe id (e.g. sha256 prefix)"
+    },
+    "data_source": {
+      "type": "string",
+      "enum": ["synthetic_bootstrap", "live_telemetry"]
+    },
+    "label_confidence_tier": {
+      "type": "string",
+      "enum": [
+        "synthetic_heuristic",
+        "implicit_feedback_derived",
+        "explicit_feedback_derived",
+        "post_install_validated"
+      ]
+    },
+    "leakage_group_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Split key: project_id (preferred) or session id fallback"
+    },
+    "recommendation_session_id": {
+      "type": ["string", "null"],
+      "description": "Null for synthetic rows"
+    },
+    "project_id": { "type": "string" },
+    "candidate_key": { "type": "string" },
+    "row_weight": {
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 10
+    },
+    "pointwise_relevance_score": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "pointwise_binary_relevant": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "outcome_success_proxy": {
+      "type": ["number", "null"],
+      "description": "Outcome-head target or pseudo-label"
+    },
+    "had_logged_feedback": { "type": "boolean" },
+    "label_policy_version": { "type": "string" },
+    "weighting_policy_version": { "type": "string" },
+    "split": {
+      "type": ["string", "null"],
+      "enum": ["train", "val", "test", null]
+    }
+  },
+  "additionalProperties": true
+}

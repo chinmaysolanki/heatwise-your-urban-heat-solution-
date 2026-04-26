@@ -1,0 +1,2 @@
+{"audit_event_type":"quote.submitted","subsystem":"installer_ops","actor_type":"user","actor_id":"cabcdefghijklmnopqrs012345","entity_type":"InstallerQuoteRequest","entity_id":"cabcdefghijklmnopqrs012346","action":"submit_quote","outcome":"success","severity":"info","payload":{"amount_inr":120000},"correlation_id":"c1"}
+{"audit_event_type":"report.exported","subsystem":"reporting","actor_type":"ops","action":"export_dossier_pdf","outcome":"success","payload":{"format":"pdf"}}

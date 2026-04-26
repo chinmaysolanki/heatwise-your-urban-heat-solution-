@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/recommendation_constraint_snapshot_v1.json",
+  "title": "recommendation_constraint_snapshot",
+  "type": "object",
+  "required": [
+    "constraint_snapshot_id",
+    "region",
+    "climate_zone",
+    "month_of_year",
+    "constraint_flags_json",
+    "blocked_species_json",
+    "blocked_materials_json",
+    "blocked_solution_types_json",
+    "allowed_substitutions_json",
+    "supply_readiness_score",
+    "seasonal_readiness_score",
+    "generated_at"
+  ],
+  "properties": {
+    "constraint_snapshot_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": ["string", "null"] },
+    "recommendation_session_id": { "type": ["string", "null"] },
+    "region": { "type": "string", "minLength": 1 },
+    "climate_zone": { "type": "string", "minLength": 1 },
+    "month_of_year": { "type": "integer", "minimum": 1, "maximum": 12 },
+    "constraint_flags_json": { "type": "string" },
+    "blocked_species_json": { "type": "string" },
+    "blocked_materials_json": { "type": "string" },
+    "blocked_solution_types_json": { "type": "string" },
+    "allowed_substitutions_json": { "type": "string" },
+    "supply_readiness_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "seasonal_readiness_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "generated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>HeatWise — Goal Report 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ── RESET & PAGE ───────────────────────────────────────────── */
+@page { size: A4 portrait; margin: 0; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:      #04091A;
+  --bgAlt:   #07102B;
+  --bgMid:   #0C1838;
+  --blue:    #38BDF8;
+  --blueL:   #7DD3FC;
+  --teal:    #14B8A6;
+  --cyan:    #22D3EE;
+  --amber:   #FCD34D;
+  --gold:    #FBBF24;
+  --heat:    #F97316;
+  --red:     #F43F5E;
+  --tw:      #BAE6FD;
+  --tb:      #E0F2FE;
+  --td:      rgba(186,230,253,0.42);
+  --bdr:     rgba(56,189,248,0.15);
+  --bdrB:    rgba(56,189,248,0.38);
+  --PW:      210mm;
+  --PH:      297mm;
+  --PX:      16mm;
+  --PT:      13mm;
+  --PB:      12mm;
+}
+
+body {
+  font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--tw);
+  font-size: 8.5pt;
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ── PAGE WRAPPER ──────────────────────────────────────────── */
+.page {
+  width: var(--PW);
+  height: var(--PH);
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  break-after: page;
+  page-break-after: always;
+}
+.page:last-child { break-after: auto; page-break-after: auto; }
+
+/* ── COVER ─────────────────────────────────────────────────── */
+.cover {
+  padding: var(--PT) var(--PX) var(--PB);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+}
+.orb-1 { width: 160mm; height: 160mm; background: #38BDF8; opacity: .13; top: -50mm; right: -40mm; }
+.orb-2 { width: 110mm; height: 110mm; background: #14B8A6; opacity: .11; bottom: 10mm; left: -30mm; }
+.orb-3 { width: 70mm;  height: 70mm;  background: #FCD34D; opacity: .07; bottom: 50mm; right: 15mm; }
+
+.cover-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 52mm;
+  position: relative;
+  z-index: 2;
+}
+.bmark {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #0284C7, #38BDF8);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 18px rgba(56,189,248,.38);
+  flex-shrink: 0;
+}
+.bmark svg { width: 18px; height: 18px; }
+.bname {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 17pt;
+  font-weight: 700;
+  color: var(--tb);
+  letter-spacing: -.3px;
+}
+.bname em { color: var(--blue); font-style: normal; }
+
+.cover-hero { position: relative; z-index: 2; margin-bottom: 10mm; }
+.cover-tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 6pt;
+  color: var(--blue);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  border: .5pt solid rgba(56,189,248,.32);
+  border-radius: 30px;
+  padding: 3px 11px;
+  margin-bottom: 7mm;
+}
+.cover-h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32pt;
+  font-weight: 700;
+  color: var(--tb);
+  line-height: 1.08;
+  letter-spacing: -1px;
+  margin-bottom: 5mm;
+}
+.cover-h1 span { color: var(--blue); }
+.cover-rule {
+  width: 38mm; height: 1.5pt;
+  background: linear-gradient(90deg, var(--blue), transparent);
+  margin-bottom: 5mm;
+}
+.cover-sub {
+  font-size: 9.5pt;
+  color: var(--td);
+  max-width: 138mm;
+  line-height: 1.55;
+}
+
+.cover-footer { position: relative; z-index: 2; }
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3mm;
+  margin-bottom: 6mm;
+}
+.meta-cell {
+  background: rgba(56,189,248,.05);
+  border: .5pt solid var(--bdr);
+  border-radius: 8px;
+  padding: 3.5mm 4mm;
+}
+.meta-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 5.5pt;
+  color: var(--blue);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 1.5mm;
+}
+.meta-val {
+  font-size: 8.5pt;
+  font-weight: 600;
+  color: var(--tb);
+}
+.cover-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 4mm;
+  border-top: .5pt solid rgba(56,189,248,.12);
+}
+.cover-bottom-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 5.5pt;
+  color: var(--td);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.conf-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 5.5pt;
+  color: var(--heat);
+  border: .5pt solid rgba(249,115,22,.32);
+  border-radius: 10px;
+  padding: 2px 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── CONTENT PAGE STRUCTURE ─────────────────────────────────── */
+.pg-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8mm var(--PX) 5mm;
+  border-bottom: .5pt solid rgba(56,189,248,.12);
+  flex-shrink: 0;
+}
+.pg-brand {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  color: var(--blue);
+}
+.pg-section {
+  font-family: 'DM Mono', monospace;
+  font-size: 5.5pt;
+  color: var(--td);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.pg-body {
+  flex: 1;
+  padding: 6mm var(--PX) 0;
+  overflow: hidden;
+}
+
+.pg-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3mm var(--PX) 5mm;
+  border-top: .5pt solid rgba(56,189,248,.08);
+  flex-shrink: 0;
+  margin-top: auto;
+}
+.pg-foot-txt {
+  font-family: 'DM Mono', monospace;
+  font-size: 5.5pt;
+  color: var(--td);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── SECTION HEADER ─────────────────────────────────────────── */
+.eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 6pt;
+  color: var(--blue);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-bottom: 2mm;
+}
+.sec-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15pt;
+  font-weight: 700;
+  color: var(--tb);
+  line-height: 1.15;
+  letter-spacing: -.3px;
+  margin-bottom: 2mm;
+}
+.sec-desc {
+  font-size: 8.5pt;
+  color: var(--td);
+  max-width: 150mm;
+  line-height: 1.58;
+  margin-bottom: 6mm;
+}
+
+/* ── TYPOGRAPHY ─────────────────────────────────────────────── */
+h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9.5pt;
+  font-weight: 700;
+  color: var(--cyan);
+  margin: 6mm 0 2.5mm;
+  padding-bottom: 1.5mm;
+  border-bottom: .5pt solid rgba(34,211,238,.14);
+  letter-spacing: .2px;
+}
+h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8.5pt;
+  font-weight: 600;
+  color: var(--tb);
+  margin: 4mm 0 1.5mm;
+}
+p {
+  font-size: 8pt;
+  color: rgba(186,230,253,.80);
+  margin-bottom: 2mm;
+  line-height: 1.58;
+}
+ul, ol { padding-left: 4mm; margin: 1mm 0 2.5mm; }
+li {
+  font-size: 8pt;
+  color: rgba(186,230,253,.80);
+  margin-bottom: 1mm;
+  line-height: 1.5;
+}
+li::marker { color: var(--blue); }
+strong { color: var(--tb); font-weight: 600; }
+
+/* ── STAT GRID ──────────────────────────────────────────────── */
+.sg { display: grid; gap: 3mm; margin: 3mm 0 5mm; }
+.sg2 { grid-template-columns: repeat(2,1fr); }
+.sg3 { grid-template-columns: repeat(3,1fr); }
+.sg4 { grid-template-columns: repeat(4,1fr); }
+
+.sc {
+  background: var(--bgAlt);
+  border: .5pt solid var(--bdr);
+  border-radius: 9px;
+  padding: 4mm 4.5mm;
+  position: relative;
+  overflow: hidden;
+  page-break-inside: avoid;
+}
+.sc::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2pt;
+  border-radius: 9px 9px 0 0;
+}
+.sc.b::after  { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+.sc.t::after  { background: linear-gradient(90deg, var(--teal), #34D399); }
+.sc.a::after  { background: linear-gradient(90deg, var(--amber), var(--gold)); }
+.sc.h::after  { background: linear-gradient(90deg, var(--heat), #FB923C); }
+.sc.r::after  { background: linear-gradient(90deg, var(--red), #FB7185); }
+.sc.c::after  { background: linear-gradient(90deg, var(--cyan), var(--blue)); }
+
+.slbl {
+  font-family: 'DM Mono', monospace;
+  font-size: 5.5pt;
+  color: var(--td);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 2mm;
+}
+.sval {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 19pt;
+  font-weight: 700;
+  color: var(--tb);
+  line-height: 1;
+  margin-bottom: 1mm;
+}
+.sval.b { color: var(--blue); }
+.sval.t { color: var(--teal); }
+.sval.a { color: var(--amber); }
+.sval.h { color: var(--heat); }
+.sval.c { color: var(--cyan); }
+.ssub { font-size: 7pt; color: var(--td); line-height: 1.3; }
+
+/* ── TABLE ──────────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2.5mm 0 4mm;
+  font-size: 7.5pt;
+  page-break-inside: avoid;
+}
+thead { background: rgba(56,189,248,.06); }
+th {
+  font-family: 'DM Mono', monospace;
+  font-size: 5.8pt;
+  color: var(--blue);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 2.5mm 3mm;
+  border: .4pt solid rgba(56,189,248,.13);
+  text-align: left;
+  font-weight: 500;
+}
+td {
+  padding: 2.5mm 3mm;
+  border: .4pt solid rgba(56,189,248,.09);
+  color: rgba(186,230,253,.80);
+  vertical-align: top;
+  line-height: 1.42;
+}
+tr:nth-child(even) td { background: rgba(56,189,248,.018); }
+
+/* ── GOAL CARD ──────────────────────────────────────────────── */
+.gc {
+  background: var(--bgAlt);
+  border: .5pt solid var(--bdr);
+  border-left: 2.5pt solid var(--blue);
+  border-radius: 0 9px 9px 0;
+  padding: 3.5mm 4.5mm;
+  margin: 2mm 0;
+  page-break-inside: avoid;
+}
+.gc.t { border-left-color: var(--teal); }
+.gc.a { border-left-color: var(--amber); }
+.gc.c { border-left-color: var(--cyan); }
+.gc.h { border-left-color: var(--heat); }
+.gc.r { border-left-color: var(--red); }
+
+.gc-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8.5pt;
+  font-weight: 700;
+  color: var(--tb);
+  margin-bottom: 1.5mm;
+}
+.gc-body {
+  font-size: 7.5pt;
+  color: rgba(186,230,253,.74);
+  line-height: 1.52;
+}
+.chips { display: flex; gap: 3mm; flex-wrap: wrap; margin-top: 2mm; }
+.chip {
+  font-family: 'DM Mono', monospace;
+  font-size: 5pt;
+  letter-spacing: .8px;
+  border-radius: 20px;
+  padding: 1.5px 6px;
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+.cb { color: var(--blue);  background: rgba(56,189,248,.07);  border: .4pt solid rgba(56,189,248,.24); }
+.ct { color: var(--teal);  background: rgba(20,184,166,.07);  border: .4pt solid rgba(20,184,166,.24); }
+.ca { color: var(--amber); background: rgba(252,211,77,.07);  border: .4pt solid rgba(252,211,77,.24); }
+.ch { color: var(--heat);  background: rgba(249,115,22,.07);  border: .4pt solid rgba(249,115,22,.24); }
+.cc { color: var(--cyan);  background: rgba(34,211,238,.07);  border: .4pt solid rgba(34,211,238,.24); }
+.cr { color: var(--red);   background: rgba(244,63,94,.07);   border: .4pt solid rgba(244,63,94,.24); }
+
+/* ── PROGRESS BAR ───────────────────────────────────────────── */
+.pr { margin: 2mm 0; page-break-inside: avoid; }
+.pr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1mm;
+}
+.pr-label { font-size: 7.5pt; color: var(--tb); font-weight: 500; }
+.pr-pct {
+  font-family: 'DM Mono', monospace;
+  font-size: 6.5pt;
+  color: var(--blue);
+  flex-shrink: 0;
+  margin-left: 3mm;
+}
+.pr-track {
+  width: 100%;
+  height: 2.5pt;
+  background: rgba(56,189,248,.08);
+  border-radius: 10pt;
+  overflow: hidden;
+}
+.pr-fill {
+  height: 100%;
+  border-radius: 10pt;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+}
+.pr-fill.t { background: linear-gradient(90deg, var(--teal), #34D399); }
+.pr-fill.a { background: linear-gradient(90deg, var(--amber), var(--gold)); }
+.pr-fill.h { background: linear-gradient(90deg, var(--heat), #FB923C); }
+
+/* ── CALLOUT ────────────────────────────────────────────────── */
+.callout {
+  background: rgba(56,189,248,.05);
+  border: .5pt solid rgba(56,189,248,.17);
+  border-radius: 9px;
+  padding: 3.5mm 4.5mm;
+  margin: 3mm 0;
+  page-break-inside: avoid;
+}
+.callout.t { background: rgba(20,184,166,.04); border-color: rgba(20,184,166,.17); }
+.callout.a { background: rgba(252,211,77,.04); border-color: rgba(252,211,77,.17); }
+.callout.h { background: rgba(249,115,22,.04); border-color: rgba(249,115,22,.17); }
+
+.callout-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8pt;
+  font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 1.5mm;
+}
+.callout.t .callout-title { color: var(--teal); }
+.callout.a .callout-title { color: var(--amber); }
+.callout.h .callout-title { color: var(--heat); }
+.callout-body { font-size: 7.5pt; color: rgba(186,230,253,.78); line-height: 1.55; }
+
+/* ── TWO-COL ────────────────────────────────────────────────── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4mm;
+  margin: 2.5mm 0 4mm;
+}
+.col-box {
+  background: var(--bgAlt);
+  border: .5pt solid var(--bdr);
+  border-radius: 9px;
+  padding: 3.5mm 4mm;
+  page-break-inside: avoid;
+}
+.col-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 5.8pt;
+  color: var(--blue);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 2.5mm;
+  padding-bottom: 1.5mm;
+  border-bottom: .4pt solid rgba(56,189,248,.12);
+}
+.col-title.t { color: var(--teal); border-bottom-color: rgba(20,184,166,.12); }
+.col-title.a { color: var(--amber); border-bottom-color: rgba(252,211,77,.12); }
+
+/* ── TIMELINE ───────────────────────────────────────────────── */
+.timeline { position: relative; margin: 3mm 0; }
+.tl-line {
+  position: absolute;
+  left: 4mm;
+  top: 4mm;
+  bottom: 4mm;
+  width: .5pt;
+  background: var(--bdr);
+}
+.tl-item {
+  display: flex;
+  gap: 4mm;
+  margin-bottom: 3.5mm;
+  position: relative;
+  page-break-inside: avoid;
+}
+.tl-dot-wrap {
+  width: 8mm;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding-top: 1mm;
+}
+.tl-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--blue);
+  border: 1.5pt solid var(--bg);
+  box-shadow: 0 0 7px rgba(56,189,248,.55);
+  flex-shrink: 0;
+}
+.tl-dot.done  { background: var(--teal);  box-shadow: 0 0 7px rgba(20,184,166,.5); }
+.tl-dot.prog  { background: var(--amber); box-shadow: 0 0 7px rgba(252,211,77,.45); }
+.tl-dot.plan  { background: #1E3A5F; box-shadow: none; border-color: var(--blue); }
+.tl-dot.later { background: var(--heat);  box-shadow: 0 0 7px rgba(249,115,22,.45); }
+
+.tl-content {
+  flex: 1;
+  background: var(--bgAlt);
+  border: .5pt solid var(--bdr);
+  border-radius: 8px;
+  padding: 3mm 3.5mm;
+}
+.tl-phase {
+  font-family: 'DM Mono', monospace;
+  font-size: 5.5pt;
+  color: var(--blue);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: .8mm;
+}
+.tl-phase.done  { color: var(--teal); }
+.tl-phase.prog  { color: var(--amber); }
+.tl-phase.plan  { color: var(--td); }
+.tl-phase.later { color: var(--heat); }
+.tl-h {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 8.5pt;
+  font-weight: 700;
+  color: var(--tb);
+  margin-bottom: .8mm;
+}
+.tl-desc { font-size: 7.5pt; color: rgba(186,230,253,.72); line-height: 1.5; }
+
+/* ── RISK BADGE ─────────────────────────────────────────────── */
+.rb {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 5pt;
+  letter-spacing: .8px;
+  border-radius: 20px;
+  padding: 1.5px 6px;
+  text-transform: uppercase;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.rb-hi  { color: var(--red);   background: rgba(244,63,94,.09);  border: .4pt solid rgba(244,63,94,.28); }
+.rb-md  { color: var(--amber); background: rgba(252,211,77,.07); border: .4pt solid rgba(252,211,77,.24); }
+.rb-lo  { color: var(--teal);  background: rgba(20,184,166,.07); border: .4pt solid rgba(20,184,166,.24); }
+.rb-ip  { color: var(--blue);  background: rgba(56,189,248,.07); border: .4pt solid rgba(56,189,248,.24); }
+
+/* ── DIVIDER ────────────────────────────────────────────────── */
+.div { border: none; border-top: .5pt solid rgba(56,189,248,.12); margin: 4mm 0; }
+
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════
+     COVER
+════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="cover">
+    <div class="cover-brand">
+      <div class="bmark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#E0F2FE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      </div>
+      <span class="bname">Heat<em>Wise</em></span>
+    </div>
+
+    <div class="cover-hero">
+      <div class="cover-tag">Project Goal Report &nbsp;·&nbsp; 2026</div>
+      <div class="cover-h1">Cooling Cities.<br><span>One Rooftop</span><br>at a Time.</div>
+      <div class="cover-rule"></div>
+      <div class="cover-sub">A comprehensive goal report covering product vision, strategic objectives, progress metrics, technical architecture, commercial targets, and the full platform roadmap for HeatWise — an AI-powered urban heat reduction platform for Indian cities.</div>
+    </div>
+
+    <div class="cover-footer">
+      <div class="meta-grid">
+        <div class="meta-cell"><div class="meta-label">Report Date</div><div class="meta-val">April 8, 2026</div></div>
+        <div class="meta-cell"><div class="meta-label">Stage</div><div class="meta-val">Pre-Seed / MVP</div></div>
+        <div class="meta-cell"><div class="meta-label">Version</div><div class="meta-val">v1.0</div></div>
+        <div class="meta-cell"><div class="meta-label">Platform</div><div class="meta-val">Next.js + Android</div></div>
+        <div class="meta-cell"><div class="meta-label">Market</div><div class="meta-val">India — Tier 1–3</div></div>
+        <div class="meta-cell"><div class="meta-label">Category</div><div class="meta-val">ClimaTech / GreenTech</div></div>
+      </div>
+      <div class="cover-bottom">
+        <span class="cover-bottom-text">HeatWise &nbsp;·&nbsp; Internal Strategy Document</span>
+        <span class="conf-badge">Confidential</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PAGE 1 — EXECUTIVE SUMMARY
+════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="pg-head">
+    <span class="pg-brand">HeatWise</span>
+    <span class="pg-section">01 &nbsp;—&nbsp; Executive Summary</span>
+  </div>
+  <div class="pg-body">
+
+    <div class="eyebrow">01 &nbsp;·&nbsp; Executive Summary</div>
+    <div class="sec-title">What HeatWise Is Building</div>
+    <div class="sec-desc">HeatWise is an AI-powered platform that reduces urban heat stress in Indian cities by recommending, visualizing, and facilitating the installation of optimized green cover — connecting homeowners and businesses with a verified installer network.</div>
+
+    <div class="sg sg4">
+      <div class="sc b"><div class="slbl">Database Models</div><div class="sval b">73</div><div class="ssub">Prisma schema entities</div></div>
+      <div class="sc t"><div class="slbl">App Screens</div><div class="sval t">27</div><div class="ssub">End-to-end UI flows</div></div>
+      <div class="sc a"><div class="slbl">API Endpoints</div><div class="sval a">100+</div><div class="ssub">Across 19 domains</div></div>
+      <div class="sc c"><div class="slbl">Library Modules</div><div class="sval c">100+</div><div class="ssub">Domain service files</div></div>
+    </div>
+
+    <h2>Mission</h2>
+    <div class="callout">
+      <div class="callout-title">Core Mission Statement</div>
+      <div class="callout-body">To make every rooftop in India a cooling asset — using AI-driven species recommendations, AR-assisted measurement, and a vetted green installer network — so that urban communities can fight extreme heat without waiting for government intervention.</div>
+    </div>
+
+    <h2>The Problem</h2>
+    <p>Indian cities regularly exceed 45°C in summer. The Urban Heat Island (UHI) effect amplifies ambient temperatures by 3–8°C. Over 90% of Indian rooftops are bare concrete — a massive untapped thermal mass radiating heat into homes and streets. No accessible, AI-guided product exists that takes a homeowner from their specific rooftop conditions to a species plan, installer quote, and verified outcome — until HeatWise.</p>
+
+    <h2>The Solution</h2>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-title">For Homeowners &amp; Businesses</div>
+        <ul>
+          <li>Scan rooftop via camera and AR measurement</li>
+          <li>Receive AI-ranked green cover recommendations</li>
+          <li>Visualize before/after thermal transformation</li>
+          <li>Connect with and pay verified green installers</li>
+          <li>Track CO₂ offset, cooling delta, and biodiversity</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-title t">For the Platform</div>
+        <ul>
+          <li>Hybrid ML + rules recommendation engine</li>
+          <li>73-model data layer for telemetry and outcomes</li>
+          <li>Installer marketplace with SLA and outcome tracking</li>
+          <li>Longitudinal follow-up at 7d / 30d / 90d / 180d</li>
+          <li>Full commercial analytics and unit economics</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Table of Contents</h2>
+    <table>
+      <thead><tr><th>Section</th><th>Page</th><th>Summary</th></tr></thead>
+      <tbody>
+        <tr><td>01 &nbsp;Executive Summary</td><td>1</td><td>Mission, problem, solution overview</td></tr>
+        <tr><td>02 &nbsp;Strategic Goals</td><td>2</td><td>Six goal pillars driving all decisions</td></tr>
+        <tr><td>03 &nbsp;Product Goals</td><td>3</td><td>Screen completion status and sprint objectives</td></tr>
+        <tr><td>04 &nbsp;Technical Goals</td><td>4</td><td>Architecture, schema, platform hardening</td></tr>
+        <tr><td>05 &nbsp;Commercial Goals</td><td>5</td><td>Revenue model, funnel, unit economics</td></tr>
+        <tr><td>06 &nbsp;Roadmap</td><td>6</td><td>Six-phase execution plan</td></tr>
+        <tr><td>07 &nbsp;Risks &amp; Dependencies</td><td>7</td><td>Risk register and mitigation strategies</td></tr>
+        <tr><td>08 &nbsp;Impact Goals</td><td>8</td><td>Environmental and social targets</td></tr>
+        <tr><td>09 &nbsp;Summary</td><td>9</td><td>What is built, what is next</td></tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div class="pg-foot">
+    <span class="pg-foot-txt">HeatWise &nbsp;·&nbsp; Goal Report 2026 &nbsp;·&nbsp; Confidential</span>
+    <span class="pg-foot-txt">Page 1 of 9</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PAGE 2 — STRATEGIC GOALS
+════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="pg-head">
+    <span class="pg-brand">HeatWise</span>
+    <span class="pg-section">02 &nbsp;—&nbsp; Strategic Goals</span>
+  </div>
+  <div class="pg-body">
+
+    <div class="eyebrow">02 &nbsp;·&nbsp; Strategic Goals</div>
+    <div class="sec-title">What We Are Trying to Achieve</div>
+    <div class="sec-desc">Six primary goal pillars drive every product, engineering, and commercial decision at HeatWise. Each goal has a clear scope, success criteria, and dependency chain.</div>
+
+    <div class="gc">
+      <div class="gc-title">Goal 1 — Deliver a Best-in-Class AI Recommendation Engine</div>
+      <div class="gc-body">Build a hybrid ML + rules-based recommendation system that produces accurate, reproducible, and explainable green cover plans for any Indian rooftop — regardless of size, budget, climate zone, or soil condition. The engine handles supply constraints, seasonal availability, and budget fit in real time.</div>
+      <div class="chips"><span class="chip cb">ML + Rules Hybrid</span><span class="chip ct">Telemetry-First</span><span class="chip cc">Explainable AI</span></div>
+    </div>
+
+    <div class="gc t">
+      <div class="gc-title">Goal 2 — Build a Verified Installer Marketplace</div>
+      <div class="gc-body">Create a trust-first installer network covering Tier 1–3 Indian cities. Each installer is capability-verified, SLA-tracked, and commercially integrated. Quotes, job assignments, completion, and outcome tracking all flow through the platform with full auditability.</div>
+      <div class="chips"><span class="chip ct">Verified Network</span><span class="chip cb">SLA Tracking</span><span class="chip ca">Commercial Layer</span></div>
+    </div>
+
+    <div class="gc a">
+      <div class="gc-title">Goal 3 — Measure Real-World Impact at Scale</div>
+      <div class="gc-body">Every completed installation feeds longitudinal outcome data back into the platform. Temperature delta, plant survival rate, CO₂ offset, and user satisfaction are measured at 7d, 30d, 90d, and 180d checkpoints. This data trains the next generation of the ML model.</div>
+      <div class="chips"><span class="chip ca">Longitudinal Tracking</span><span class="chip ct">ML Feedback Loop</span><span class="chip cb">Verified Outcomes</span></div>
+    </div>
+
+    <div class="gc c">
+      <div class="gc-title">Goal 4 — Launch a Production-Ready Android + Web App</div>
+      <div class="gc-body">Ship a complete 27-screen mobile-first application on Android (Capacitor shell) and web. The app supports phone OTP auth, AR measurement, 3D garden layout visualization, push notifications, and offline-capable project management.</div>
+      <div class="chips"><span class="chip cc">Android + Web</span><span class="chip cb">AR Measurement</span><span class="chip ct">27 Screens</span></div>
+    </div>
+
+    <div class="gc h">
+      <div class="gc-title">Goal 5 — Achieve Commercial Sustainability</div>
+      <div class="gc-body">Drive revenue through installer commissions (15% per job), premium PDF reports, and B2B white-label partnerships. Track funnel metrics and unit economics per project to reach contribution-positive economics within 12 months of commercial launch.</div>
+      <div class="chips"><span class="chip ch">15% Commission</span><span class="chip ca">B2B White-Label</span><span class="chip cb">Unit Economics</span></div>
+    </div>
+
+    <div class="gc r">
+      <div class="gc-title">Goal 6 — Operate with Enterprise-Grade Governance</div>
+      <div class="gc-body">All user data is managed under a full consent and retention policy framework. Telemetry is append-only and immutable. Platform audit trails, idempotency records, and structured error handling ensure the system is compliant, debuggable, and production-scalable from day one.</div>
+      <div class="chips"><span class="chip cr">Consent Tracking</span><span class="chip cb">Append-Only Telemetry</span><span class="chip ct">Audit Trails</span></div>
+    </div>
+
+  </div>
+  <div class="pg-foot">
+    <span class="pg-foot-txt">HeatWise &nbsp;·&nbsp; Goal Report 2026 &nbsp;·&nbsp; Confidential</span>
+    <span class="pg-foot-txt">Page 2 of 9</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PAGE 3 — PRODUCT GOALS
+════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="pg-head">
+    <span class="pg-brand">HeatWise</span>
+    <span class="pg-section">03 &nbsp;—&nbsp; Product Goals</span>
+  </div>
+  <div class="pg-body">
+
+    <div class="eyebrow">03 &nbsp;·&nbsp; Product Goals</div>
+    <div class="sec-title">Screen Completion &amp; Sprint Objectives</div>
+    <div class="sec-desc">Current build status of all 27 app screens and active sprint objectives for Q2 2026.</div>
+
+    <div class="two-col">
+      <div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Auth Flow (Login, OTP, Profile)</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Splash + Onboarding</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Home Dashboard</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">AR Measure + Photo Capture</span><span class="pr-pct">90%</span></div><div class="pr-track"><div class="pr-fill" style="width:90%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Environment Inputs</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">AI Analysis Screen</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Garden Layout (3D Isometric)</span><span class="pr-pct">85%</span></div><div class="pr-track"><div class="pr-fill" style="width:85%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Results Screen</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+      </div>
+      <div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Before/After Thermal View</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Installer Quote + Install Flow</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Species Library + Detail</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Impact + Carbon Dashboard</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">City Heat Map</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Notifications / Alerts</span><span class="pr-pct">70%</span></div><div class="pr-track"><div class="pr-fill" style="width:70%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Report Screen + PDF Export</span><span class="pr-pct">85%</span></div><div class="pr-track"><div class="pr-fill" style="width:85%"></div></div></div>
+        <div class="pr"><div class="pr-row"><span class="pr-label">Settings + Eco Tips</span><span class="pr-pct">100%</span></div><div class="pr-track"><div class="pr-fill" style="width:100%"></div></div></div>
+      </div>
+    </div>
+
+    <h2>Sprint Objectives — Q2 2026</h2>
+    <table>
+      <thead><tr><th>Objective</th><th>Domain</th><th>Status</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td>Real-time push notifications for heat alerts</td><td>Frontend</td><td><span class="rb rb-ip">In Progress</span></td><td>Q2 2026</td></tr>
+        <tr><td>Flutter UI redesign — Midnight Aurora theme import</td><td>Design</td><td><span class="rb rb-hi">Pending</span></td><td>Q2 2026</td></tr>
+        <tr><td>3D animated garden layout finalization</td><td>Frontend</td><td><span class="rb rb-ip">In Progress</span></td><td>Q2 2026</td></tr>
+        <tr><td>Installer SLA dashboard in admin panel</td><td>Backend</td><td><span class="rb rb-ip">In Progress</span></td><td>Q2 2026</td></tr>
+        <tr><td>Android Capacitor APK release build</td><td>Mobile</td><td><span class="rb rb-hi">Pending</span></td><td>Q3 2026</td></tr>
+        <tr><td>Species catalog mapping CI verification</td><td>Platform</td><td><span class="rb rb-lo">Shipped</span></td><td>Done</td></tr>
+        <tr><td>ML model registry + Python serving</td><td>ML</td><td><span class="rb rb-lo">Shipped</span></td><td>Done</td></tr>
+        <tr><td>Recommendation telemetry Phase 8–9</td><td>Backend</td><td><span class="rb rb-lo">Shipped</span></td><td>Done</td></tr>
+        <tr><td>Governance and consent framework</td><td>Platform</td><td><span class="rb rb-lo">Shipped</span></td><td>Done</td></tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div class="pg-foot">
+    <span class="pg-foot-txt">HeatWise &nbsp;·&nbsp; Goal Report 2026 &nbsp;·&nbsp; Confidential</span>
+    <span class="pg-foot-txt">Page 3 of 9</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PAGE 4 — TECHNICAL GOALS
+════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="pg-head">
+    <span class="pg-brand">HeatWise</span>
+    <span class="pg-section">04 &nbsp;—&nbsp; Technical Goals</span>
+  </div>
+  <div class="pg-body">
+
+    <div class="eyebrow">04 &nbsp;·&nbsp; Technical Goals</div>
+    <div class="sec-title">Architecture &amp; Engineering Objectives</div>
+    <div class="sec-desc">The technical goals underpinning the platform's scalability, accuracy, reproducibility, and operational reliability.</div>
+
+    <h2>Recommendation Engine</h2>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-title">ML Layer Targets</div>
+        <ul>
+          <li>Python ML service co-deployed with Next.js, scoring species via IPC</li>
+          <li>ML registry versioning with per-rollout guardrail checks</li>
+          <li>Nightly telemetry pipeline export to training data store</li>
+          <li>Candidate snapshot immutability for reproducibility</li>
+          <li>A/B experiment assignment with rollout control flags</li>
+          <li>Automatic fallback on guardrail failure detection</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-title t">Fallback Layer Targets</div>
+        <ul>
+          <li>Catalog hybrid fallback covers 100% of species</li>
+          <li>Rules-only emergency fallback for ML outages</li>
+          <li>Eligibility filtering before candidate scoring</li>
+          <li>Supply constraint injection at recommendation time</li>
+          <li>Budget fit assessment with downgrade path logic</li>
+          <li>Seasonal availability window enforcement</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Schema Goals by Domain</h2>
+    <table>
+      <thead><tr><th>Domain</th><th>Models</th><th>Primary Goal</th></tr></thead>
+      <tbody>
+        <tr><td>Recommendation Telemetry</td><td>7</td><td>Immutable append-only sessions, candidate snapshots, and runtime events</td></tr>
+        <tr><td>Installer &amp; Commercial</td><td>16</td><td>Full quote-to-install-to-outcome lifecycle with SLA tracking</td></tr>
+        <tr><td>Geospatial Intelligence</td><td>4</td><td>City tier, microclimate, UHI risk, and exposure profile per project</td></tr>
+        <tr><td>Longitudinal Outcomes</td><td>7</td><td>Plant survival and temperature tracking at 7d/30d/90d/180d</td></tr>
+        <tr><td>Governance &amp; Compliance</td><td>5</td><td>Consent, retention policies, and audit trail enforcement</td></tr>
+        <tr><td>Supply Chain</td><td>5</td><td>Species and material availability with regional readiness scores</td></tr>
+        <tr><td>Reporting &amp; Insights</td><td>9</td><td>Dossier assembly, PDF export, lesson memory, and segment analytics</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Platform Hardening Targets</h2>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-title">Reliability</div>
+        <ul>
+          <li><strong>Idempotency</strong> — all mutation APIs deduplicated via IdempotencyRecord</li>
+          <li><strong>Structured errors</strong> — machine-readable codes + provenance on every error</li>
+          <li><strong>Audit trail</strong> — PlatformAuditEvent captures all operations append-only</li>
+          <li><strong>Readiness check</strong> — /api/platform/readiness validates DB, ML, and supply before launch</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-title a">CI / Quality Gates</div>
+        <ul>
+          <li><strong>TypeScript strict</strong> — tsc --noEmit runs on every push to main</li>
+          <li><strong>Species mapping CI</strong> — generated artifact verified in pipeline</li>
+          <li><strong>Recommendation tests</strong> — integration suite requires seeded DB</li>
+          <li><strong>ML smoke test</strong> — ml:serving-smoke validates Python serving on each deploy</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Mobile / Android Target</h2>
+    <div class="callout a">
+      <div class="callout-title">Android Build Goal — Q3 2026</div>
+      <div class="callout-body">Capacitor shell wrapping the Next.js web app. Android WebView pointed at CAP_SERVER_URL. adb reverse for device port forwarding. APK target for Google Play Store submission in Q3 2026. AR measurement must function natively on Android 11+ via device camera with no additional hardware.</div>
+    </div>
+
+  </div>
+  <div class="pg-foot">
+    <span class="pg-foot-txt">HeatWise &nbsp;·&nbsp; Goal Report 2026 &nbsp;·&nbsp; Confidential</span>
+    <span class="pg-foot-txt">Page 4 of 9</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PAGE 5 — COMMERCIAL GOALS
+════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="pg-head">
+    <span class="pg-brand">HeatWise</span>
+    <span class="pg-section">05 &nbsp;—&nbsp; Commercial Goals</span>
+  </div>
+  <div class="pg-body">
+
+    <div class="eyebrow">05 &nbsp;·&nbsp; Commercial Goals</div>
+    <div class="sec-title">Revenue Model &amp; Growth Targets</div>
+    <div class="sec-desc">HeatWise operates a marketplace model. Revenue is generated at the point of successful installation, with secondary streams from premium features and B2B partnerships.</div>
+
+    <div class="sg sg3">
+      <div class="sc h"><div class="slbl">Primary Revenue</div><div class="sval h">15%</div><div class="ssub">Commission per installer job</div></div>
+      <div class="sc a"><div class="slbl">Secondary Revenue</div><div class="sval a">B2B</div><div class="ssub">White-label + report exports</div></div>
+      <div class="sc b"><div class="slbl">Profitability Target</div><div class="sval b">12mo</div><div class="ssub">To positive unit economics</div></div>
+    </div>
+
+    <h2>Conversion Funnel Goals</h2>
+    <table>
+      <thead><tr><th>Funnel Stage</th><th>Event</th><th>Target Rate</th><th>Tracked Via</th></tr></thead>
+      <tbody>
+        <tr><td>1 &nbsp;·&nbsp; Recommendation</td><td>User receives ranked candidates</td><td>100% of scans</td><td>RecommendationTelemetrySession</td></tr>
+        <tr><td>2 &nbsp;·&nbsp; Quote Request</td><td>User requests installer quote</td><td>&gt; 30%</td><td>LeadFunnelEvent</td></tr>
+        <tr><td>3 &nbsp;·&nbsp; Quote Acceptance</td><td>User accepts installer quote</td><td>&gt; 40% of requests</td><td>InstallerQuote</td></tr>
+        <tr><td>4 &nbsp;·&nbsp; Installation</td><td>Job completed and verified</td><td>&gt; 85% of acceptances</td><td>VerifiedInstallRecord</td></tr>
+        <tr><td>5 &nbsp;·&nbsp; Follow-Up</td><td>30-day outcome data submitted</td><td>&gt; 60% of installs</td><td>LongitudinalFollowupCheckpoint</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Installer Network Goals</h2>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-title">Coverage Targets</div>
+        <ul>
+          <li>5 Tier-1 cities at launch — Delhi, Mumbai, Bangalore, Chennai, Hyderabad</li>
+          <li>10 Tier-2 cities by end of Year 1</li>
+          <li>Minimum 3 verified installers per city before going live</li>
+          <li>Quote response SLA: within 48 hours</li>
+          <li>Installation completion SLA: within 14 days of acceptance</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-title a">Quality Standards</div>
+        <ul>
+          <li>Installer average rating maintained above 4.2 / 5.0</li>
+          <li>PartnerSLAMetrics tracked per installer per rolling window</li>
+          <li>PartnerCapabilityMatrix verified before onboarding</li>
+          <li>Post-install outcome verification mandatory for all jobs</li>
+          <li>PartnerFieldOpsStatus updated in real time during active jobs</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Unit Economics Targets</h2>
+    <table>
+      <thead><tr><th>Metric</th><th>Target</th><th>Tracking Model</th></tr></thead>
+      <tbody>
+        <tr><td>Average project value</td><td>INR 25,000 – 80,000</td><td>InstallerQuote</td></tr>
+        <tr><td>Platform commission per job</td><td>INR 3,750 – 12,000</td><td>RevenueEvent</td></tr>
+        <tr><td>Customer Acquisition Cost</td><td>&lt; INR 800</td><td>CommercialOutcome</td></tr>
+        <tr><td>LTV / CAC ratio</td><td>&gt; 8x by Month 12</td><td>CommercialOutcome</td></tr>
+        <tr><td>Monthly recurring installs</td><td>500+ by Month 6</td><td>LeadFunnelEvent</td></tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div class="pg-foot">
+    <span class="pg-foot-txt">HeatWise &nbsp;·&nbsp; Goal Report 2026 &nbsp;·&nbsp; Confidential</span>
+    <span class="pg-foot-txt">Page 5 of 9</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PAGE 6 — ROADMAP
+════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="pg-head">
+    <span class="pg-brand">HeatWise</span>
+    <span class="pg-section">06 &nbsp;—&nbsp; Roadmap</span>
+  </div>
+  <div class="pg-body">
+
+    <div class="eyebrow">06 &nbsp;·&nbsp; Roadmap</div>
+    <div class="sec-title">Phase-by-Phase Execution Plan</div>
+    <div class="sec-desc">Six phases from foundation to full commercial scale. Phases 1–3 are complete. Phase 4 is active. Phases 5–6 are planned.</div>
+
+    <div class="timeline">
+      <div class="tl-line"></div>
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot done"></div></div>
+        <div class="tl-content">
+          <div class="tl-phase done">Phase 1 &nbsp;·&nbsp; Complete &nbsp;·&nbsp; Q4 2025</div>
+          <div class="tl-h">Core Platform Infrastructure</div>
+          <div class="tl-desc">Next.js setup, Prisma schema (73 models), NextAuth phone OTP auth, recommendation engine skeleton, species catalog seeding, basic API routing across 19 domains. All foundational data models live and tested.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot done"></div></div>
+        <div class="tl-content">
+          <div class="tl-phase done">Phase 2 &nbsp;·&nbsp; Complete &nbsp;·&nbsp; Q1 2026</div>
+          <div class="tl-h">Recommendation Engine + Telemetry</div>
+          <div class="tl-desc">Hybrid ML + catalog fallback + rules-only fallback. Immutable telemetry sessions and candidate snapshots (Phase 8–9 architecture). Rollout guardrails, A/B assignment, and Python ML serving integration fully operational.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot done"></div></div>
+        <div class="tl-content">
+          <div class="tl-phase done">Phase 3 &nbsp;·&nbsp; Complete &nbsp;·&nbsp; Q1 2026</div>
+          <div class="tl-h">Full 27-Screen UI — Midnight Aurora Theme</div>
+          <div class="tl-desc">All screens built and integrated. 3D scenes via Three.js, AR measurement overlay, before/after thermal visualization, installer quote flow, impact dashboards, species library, city heat map, and Capacitor Android shell.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot prog"></div></div>
+        <div class="tl-content">
+          <div class="tl-phase prog">Phase 4 &nbsp;·&nbsp; In Progress &nbsp;·&nbsp; Q2 2026</div>
+          <div class="tl-h">Flutter Redesign + Real-Time Alerts</div>
+          <div class="tl-desc">Full Flutter UI system using Midnight Aurora design tokens imported into the project. Real-time push notifications for heat alerts, installer updates, and AI insights. 3D animation upgrade across all 27 screens.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot plan"></div></div>
+        <div class="tl-content">
+          <div class="tl-phase plan">Phase 5 &nbsp;·&nbsp; Planned &nbsp;·&nbsp; Q3 2026</div>
+          <div class="tl-h">Android Launch + Installer Marketplace Go-Live</div>
+          <div class="tl-desc">Capacitor APK submitted to Google Play Store. Installer marketplace live with real transactions in 5 Tier-1 cities. SLA monitoring active. Longitudinal follow-up scheduler running in production at scale.</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot-wrap"><div class="tl-dot later"></div></div>
+        <div class="tl-content">
+          <div class="tl-phase later">Phase 6 &nbsp;·&nbsp; Planned &nbsp;·&nbsp; Q4 2026</div>
+          <div class="tl-h">Commercial Scale + ML Retraining on Real Data</div>
+          <div class="tl-desc">500+ verified installs per month. ML model retrained on real outcome data from longitudinal tracking. Tier-2 city expansion to 10 cities. B2B white-label product for housing societies and commercial real estate. Unit economics positive.</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  <div class="pg-foot">
+    <span class="pg-foot-txt">HeatWise &nbsp;·&nbsp; Goal Report 2026 &nbsp;·&nbsp; Confidential</span>
+    <span class="pg-foot-txt">Page 6 of 9</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PAGE 7 — RISKS & DEPENDENCIES
+════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="pg-head">
+    <span class="pg-brand">HeatWise</span>
+    <span class="pg-section">07 &nbsp;—&nbsp; Risks &amp; Dependencies</span>
+  </div>
+  <div class="pg-body">
+
+    <div class="eyebrow">07 &nbsp;·&nbsp; Risks &amp; Dependencies</div>
+    <div class="sec-title">Risk Register &amp; Mitigation Strategies</div>
+    <div class="sec-desc">Key risks across product, technical, commercial, and market dimensions — each with a defined mitigation path built into the platform architecture.</div>
+
+    <table>
+      <thead>
+        <tr><th style="width:34%">Risk</th><th style="width:12%">Category</th><th style="width:11%">Severity</th><th>Mitigation</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ML model underperforms on edge-case Indian climates (coastal, hill stations)</td>
+          <td>Technical</td>
+          <td><span class="rb rb-hi">High</span></td>
+          <td>Catalog hybrid and rules-only fallbacks always active. Guardrail failures trigger automatic downgrade with zero user-facing impact.</td>
+        </tr>
+        <tr>
+          <td>Installer network too sparse at launch in Tier-2 cities</td>
+          <td>Commercial</td>
+          <td><span class="rb rb-hi">High</span></td>
+          <td>Launch restricted to 5 Tier-1 cities. Tier-2 expansion gated on minimum 3 verified installers per city.</td>
+        </tr>
+        <tr>
+          <td>AR measurement inaccurate on low-end Android devices</td>
+          <td>Product</td>
+          <td><span class="rb rb-md">Medium</span></td>
+          <td>Manual measurement fallback always available. AR is an enhancement, not a hard requirement for recommendation generation.</td>
+        </tr>
+        <tr>
+          <td>Species availability data stale or mismatched to region</td>
+          <td>Data</td>
+          <td><span class="rb rb-md">Medium</span></td>
+          <td>RecommendationConstraintSnapshot captures supply state at recommendation time. Seasonal windows enforced server-side before candidates are scored.</td>
+        </tr>
+        <tr>
+          <td>Plant survival rate below prediction in extreme heat zones</td>
+          <td>Outcome</td>
+          <td><span class="rb rb-md">Medium</span></td>
+          <td>LongitudinalFollowupSchedule tracks survival at 4 checkpoints. Outcome data directly feeds the ML retraining pipeline.</td>
+        </tr>
+        <tr>
+          <td>User drop-off before completing recommendation flow</td>
+          <td>Product</td>
+          <td><span class="rb rb-md">Medium</span></td>
+          <td>RecommendationTelemetryEvent tracks drop-off at each stage. Phase 4 Flutter redesign targets conversion friction directly.</td>
+        </tr>
+        <tr>
+          <td>Recommendation engine latency unacceptable on mobile</td>
+          <td>Technical</td>
+          <td><span class="rb rb-lo">Low</span></td>
+          <td>Python ML subprocess pre-warmed on server start. IdempotencyRecord deduplicates repeat requests. Fingerprinting caches recent responses.</td>
+        </tr>
+        <tr>
+          <td>OpenAI API cost spike at high recommendation volume</td>
+          <td>Commercial</td>
+          <td><span class="rb rb-lo">Low</span></td>
+          <td>ML-first architecture reduces GPT dependency to edge cases only. Rules fallback costs zero. Cost-per-recommendation tracked in unit economics model.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Critical Dependencies</h2>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-title">External</div>
+        <ul>
+          <li><strong>OpenAI API</strong> — GPT-backed analysis and explanation features</li>
+          <li><strong>Runware API</strong> — AI garden visualization image generation</li>
+          <li><strong>SMS Provider</strong> — Phone OTP delivery at login</li>
+          <li><strong>Google Play Store</strong> — Android APK distribution channel</li>
+          <li><strong>Postgres (prod)</strong> — Production DB; replaces SQLite local dev</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-title t">Internal</div>
+        <ul>
+          <li><strong>Python ML service</strong> — Must be co-deployed with Next.js on same server</li>
+          <li><strong>Species catalog artifact</strong> — Must be regenerated and committed after any alias change</li>
+          <li><strong>Installer onboarding</strong> — Commercial launch blocked until 3+ installers per city verified</li>
+          <li><strong>Seeded database</strong> — Recommendation integration tests require seeded DB + DATABASE_URL</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+  <div class="pg-foot">
+    <span class="pg-foot-txt">HeatWise &nbsp;·&nbsp; Goal Report 2026 &nbsp;·&nbsp; Confidential</span>
+    <span class="pg-foot-txt">Page 7 of 9</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PAGE 8 — IMPACT GOALS
+════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="pg-head">
+    <span class="pg-brand">HeatWise</span>
+    <span class="pg-section">08 &nbsp;—&nbsp; Impact Goals</span>
+  </div>
+  <div class="pg-body">
+
+    <div class="eyebrow">08 &nbsp;·&nbsp; Impact Goals</div>
+    <div class="sec-title">Environmental &amp; Social Targets</div>
+    <div class="sec-desc">HeatWise's north star is measurable impact on urban temperature and quality of life. Revenue and growth are outputs of impact — not the other way around.</div>
+
+    <div class="sg sg3">
+      <div class="sc t"><div class="slbl">Cooling Per Install</div><div class="sval t">-3.5°C</div><div class="ssub">Average surface temp reduction target</div></div>
+      <div class="sc b"><div class="slbl">CO₂ Offset / Install</div><div class="sval b">12kg</div><div class="ssub">Per month per project</div></div>
+      <div class="sc a"><div class="slbl">Year 1 Install Target</div><div class="sval a">5,000</div><div class="ssub">Verified rooftop installations</div></div>
+    </div>
+
+    <h2>Measurable Impact Metrics</h2>
+    <table>
+      <thead><tr><th>Impact Metric</th><th>Measurement Method</th><th>Year 1 Target</th></tr></thead>
+      <tbody>
+        <tr><td>Total surface area greened</td><td>VerifiedInstallRecord.areaSqm aggregate</td><td>500,000 sqm</td></tr>
+        <tr><td>Average surface cooling per installation</td><td>LongitudinalRemeasurement temperature delta avg</td><td>-3.5°C</td></tr>
+        <tr><td>Total CO₂ offset across all installs</td><td>CarbonDashboardScreen — platform aggregate</td><td>60,000 kg/month</td></tr>
+        <tr><td>Plant survival rate at 90 days</td><td>OutcomeVerificationRecord at 90d checkpoint</td><td>&gt; 80%</td></tr>
+        <tr><td>User satisfaction score</td><td>InstallOutcomeRecord.satisfactionScore avg</td><td>&gt; 4.3 / 5.0</td></tr>
+        <tr><td>Cities with active green cover data</td><td>GeoContext.cityName distinct count in DB</td><td>15 cities</td></tr>
+        <tr><td>Unique species successfully deployed</td><td>VerifiedInstallRecord species variety count</td><td>50+ species</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Species Cooling Benchmark</h2>
+    <div class="callout t">
+      <div class="callout-title">Target: Top-10 Cooling Species Deployed in Every City</div>
+      <div class="callout-body">The SpeciesCatalog ranks plants by cooling score (0–10). HeatWise targets deployment of the top 10 catalog species — Vetiver, Areca Palm, Bamboo, Tulsi, Curry Leaf, Bougainvillea, Moringa, Jasmine, Ficus, and Neem — across all active cities. Vetiver carries the highest cooling score at 9/10 with a measured -4°C surface reduction. The recommendation engine weights these species higher in heat-risk zones where UHI score exceeds 7.</div>
+    </div>
+
+    <h2>City-Level Contribution Model</h2>
+    <p>HeatWise tracks each installation's fractional contribution to the host city's annual green cover target. The City Heat Map screen surfaces this in real time — showing the aggregate cooling effect of all verified installations across a city. This data becomes the platform's most defensible asset: a ground-truth, installation-by-installation record of urban temperature reduction.</p>
+
+    <div class="callout h">
+      <div class="callout-title">Long-Term Vision — 3 Years</div>
+      <div class="callout-body">By 2028, HeatWise aims to have contributed to measurable UHI reduction in at least 3 major Indian cities — verifiable via satellite thermal imagery comparison before and after platform deployment. The longitudinal outcome data and city-level aggregation make HeatWise uniquely positioned to demonstrate population-scale climate impact backed by ground-truth installation records — a capability no other platform in the market currently offers.</div>
+    </div>
+
+  </div>
+  <div class="pg-foot">
+    <span class="pg-foot-txt">HeatWise &nbsp;·&nbsp; Goal Report 2026 &nbsp;·&nbsp; Confidential</span>
+    <span class="pg-foot-txt">Page 8 of 9</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PAGE 9 — SUMMARY
+════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="pg-head">
+    <span class="pg-brand">HeatWise</span>
+    <span class="pg-section">09 &nbsp;—&nbsp; Summary</span>
+  </div>
+  <div class="pg-body">
+
+    <div class="eyebrow">09 &nbsp;·&nbsp; Summary</div>
+    <div class="sec-title">Where We Are. Where We Are Going.</div>
+    <div class="sec-desc">A final snapshot of the full platform scope, current build state, immediate next steps, and the closing thesis behind HeatWise.</div>
+
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-title">What Is Built — Today</div>
+        <ul>
+          <li>73-model Prisma schema covering all domains end-to-end</li>
+          <li>27-screen mobile-first UI with 3D animations and AR</li>
+          <li>Hybrid ML + catalog + rules recommendation engine</li>
+          <li>100+ API endpoints across 19 service domains</li>
+          <li>Full installer quote-to-job-to-outcome lifecycle</li>
+          <li>Longitudinal follow-up at 7d / 30d / 90d / 180d</li>
+          <li>Enterprise governance: consent, retention, audit trail</li>
+          <li>Android Capacitor shell with dev setup complete</li>
+          <li>CI pipeline: typecheck + species-mapping verification</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-title a">What Is Next</div>
+        <ul>
+          <li><strong>Q2 2026 (Phase 4):</strong> Flutter UI import, real-time alerts, 3D animation upgrade</li>
+          <li><strong>Q3 2026 (Phase 5):</strong> Android Play Store launch, installer marketplace live, 5 cities active</li>
+          <li><strong>Q4 2026 (Phase 6):</strong> ML retraining on real outcomes, Tier-2 expansion, B2B white-label</li>
+          <li><strong>2027:</strong> 10,000+ installs, satellite-verifiable city-level cooling data, Series A raise</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Platform Scope at a Glance</h2>
+    <div class="sg sg4">
+      <div class="sc b"><div class="slbl">Prisma Models</div><div class="sval b">73</div></div>
+      <div class="sc t"><div class="slbl">App Screens</div><div class="sval t">27</div></div>
+      <div class="sc a"><div class="slbl">API Routes</div><div class="sval a">100+</div></div>
+      <div class="sc c"><div class="slbl">Lib Modules</div><div class="sval c">100+</div></div>
+    </div>
+    <div class="sg sg4" style="margin-top: 0;">
+      <div class="sc h"><div class="slbl">Cooling Target</div><div class="sval h">-3.5°C</div><div class="ssub">Per installation</div></div>
+      <div class="sc t"><div class="slbl">Year 1 Installs</div><div class="sval t">5,000</div><div class="ssub">Verified rooftops</div></div>
+      <div class="sc a"><div class="slbl">Launch Cities</div><div class="sval a">5</div><div class="ssub">Tier-1 India</div></div>
+      <div class="sc r"><div class="slbl">Runway Goal</div><div class="sval r">12mo</div><div class="ssub">To positive unit economics</div></div>
+    </div>
+
+    <div class="callout" style="margin-top: 4mm;">
+      <div class="callout-title">Closing Statement</div>
+      <div class="callout-body">HeatWise is not a gardening app. It is urban climate infrastructure — built from the ground up for scale, accuracy, and verifiable real-world impact. Every architectural decision, from immutable telemetry to longitudinal outcome tracking, exists to ensure that every claim the platform makes about cooling a city is backed by auditable, ground-truth data. The goal is not to sell green installations. The goal is to make Indian rooftops a measurable weapon against urban heat — and to prove it with numbers.</div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6mm; padding-top:3.5mm; border-top:.5pt solid rgba(56,189,248,.12);">
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif; font-size:9pt; font-weight:700; color:#E0F2FE;">HeatWise</div>
+        <div style="font-size:7pt; color:rgba(186,230,253,.42); margin-top:1mm;">Goal Report &nbsp;·&nbsp; April 2026 &nbsp;·&nbsp; v1.0</div>
+      </div>
+      <div style="font-family:'DM Mono',monospace; font-size:5.5pt; color:rgba(186,230,253,.30); letter-spacing:1px; text-transform:uppercase;">Internal &nbsp;·&nbsp; Confidential</div>
+    </div>
+
+  </div>
+  <div class="pg-foot">
+    <span class="pg-foot-txt">HeatWise &nbsp;·&nbsp; Goal Report 2026 &nbsp;·&nbsp; Confidential</span>
+    <span class="pg-foot-txt">Page 9 of 9</span>
+  </div>
+</div>
+
+</body>
+</html>

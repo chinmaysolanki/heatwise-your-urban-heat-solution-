@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Annexure IV — Internship Goals Report</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 18mm 20mm 18mm 20mm;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 11.5pt;
+    color: #000;
+    background: #fff;
+    line-height: 1.5;
+  }
+
+  /* ── TOP RIGHT LABEL ── */
+  .annexure {
+    text-align: right;
+    font-size: 11pt;
+    margin-bottom: 4mm;
+  }
+
+  /* ── HEADER ── */
+  .inst-name {
+    text-align: center;
+    font-size: 13.5pt;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    margin-bottom: 1.5mm;
+  }
+  .dept-name {
+    text-align: center;
+    font-size: 11.5pt;
+    margin-bottom: 1.5mm;
+  }
+  .sem-line {
+    text-align: center;
+    font-size: 11.5pt;
+    font-variant: small-caps;
+    letter-spacing: 0.2px;
+    margin-bottom: 1.5mm;
+  }
+  .report-title {
+    text-align: center;
+    font-size: 12pt;
+    font-weight: bold;
+    margin-bottom: 6mm;
+  }
+
+  /* ── DATE ROW ── */
+  .date-row {
+    text-align: right;
+    font-size: 11.5pt;
+    font-weight: bold;
+    margin-bottom: 5mm;
+  }
+  .date-row .date-val {
+    font-weight: normal;
+    border-bottom: 1pt solid #000;
+    display: inline-block;
+    min-width: 36mm;
+    padding: 0 2mm;
+    text-align: center;
+  }
+
+  /* ── FORM FIELD ── */
+  .field-row {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 3.5mm;
+    font-size: 11.5pt;
+    gap: 0;
+  }
+  .field-label {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .field-val {
+    flex: 1;
+    border-bottom: 1pt solid #000;
+    padding: 0 2mm 0.5mm;
+    min-width: 0;
+    line-height: 1.3;
+  }
+  .field-val.bold { font-weight: bold; }
+
+  /* Row with two fields side by side */
+  .field-dual {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 3.5mm;
+    font-size: 11.5pt;
+    gap: 6mm;
+  }
+  .field-dual .part {
+    display: flex;
+    align-items: baseline;
+    flex: 1;
+    gap: 0;
+  }
+  .field-dual .part.shrink { flex: 0 0 auto; }
+
+  /* ── SECTION HEADING ── */
+  .section-head {
+    font-size: 11.5pt;
+    font-weight: bold;
+    margin: 4mm 0 3mm;
+  }
+
+  /* ── ITEM BLOCK (i, ii) ── */
+  .item-block {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 3mm;
+    gap: 2mm;
+  }
+  .item-label {
+    flex-shrink: 0;
+    width: 12mm;
+    font-size: 11.5pt;
+    padding-top: 0.3mm;
+  }
+  .item-content { flex: 1; }
+  .item-title {
+    font-size: 11.5pt;
+    white-space: nowrap;
+  }
+  .item-line {
+    border-bottom: 1pt solid #000;
+    margin-bottom: 2.5mm;
+    min-height: 5.5mm;
+    padding: 0 2mm 0.5mm;
+    font-size: 11pt;
+  }
+  .item-line.filled { font-weight: normal; }
+
+  /* ── DETAILS LINES ── */
+  .details-section { margin-top: 3mm; }
+  .details-label {
+    font-size: 11.5pt;
+    margin-bottom: 2.5mm;
+  }
+  .dline {
+    border-bottom: 1pt solid #000;
+    min-height: 5.5mm;
+    margin-bottom: 2.5mm;
+    padding: 0 2mm 0.5mm;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+  .dline.dotted {
+    border-bottom: 1pt dotted #000;
+  }
+  .dline.empty { min-height: 5.5mm; }
+
+  /* ── SIGNATURE SECTION ── */
+  .sig-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10mm;
+    gap: 10mm;
+  }
+  .sig-col { flex: 1; }
+  .sig-title {
+    font-size: 11.5pt;
+    font-weight: bold;
+    margin-bottom: 8mm;
+  }
+  .sig-field {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 3mm;
+    font-size: 11.5pt;
+    gap: 0;
+  }
+  .sig-field-label { white-space: nowrap; flex-shrink: 0; }
+  .sig-field-val {
+    flex: 1;
+    border-bottom: 1pt solid #000;
+    padding: 0 2mm 0.3mm;
+    min-width: 0;
+  }
+</style>
+</head>
+<body>
+
+  <div class="annexure">ANNEXURE –IV</div>
+
+  <div class="inst-name">THAPAR INSTITUTE OF ENGINEERING &amp; TECHNOLOGY, PATIALA</div>
+  <div class="dept-name">Department of Electronics &amp; Communication Engineering</div>
+  <div class="sem-line">PROJECT SEMESTER: 2025-26 Even Semester (from January 2026)</div>
+  <div class="report-title">Internship Student GOALS REPORT (during First Visit)</div>
+
+  <div class="date-row">
+    Date of Visit &nbsp;<span class="date-val">08 April 2026</span>
+  </div>
+
+  <!-- Roll No & Name -->
+  <div class="field-row">
+    <span class="field-label">Roll No. &amp; Name of Student</span>
+    <span class="field-val bold">&nbsp;102203389 &nbsp;·&nbsp; Chinmay Solanki</span>
+  </div>
+
+  <!-- Organization Name -->
+  <div class="field-row">
+    <span class="field-label">Name of Organization &amp; Address: &nbsp;</span>
+    <span class="field-val bold">Min Melon Business Consulting</span>
+  </div>
+
+  <!-- Address line 2 -->
+  <div class="field-row">
+    <span class="field-label" style="width:0; visibility:hidden;">x</span>
+    <span class="field-val">Venture Labs, Thapar University, Patiala, Punjab – 147004</span>
+  </div>
+
+  <!-- Phone & Email -->
+  <div class="field-dual">
+    <div class="part">
+      <span class="field-label">Phone No.&nbsp;</span>
+      <span class="field-val">9659757000</span>
+    </div>
+    <div class="part">
+      <span class="field-label">Email&nbsp;</span>
+      <span class="field-val">chinmaysolanki123@gmail.com</span>
+    </div>
+  </div>
+
+  <!-- Industry Mentor -->
+  <div class="field-row">
+    <span class="field-label">Name of Industry Mentor: &nbsp;</span>
+    <span class="field-val bold">Mr. Aneesh Gopalakrishnan</span>
+  </div>
+
+  <!-- Designation / Phone / Email -->
+  <div class="field-dual">
+    <div class="part shrink">
+      <span class="field-label">Designation&nbsp;</span>
+      <span class="field-val" style="min-width:28mm;">Managing Partner</span>
+    </div>
+    <div class="part shrink">
+      <span class="field-label">Phone No.&nbsp;</span>
+      <span class="field-val" style="min-width:26mm;">7025235498</span>
+    </div>
+    <div class="part">
+      <span class="field-label">Email&nbsp;</span>
+      <span class="field-val">aneesh.pg@thapar.edu</span>
+    </div>
+  </div>
+
+  <!-- Brief Goal Report heading -->
+  <div class="section-head">BRIEF GOAL REPORT</div>
+
+  <!-- i) Title -->
+  <div class="item-block">
+    <span class="item-label">i)</span>
+    <div class="item-content">
+      <div style="display:flex; align-items:baseline; gap:0; margin-bottom:2.5mm;">
+        <span style="white-space:nowrap; font-size:11.5pt;">Topic/Title of Project: &nbsp;</span>
+        <span style="flex:1; border-bottom:1pt solid #000; padding:0 2mm 0.5mm; font-size:11pt;">HeatWise — AI-Powered Urban Heat Reduction &amp; Green Cover Recommendation Platform</span>
+      </div>
+      <div class="item-line filled">for Indian Cities using Machine Learning, AR Measurement, and Installer Marketplace Integration.</div>
+      <div class="item-line empty"></div>
+    </div>
+  </div>
+
+  <!-- ii) Type -->
+  <div class="item-block">
+    <span class="item-label">ii)</span>
+    <div class="item-content">
+      <div style="display:flex; align-items:baseline; gap:0; margin-bottom:2.5mm;">
+        <span style="white-space:nowrap; font-size:11.5pt;">Type of Project&nbsp;</span>
+        <span style="flex:1; border-bottom:1pt solid #000; padding:0 2mm 0.5mm; font-size:11pt;">Full-Stack Software Development — Web &amp; Mobile Application with AI/ML Integration</span>
+      </div>
+      <div class="item-line filled">Domains: Artificial Intelligence, Machine Learning, Mobile Development (Android/Capacitor), Geospatial Intelligence,</div>
+      <div class="item-line filled">Computer Vision (AR Measurement), Backend Engineering (Next.js, Prisma ORM, PostgreSQL).</div>
+    </div>
+  </div>
+
+  <!-- Details -->
+  <div class="details-section">
+    <div class="details-label">Details of Project Semester Assignment:</div>
+
+    <div class="dline">The project involves the end-to-end design, development, and deployment of HeatWise — a full-stack AI-powered platform</div>
+    <div class="dline">that recommends optimized green cover solutions for urban rooftops in Indian cities to combat the Urban Heat Island (UHI)</div>
+    <div class="dline">effect. The platform integrates a hybrid Machine Learning and rules-based recommendation engine, AR-assisted space</div>
+    <div class="dline">measurement, 3D garden layout visualization, a verified green installer marketplace, and longitudinal outcome tracking.</div>
+    <div class="dline dotted">During this project semester, the student is responsible for: (1) Frontend development of all 27 application screens</div>
+    <div class="dline dotted">using Next.js and React, implementing the "Midnight Aurora" dark UI theme with 3D animations via Three.js and</div>
+    <div class="dline dotted">CSS animations; (2) Building and integrating the real-time Notifications and Alerts system for heat alerts, AI analysis</div>
+    <div class="dline dotted">updates, installer replies, eco tips, and achievement milestones; (3) Designing Flutter-based UI components using the</div>
+    <div class="dline">established Midnight Aurora design token system (color palette: #04091A background, #38BDF8 primary electric blue,</div>
+    <div class="dline dotted">#14B8A6 teal accent) and porting them to the web application; (4) Integrating the recommendation engine frontend</div>
+    <div class="dline">with the backend API (/api/recommendations/generate) that orchestrates ML scoring, catalog hybrid fallback, supply</div>
+    <div class="dline dotted">constraint checking, and geospatial enrichment; (5) Supporting the Android Capacitor mobile build for Play Store</div>
+    <div class="dline">submission. The project directly addresses climate resilience in Tier 1–3 Indian cities by enabling measurable urban</div>
+    <div class="dline dotted">temperature reduction through data-driven green infrastructure planning and verified installer deployment.</div>
+  </div>
+
+  <!-- Signature Section -->
+  <div class="sig-section">
+    <div class="sig-col">
+      <div class="sig-title">(Signature of Faculty Mentor)</div>
+      <div class="sig-field">
+        <span class="sig-field-label">Name&nbsp;</span>
+        <span class="sig-field-val">Dr. Harpreet Singh</span>
+      </div>
+      <div class="sig-field">
+        <span class="sig-field-label">Designation&nbsp;</span>
+        <span class="sig-field-val">Lecturer</span>
+      </div>
+    </div>
+    <div class="sig-col">
+      <div class="sig-title">(Signature of Industry Mentor)</div>
+      <div class="sig-field">
+        <span class="sig-field-label">Name&nbsp;</span>
+        <span class="sig-field-val">Mr. Aneesh Gopalakrishnan</span>
+      </div>
+      <div class="sig-field">
+        <span class="sig-field-label">Designation&nbsp;</span>
+        <span class="sig-field-val">Managing Partner</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

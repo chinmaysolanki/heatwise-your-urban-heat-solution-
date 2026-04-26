@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HeatWise — Product, User Flow & Technical Documentation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  :root {
+    --green:   #52B788;
+    --green-d: #2D6A4F;
+    --green-l: #D8F3DC;
+    --bg:      #0B1E12;
+    --bg2:     #0D2116;
+    --cyan:    #48CAE4;
+    --gold:    #F9C74F;
+    --orange:  #E76F51;
+    --text:    #D8F3DC;
+    --dim:     rgba(216,243,220,.5);
+    --border:  rgba(82,183,136,.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f4f4f0;
+    color: #1a1a1a;
+    font-size: 10pt;
+    line-height: 1.6;
+  }
+
+  /* ── Page layout ── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto 12mm;
+    background: white;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+
+  @media print {
+    body { background: white; margin: 0; }
+    .page { margin: 0; page-break-after: always; box-shadow: none; }
+    @page { size: A4; margin: 0; }
+  }
+
+  /* ── Cover page ── */
+  .cover {
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0;
+    min-height: 297mm;
+  }
+
+  .cover-top {
+    padding: 18mm 18mm 0;
+  }
+
+  .cover-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 60px;
+  }
+
+  .cover-logo-mark {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--green-d), var(--green));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+
+  .cover-logo-text {
+    font-size: 18pt;
+    font-weight: 800;
+    color: var(--green);
+    letter-spacing: -0.5px;
+  }
+
+  .cover-eyebrow {
+    font-size: 8pt;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: rgba(82,183,136,.55);
+    margin-bottom: 14px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .cover-title {
+    font-size: 36pt;
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--text);
+    margin-bottom: 20px;
+    letter-spacing: -1.5px;
+  }
+
+  .cover-title span { color: var(--green); }
+
+  .cover-sub {
+    font-size: 12pt;
+    color: rgba(216,243,220,.55);
+    max-width: 130mm;
+    line-height: 1.6;
+  }
+
+  .cover-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+
+  .cover-stat {
+    background: var(--bg2);
+    padding: 14px 18px;
+    text-align: center;
+  }
+
+  .cover-stat-num {
+    font-size: 24pt;
+    font-weight: 900;
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .cover-stat-label {
+    font-size: 7.5pt;
+    color: var(--dim);
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .cover-meta {
+    background: rgba(82,183,136,.06);
+    border-top: 1px solid var(--border);
+    padding: 10px 18mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cover-meta-item {
+    font-size: 7.5pt;
+    color: rgba(82,183,136,.45);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Content pages ── */
+  .content-page {
+    padding: 14mm 16mm 14mm;
+    min-height: 297mm;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 9mm;
+    padding-bottom: 4mm;
+    border-bottom: 2px solid #e8ede9;
+  }
+
+  .page-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chapter-tag {
+    font-size: 7pt;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--green-d);
+    background: #e8f5ee;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .chapter-title {
+    font-size: 18pt;
+    font-weight: 800;
+    color: #0d1f14;
+    letter-spacing: -0.5px;
+  }
+
+  .page-num {
+    font-size: 8pt;
+    color: #aaa;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Typography ── */
+  h2 {
+    font-size: 13pt;
+    font-weight: 800;
+    color: #0d1f14;
+    margin: 7mm 0 3mm;
+    letter-spacing: -0.3px;
+  }
+
+  h3 {
+    font-size: 10pt;
+    font-weight: 700;
+    color: var(--green-d);
+    margin: 5mm 0 2mm;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p {
+    margin-bottom: 3mm;
+    color: #3a3a3a;
+    font-size: 9.5pt;
+  }
+
+  /* ── Feature cards ── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5mm;
+    margin: 4mm 0;
+  }
+
+  .feature-card {
+    border: 1.5px solid #e2ede7;
+    border-radius: 10px;
+    padding: 5mm;
+    background: #fafdfb;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--green-d), var(--green));
+  }
+
+  .feature-card-icon {
+    font-size: 20px;
+    margin-bottom: 3mm;
+    display: block;
+  }
+
+  .feature-card-title {
+    font-size: 10pt;
+    font-weight: 700;
+    color: #0d1f14;
+    margin-bottom: 2mm;
+  }
+
+  .feature-card-desc {
+    font-size: 8.5pt;
+    color: #555;
+    line-height: 1.5;
+  }
+
+  .feature-tag {
+    display: inline-block;
+    font-size: 6.5pt;
+    font-weight: 700;
+    padding: 1.5px 5px;
+    border-radius: 3px;
+    margin-top: 2mm;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tag-core    { background: #e8f5ee; color: var(--green-d); }
+  .tag-ai      { background: #e3f0fc; color: #1a6fa8; }
+  .tag-native  { background: #fef3e2; color: #a0622c; }
+  .tag-admin   { background: #f0e8fc; color: #7b2dcc; }
+
+  /* ── Flow diagram ── */
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 5mm;
+    margin-bottom: 4mm;
+    position: relative;
+  }
+
+  .flow-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 10.5px;
+    top: 28px;
+    bottom: -4mm;
+    width: 2px;
+    background: linear-gradient(180deg, #c8e6d4, #e8f5ee);
+  }
+
+  .flow-num {
+    width: 23px;
+    height: 23px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--green-d), var(--green));
+    color: white;
+    font-size: 9pt;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .flow-content {
+    flex: 1;
+    background: #f8fcf9;
+    border: 1px solid #e2ede7;
+    border-radius: 8px;
+    padding: 4mm 5mm;
+  }
+
+  .flow-screen {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #0d1f14;
+    margin-bottom: 1.5mm;
+  }
+
+  .flow-desc {
+    font-size: 8.5pt;
+    color: #555;
+    line-height: 1.5;
+  }
+
+  .flow-api {
+    font-size: 7.5pt;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--green-d);
+    background: #e8f5ee;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-top: 2mm;
+    display: inline-block;
+  }
+
+  /* ── Tech blocks ── */
+  .tech-section {
+    margin-bottom: 6mm;
+  }
+
+  .tech-row {
+    display: flex;
+    gap: 3mm;
+    margin-bottom: 3mm;
+  }
+
+  .tech-label {
+    font-size: 8pt;
+    font-weight: 700;
+    color: var(--green-d);
+    min-width: 36mm;
+    padding-top: 1px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tech-value {
+    font-size: 8.5pt;
+    color: #3a3a3a;
+    flex: 1;
+  }
+
+  .code-block {
+    background: #0d1f14;
+    color: #b8e8c8;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7.5pt;
+    padding: 4mm 5mm;
+    border-radius: 8px;
+    margin: 3mm 0;
+    line-height: 1.7;
+    overflow: hidden;
+    border: 1px solid rgba(82,183,136,.15);
+  }
+
+  .code-block .kw  { color: #52B788; }
+  .code-block .str { color: #F9C74F; }
+  .code-block .cmt { color: rgba(184,232,200,.35); }
+  .code-block .fn  { color: #48CAE4; }
+
+  /* ── API table ── */
+  .api-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 3mm 0;
+    font-size: 8pt;
+  }
+
+  .api-table th {
+    background: #0d1f14;
+    color: var(--green-l);
+    padding: 5px 8px;
+    text-align: left;
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .api-table th:first-child { border-radius: 6px 0 0 0; }
+  .api-table th:last-child  { border-radius: 0 6px 0 0; }
+
+  .api-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #eef3ef;
+    vertical-align: top;
+  }
+
+  .api-table tr:nth-child(even) td { background: #f9fdf9; }
+
+  .method {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7pt;
+    font-weight: 700;
+    padding: 1.5px 5px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+
+  .get  { background: #e3f5ee; color: #1a7a4a; }
+  .post { background: #e3ecfc; color: #1a4aa8; }
+
+  .endpoint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    color: #0d1f14;
+  }
+
+  /* ── Dividers ── */
+  .section-div {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #c8e6d4, transparent);
+    margin: 5mm 0;
+  }
+
+  /* ── Callout box ── */
+  .callout {
+    border-left: 3px solid var(--green);
+    background: #f0faf4;
+    padding: 4mm 5mm;
+    border-radius: 0 8px 8px 0;
+    margin: 4mm 0;
+  }
+
+  .callout-title {
+    font-size: 9pt;
+    font-weight: 700;
+    color: var(--green-d);
+    margin-bottom: 2mm;
+  }
+
+  .callout p {
+    font-size: 8.5pt;
+    margin: 0;
+  }
+
+  /* ── Architecture diagram ── */
+  .arch-box {
+    border: 1.5px solid #c8e6d4;
+    border-radius: 8px;
+    padding: 3mm 4mm;
+    background: #f0faf4;
+    text-align: center;
+    font-size: 8pt;
+    font-weight: 600;
+    color: #0d1f14;
+  }
+
+  .arch-arrow {
+    text-align: center;
+    color: var(--green);
+    font-size: 14pt;
+    line-height: 1;
+    margin: 1mm 0;
+  }
+
+  .arch-row {
+    display: flex;
+    gap: 3mm;
+    align-items: center;
+    margin-bottom: 2mm;
+  }
+
+  .arch-row .arch-box { flex: 1; }
+
+  /* ── Pill tags ── */
+  .pill {
+    display: inline-block;
+    font-size: 7pt;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    margin: 1px 2px;
+    white-space: nowrap;
+  }
+
+  .pill-green  { background: #d4eedd; color: #1a6640; }
+  .pill-blue   { background: #d4e6f7; color: #1a4a80; }
+  .pill-gold   { background: #fdf0d0; color: #8a6000; }
+  .pill-orange { background: #fde8e0; color: #a03000; }
+  .pill-purple { background: #ede0fc; color: #6020a0; }
+
+  /* ── Screen list ── */
+  .screen-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3mm;
+    margin: 3mm 0;
+  }
+
+  .screen-item {
+    border: 1px solid #e2ede7;
+    border-radius: 7px;
+    padding: 3mm;
+    background: #fafdfb;
+  }
+
+  .screen-name {
+    font-size: 8.5pt;
+    font-weight: 700;
+    color: #0d1f14;
+    margin-bottom: 1mm;
+  }
+
+  .screen-desc {
+    font-size: 7.5pt;
+    color: #666;
+    line-height: 1.45;
+  }
+
+  /* ── DB model table ── */
+  .model-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8pt;
+    margin: 3mm 0;
+  }
+
+  .model-table th {
+    background: #f0faf4;
+    color: var(--green-d);
+    padding: 4px 8px;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 2px solid #c8e6d4;
+    font-size: 7.5pt;
+  }
+
+  .model-table td {
+    padding: 4px 8px;
+    border-bottom: 1px solid #eef3ef;
+    vertical-align: top;
+  }
+
+  .model-table tr:hover td { background: #f8fcf9; }
+
+  .model-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    color: var(--green-d);
+    font-weight: 600;
+  }
+
+  /* ── Page footer ── */
+  .page-footer {
+    margin-top: auto;
+    padding-top: 4mm;
+    border-top: 1px solid #e8ede9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 7.5pt;
+    color: #aaa;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Phase timeline ── */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    margin: 4mm 0;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 4mm;
+    padding-bottom: 4mm;
+    position: relative;
+  }
+
+  .timeline-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--green);
+    flex-shrink: 0;
+    margin-top: 3px;
+    box-shadow: 0 0 0 3px #d4eedd;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 4px;
+    top: 13px;
+    bottom: 0;
+    width: 2px;
+    background: #d4eedd;
+  }
+
+  .timeline-content { flex: 1; }
+
+  .timeline-phase {
+    font-size: 8pt;
+    font-weight: 700;
+    color: #0d1f14;
+    margin-bottom: 1mm;
+  }
+
+  .timeline-desc {
+    font-size: 8pt;
+    color: #555;
+  }
+
+  /* ── Full-width banner ── */
+  .dark-banner {
+    background: var(--bg2);
+    color: var(--text);
+    padding: 5mm;
+    border-radius: 10px;
+    margin: 4mm 0;
+  }
+
+  .dark-banner h3 {
+    color: var(--green);
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 10pt;
+  }
+
+  .dark-banner p {
+    color: rgba(216,243,220,.6);
+    font-size: 8.5pt;
+  }
+
+  .dark-banner .code-inline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    color: var(--cyan);
+    background: rgba(72,202,228,.1);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 1 — COVER
+════════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-top">
+    <div class="cover-logo">
+      <div class="cover-logo-mark">🌿</div>
+      <span class="cover-logo-text">HeatWise</span>
+    </div>
+
+    <div class="cover-eyebrow">// PRODUCT DOCUMENTATION · v1.0</div>
+    <div class="cover-title">User Flow,<br/>Features &<br/><span>Tech Spec</span></div>
+    <div class="cover-sub">
+      An AI-powered urban heat island mitigation platform. Scan your rooftop or terrace, get real-time green cover recommendations, connect with verified installers, and track your carbon footprint — all in one app.
+    </div>
+
+    <div style="margin-top: 20mm; display: flex; flex-wrap: wrap; gap: 6px;">
+      <span class="pill pill-green">Next.js 16</span>
+      <span class="pill pill-blue">Prisma + PostgreSQL</span>
+      <span class="pill pill-gold">Python ML Serving</span>
+      <span class="pill pill-orange">Capacitor Android</span>
+      <span class="pill pill-purple">NextAuth OTP</span>
+      <span class="pill pill-green">Three.js AR</span>
+      <span class="pill pill-blue">Open-Meteo Weather</span>
+    </div>
+  </div>
+
+  <div>
+    <div class="cover-grid">
+      <div class="cover-stat">
+        <div class="cover-stat-num">27</div>
+        <div class="cover-stat-label">App Screens</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">80+</div>
+        <div class="cover-stat-label">API Endpoints</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">55+</div>
+        <div class="cover-stat-label">Data Models</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">AR</div>
+        <div class="cover-stat-label">Live Measurement</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">ML</div>
+        <div class="cover-stat-label">Species Engine</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">CO₂</div>
+        <div class="cover-stat-label">Carbon Tracking</div>
+      </div>
+    </div>
+
+    <div class="cover-meta">
+      <span class="cover-meta-item">HEATWISE PLATFORM · CONFIDENTIAL</span>
+      <span class="cover-meta-item">April 2026</span>
+      <span class="cover-meta-item">12 PAGES</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 2 — EXECUTIVE OVERVIEW & APP SCREENS
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="content-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <span class="chapter-tag">01</span>
+        <span class="chapter-title">Product Overview</span>
+      </div>
+      <span class="page-num">2 / 12</span>
+    </div>
+
+    <h2>What is HeatWise?</h2>
+    <p>
+      HeatWise is an AI-powered mobile application that helps urban residents and property owners combat the heat island effect by designing, installing, and monitoring green cover on rooftops, terraces, and balconies. Users scan their space with a phone camera, receive ML-generated plant species recommendations, connect with verified local installers, and track the resulting carbon offset — all within a single seamless journey.
+    </p>
+
+    <div class="callout">
+      <div class="callout-title">Core Value Proposition</div>
+      <p>Every 10 m² of green cover installed drops surface temperature by ~0.67°C, saves 5–15% in air conditioning energy, and sequesters ~0.21 kg CO₂ per year. HeatWise makes this measurable, actionable, and verifiable at scale.</p>
+    </div>
+
+    <div class="section-div"></div>
+
+    <h2>All App Screens (27 total)</h2>
+
+    <h3>Onboarding & Auth</h3>
+    <div class="screen-grid">
+      <div class="screen-item">
+        <div class="screen-name">🌆 Splash</div>
+        <div class="screen-desc">3D mega-city scene with animated buildings and heat shimmer. Entry point on cold launch.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">👋 Onboarding</div>
+        <div class="screen-desc">3-step intro carousel explaining the app's value. Skip or proceed to auth.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">📱 Phone Login</div>
+        <div class="screen-desc">Phone number entry with country code selector. Initiates OTP flow.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">🔢 OTP Verify</div>
+        <div class="screen-desc">6-digit code entry with countdown timer and resend option.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">👤 Profile Setup</div>
+        <div class="screen-desc">4-step onboarding: name/age, city auto-detect, gardening interests, space type and size.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">⚙️ Complete Profile</div>
+        <div class="screen-desc">Extended profile completion for returning users who skipped earlier fields.</div>
+      </div>
+    </div>
+
+    <h3>Core Workflow</h3>
+    <div class="screen-grid">
+      <div class="screen-item">
+        <div class="screen-name">🏠 Home Dashboard</div>
+        <div class="screen-desc">City Cooling Index, metric cards, carbon card, project list, explore shortcuts.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">➕ Create Project</div>
+        <div class="screen-desc">Project name, surface type, primary goal (cooling / food / aesthetics).</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">📏 Manual Measure</div>
+        <div class="screen-desc">Width, length, floor level sliders with real-time area calculation.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">📷 Photo Capture</div>
+        <div class="screen-desc">Camera shutter or gallery import. Gallery mode supports letterbox-corrected tap.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">🔭 Live AR Measure</div>
+        <div class="screen-desc">Real-time perspective-correct corner placement using device orientation sensors.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">🖼 Photo AR Overlay</div>
+        <div class="screen-desc">Measurement overlay drawn on a captured photo with gallery angle picker.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">🌤 Environment</div>
+        <div class="screen-desc">Auto-detect via geolocation + weather API or manual sun/wind/temp sliders.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">🧠 Analysis</div>
+        <div class="screen-desc">Neural-brain animation while the recommendation engine runs (ML + rules).</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">🌿 Results</div>
+        <div class="screen-desc">Ranked species cards with sun / wind / cooling preference filters.</div>
+      </div>
+    </div>
+
+    <h3>Post-Recommendation & Features</h3>
+    <div class="screen-grid">
+      <div class="screen-item">
+        <div class="screen-name">🗺 Garden Layout</div>
+        <div class="screen-desc">Zone-based spatial layout (north wall, perimeter, center) with interactive plan.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">✨ Before/After</div>
+        <div class="screen-desc">Side-by-side 3D garden visualization. Swipeable with cooling delta overlay.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">📄 Report</div>
+        <div class="screen-desc">Detailed recommendation dossier: species info, cost breakdown, installation guide.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">🔧 Install</div>
+        <div class="screen-desc">Installer search, assignment, quote request and acceptance flow.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">✅ Install Done</div>
+        <div class="screen-desc">Confirmation screen after verified installation. Triggers follow-up schedule.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">💾 Saved</div>
+        <div class="screen-desc">Bookmarked recommendations and favorited layouts.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">🗺 City Heat Map</div>
+        <div class="screen-desc">Real-time ambient temperature overlaid on a holographic 3D city globe.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">🌱 Species Library</div>
+        <div class="screen-desc">Searchable catalog of all supported plant species with trait filters.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">🌍 Carbon Track</div>
+        <div class="screen-desc">Footprint setup (4 inputs) and dashboard with garden offset calculation.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">📊 Impact Dashboard</div>
+        <div class="screen-desc">Aggregate CO₂, temperature drop, water, and species metrics with animated counters.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">💡 Tips</div>
+        <div class="screen-desc">Contextual gardening tips based on user's interest tags and experience level.</div>
+      </div>
+      <div class="screen-item">
+        <div class="screen-name">⚙️ Settings</div>
+        <div class="screen-desc">Profile edit, notification preferences, units toggle, privacy and data controls.</div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>HeatWise Platform · Product Documentation</span>
+      <span>CONFIDENTIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 3 — USER FLOW (ONBOARDING + CORE)
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="content-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <span class="chapter-tag">02</span>
+        <span class="chapter-title">User Flow — Onboarding to First Recommendation</span>
+      </div>
+      <span class="page-num">3 / 12</span>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">1</div>
+      <div class="flow-content">
+        <div class="flow-screen">🌆 Splash Screen</div>
+        <div class="flow-desc">User opens the app for the first time. A 3D animated mega-city scene renders with glowing building windows and heat shimmer columns. The scene fades automatically after 2.5 seconds. Returning users with a valid NextAuth session skip onboarding entirely and land directly on the Home Dashboard.</div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">2</div>
+      <div class="flow-content">
+        <div class="flow-screen">👋 Onboarding Carousel</div>
+        <div class="flow-desc">Three illustrated slides explain the HeatWise value proposition: (1) Measure your space, (2) Get AI species picks, (3) Cool the city. A "Get Started" button leads to phone login. A "Skip" option leads straight to profile setup if auth is not required.</div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">3</div>
+      <div class="flow-content">
+        <div class="flow-screen">📱 Phone Authentication</div>
+        <div class="flow-desc">User enters their phone number. The system normalises the number and calls <span class="flow-api">POST /api/phone-auth/send-otp</span>. A 6-digit OTP is generated, hashed, stored with an expiry, and sent via SMS (or logged to console in dev mode when HEATWISE_DEV_OTP=true).</div>
+        <span class="flow-api">POST /api/phone-auth/send-otp</span>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">4</div>
+      <div class="flow-content">
+        <div class="flow-screen">🔢 OTP Verification</div>
+        <div class="flow-desc">User enters the 6-digit code within the 10-minute expiry window. The system verifies the hash, checks rate limits, and on success calls NextAuth to create a session. If the user's profile is incomplete, the app redirects to Profile Setup rather than Home.</div>
+        <span class="flow-api">POST /api/phone-auth/verify-otp</span>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">5</div>
+      <div class="flow-content">
+        <div class="flow-screen">👤 Profile Setup (4 Steps)</div>
+        <div class="flow-desc">
+          <strong>Step 1</strong> — Name and age input.<br/>
+          <strong>Step 2</strong> — City: auto-detected via browser Geolocation API + Open-Meteo reverse geocode, or manually typed.<br/>
+          <strong>Step 3</strong> — Gardening experience (Beginner / Intermediate / Expert) and interest chips (Food Garden, Aesthetics, Herbs &amp; Spices, Wildlife, Rooftop Farm, Zen Garden, etc.).<br/>
+          <strong>Step 4</strong> — Space type (Rooftop / Terrace / Balcony / Semi-outdoor) and estimated size slider (5–500 m²). Saved to localStorage as <code>hw_profile</code>.
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">6</div>
+      <div class="flow-content">
+        <div class="flow-screen">🏠 Home Dashboard</div>
+        <div class="flow-desc">Animated City Cooling Index score (derived from total green area + project count). Four metric cards: Garden Area, Temp Drop, CO₂/yr, Energy Saving — all calculated from live project data fetched from <span class="flow-api">GET /api/projects</span>. Personalized tip based on interest tag. Carbon footprint card. Explore shortcuts. Recent scans list.</div>
+        <span class="flow-api">GET /api/projects</span>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">7</div>
+      <div class="flow-content">
+        <div class="flow-screen">➕ Create Project</div>
+        <div class="flow-desc">User taps the FAB (+) or Scan nav item. Enters project name, selects surface type (rooftop/terrace/balcony), and sets primary goal. A project record is created in the database before measurement begins.</div>
+        <span class="flow-api">POST /api/projects</span>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">8</div>
+      <div class="flow-content">
+        <div class="flow-screen">📏 Measurement (3 paths)</div>
+        <div class="flow-desc">
+          <strong>Path A — Live AR:</strong> Device camera streams to canvas. Corner markers placed via tap using perspective-correct ray-floor intersection math (device pitch β + roll γ from DeviceOrientationEvent). Width × length auto-calculated.<br/>
+          <strong>Path B — Photo AR:</strong> User imports or captures a photo. Gallery-mode corrects for objectFit:contain letterboxing. Angle picker (Overhead / High / Mid / Low) substitutes for live device orientation.<br/>
+          <strong>Path C — Manual:</strong> Sliders for width (m), length (m), and floor level.
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">9</div>
+      <div class="flow-content">
+        <div class="flow-screen">🌤 Environment Detection</div>
+        <div class="flow-desc">Auto mode: browser Geolocation → <span class="flow-api">POST /api/env/detect</span> fetches Open-Meteo (temperature, wind speed, UV index) + Nominatim reverse geocode. Derives: heatExposure, windExposure, sunExposure, windLevel. Manual mode: sliders for sun exposure, wind level, summer temperature.</div>
+        <span class="flow-api">POST /api/env/detect</span>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">10</div>
+      <div class="flow-content">
+        <div class="flow-screen">🧠 Analysis + Recommendation Generation</div>
+        <div class="flow-desc">A neural-brain animation plays while the server processes. The app calls <span class="flow-api">POST /api/recommendations/generate</span> with the full photo session payload: dimensions, environment signals, project metadata, user location. The engine runs: ML species scoring → catalog hybrid fallback → layout eligibility → rollout guardrails → geo enrichment → pricing. Returns ranked layout slates with candidates.</div>
+        <span class="flow-api">POST /api/recommendations/generate</span>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>HeatWise Platform · Product Documentation</span>
+      <span>CONFIDENTIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 4 — USER FLOW (RESULTS TO INSTALL)
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="content-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <span class="chapter-tag">02</span>
+        <span class="chapter-title">User Flow — Results, Install & Carbon</span>
+      </div>
+      <span class="page-num">4 / 12</span>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">11</div>
+      <div class="flow-content">
+        <div class="flow-screen">🌿 Results Screen</div>
+        <div class="flow-desc">Ranked recommendation cards displayed with: species name, image, cooling score badge, estimated cost, sun/wind compatibility chips, and CO₂ impact per year. Three filter chips at the top let the user narrow by sun exposure, wind tolerance, or cooling priority. Each card tap expands to show placement zones and maintenance level.</div>
+        <span class="flow-api">POST /api/recommendations/log-impression</span>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">12</div>
+      <div class="flow-content">
+        <div class="flow-screen">🗺 Garden Layout View</div>
+        <div class="flow-desc">The selected recommendation's layout slate is rendered as a spatial plan: zone polygons for north wall, perimeter, and center fill. Each zone shows species placement count, coverage area, and expected shading. The user can tap zones to see species detail or re-rank alternatives.</div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">13</div>
+      <div class="flow-content">
+        <div class="flow-screen">✨ Before / After Visualization</div>
+        <div class="flow-desc">A 3D Three.js scene renders the space before (bare rooftop) and after (with recommended green cover). Swipe or slider animates between states. An overlay shows the projected temperature delta and CO₂ benefit. Users can share this view as a screenshot.</div>
+        <span class="flow-api">POST /api/generate-garden-visual</span>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">14</div>
+      <div class="flow-content">
+        <div class="flow-screen">📄 Report / Dossier</div>
+        <div class="flow-desc">A detailed PDF-style report generated on-demand: species fact sheet, layout zones, estimated installation cost range, material list, watering schedule, and projected 5-year CO₂ benefit. The report can be downloaded or shared with an installer.</div>
+        <span class="flow-api">POST /api/reports/recommendation-dossier</span>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">15</div>
+      <div class="flow-content">
+        <div class="flow-screen">🔧 Installer Assignment</div>
+        <div class="flow-desc">User requests installation. The system searches verified installers by city and availability via <span class="flow-api">POST /api/installers/search</span>. The matched installer receives a job notification. The user can request a quote; the installer submits pricing. On acceptance, a job record is created. Status updates (accepted → in-progress → completed) are tracked in real time.</div>
+        <span class="flow-api">POST /api/installers/request-quote</span>
+        <span class="flow-api" style="margin-left:4px">POST /api/installers/accept-job</span>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">16</div>
+      <div class="flow-content">
+        <div class="flow-screen">✅ Install Confirmed + Follow-up</div>
+        <div class="flow-desc">After the installer submits a verified install record, the user sees a confirmation screen with before/after thumbnails and their new carbon offset calculation. A longitudinal follow-up schedule is created (30, 90, 180 days) to collect remeasurement data and improve the ML model.</div>
+        <span class="flow-api">POST /api/installers/submit-verified-install</span>
+        <span class="flow-api" style="margin-left:4px">POST /api/followups/create-schedule</span>
+      </div>
+    </div>
+
+    <div class="section-div"></div>
+
+    <h2>Carbon Footprint User Journey</h2>
+
+    <div class="flow-step">
+      <div class="flow-num">A</div>
+      <div class="flow-content">
+        <div class="flow-screen">🌍 Carbon Setup (4 inputs)</div>
+        <div class="flow-desc">User sets: car km/week, flights per year, electricity kWh/month, and diet type (Vegan / Vegetarian / Pescatarian / Omnivore / Heavy Meat). A live total badge in the header updates in real time using India-specific emission factors (car 0.210 kg/km, electricity 0.820 kg/kWh, LPG 2.983 kg/kg). Saved to localStorage as <code>hw_carbon_profile</code>.</div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">B</div>
+      <div class="flow-content">
+        <div class="flow-screen">📊 Carbon Dashboard</div>
+        <div class="flow-desc">Period switcher (Week / Month / Year). Main number shows total CO₂ in selected period. Letter grade badge (A+ to D) based on net footprint after garden offset. Breakdown bars for Transport, Energy, Diet, Other. Garden offset row showing area × 0.021 T/yr with offset percentage progress bar. Net after garden row. India average comparison (1.9 T/yr baseline).</div>
+      </div>
+    </div>
+
+    <div class="section-div"></div>
+
+    <h2>City Heat Map Journey</h2>
+
+    <div class="flow-step">
+      <div class="flow-num">C</div>
+      <div class="flow-content">
+        <div class="flow-screen">🗺 City Heat Map</div>
+        <div class="flow-desc">User navigates to Explore tab. A holographic 3D globe (Three.js) shows the city with temperature colour-coding overlaid on districts. Live temperature data is fetched via Open-Meteo. Users can tap any district to see: current temperature, heat index classification (low / medium / high / extreme), and the number of HeatWise-monitored green installations in that zone.</div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-num">D</div>
+      <div class="flow-content">
+        <div class="flow-screen">🌱 Species Library</div>
+        <div class="flow-desc">Searchable and filterable catalog of all species in the recommendation engine's database. Filters: sun exposure, water demand, pet-safe, drought-tolerant, edible, space type compatibility. Each species card links to a detail page with ASPCA safety status, watering frequency, maintenance level, and cooling score range.</div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>HeatWise Platform · Product Documentation</span>
+      <span>CONFIDENTIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 5 — ALL FEATURES
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="content-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <span class="chapter-tag">03</span>
+        <span class="chapter-title">Feature Catalogue</span>
+      </div>
+      <span class="page-num">5 / 12</span>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="feature-card-icon">📐</span>
+        <div class="feature-card-title">Live AR Measurement</div>
+        <div class="feature-card-desc">Real-time perspective-correct corner placement using DeviceOrientationEvent (beta pitch, gamma roll). Converts screen coordinates to real-world metres via ray-floor intersection math. Supports both live camera and imported photos (gallery mode with letterbox correction). Cross-browser canvas rounded-rect with quadraticCurveTo fallback for older Android WebViews.</div>
+        <span class="feature-tag tag-core">Core</span>
+        <span class="feature-tag tag-ai">Sensor Fusion</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">🤖</span>
+        <div class="feature-card-title">AI Recommendation Engine</div>
+        <div class="feature-card-desc">Hybrid 3-tier engine: (1) ML species multi-label classifier served via Python runtime, (2) rule-based catalog hybrid fallback with pet-safe / drought-tolerant / water-scarce hard-exclusion logic, (3) rules-only fallback. Outputs ranked layout slates with zone placements. A/B experiment rollout with guardrails and shadow evaluation.</div>
+        <span class="feature-tag tag-ai">ML</span>
+        <span class="feature-tag tag-core">Core</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">🌤</span>
+        <div class="feature-card-title">Auto Environment Detection</div>
+        <div class="feature-card-desc">Browser Geolocation API feeds lat/lon to the server-side env/detect endpoint. Fetches Open-Meteo (temperature_2m, wind_speed_10m, uv_index, daily max temp) and Nominatim reverse geocode. Derives 4 semantic signals: heatExposure, windExposure, sunExposure, windLevel. Falls back gracefully to manual sliders.</div>
+        <span class="feature-tag tag-core">Core</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">🔧</span>
+        <div class="feature-card-title">Installer Network</div>
+        <div class="feature-card-desc">Full marketplace: search, assignment, quote request/submit/compare, job status tracking (accepted → in-progress → verified), outcome verification, SLA monitoring, and commercial performance dashboards. Installers have their own portal with field status, capability profiles, and revenue event logging.</div>
+        <span class="feature-tag tag-core">Core</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">🌍</span>
+        <div class="feature-card-title">Carbon Footprint Tracking</div>
+        <div class="feature-card-desc">Captures 4 lifestyle inputs (car km/week, flights/year, electricity kWh/month, diet). Applies India-specific emission factors. Derives weekly / monthly / annual CO₂ footprint. Calculates garden offset using area × 0.021 T/yr. Letter grade A+ to D. Net vs India average (1.9 T/yr) comparison.</div>
+        <span class="feature-tag tag-core">Core</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">✨</span>
+        <div class="feature-card-title">3D Before/After Visualisation</div>
+        <div class="feature-card-desc">Three.js scene renders the rooftop space in before (bare) and after (planted) states. Shareable screenshot. Temperature delta overlay and CO₂ benefit badge. Exportable via installer export builder for client presentations.</div>
+        <span class="feature-tag tag-ai">3D</span>
+        <span class="feature-tag tag-native">Native</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">🗺</span>
+        <div class="feature-card-title">City Heat Map</div>
+        <div class="feature-card-desc">Holographic Three.js globe overlaid with live temperature data by district. Real-time heat zone classification. Shows density of HeatWise-monitored green installations. Helps users contextualise their contribution to the city-level heat island mitigation effort.</div>
+        <span class="feature-tag tag-ai">3D</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">🌱</span>
+        <div class="feature-card-title">Species Library & Catalog</div>
+        <div class="feature-card-desc">Full catalog backed by PostgreSQL SpeciesCatalog model. Filterable by sun, water, drought tolerance, pet safety, edibility, space type. Generated mapping artifact (species_catalog_mapping.v1.json) committed to repo for CI validation. ASPCA toxicity data and moisture requirements embedded in seed data.</div>
+        <span class="feature-tag tag-core">Core</span>
+        <span class="feature-tag tag-ai">ML Data</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">📱</span>
+        <div class="feature-card-title">Phone OTP Authentication</div>
+        <div class="feature-card-desc">Passwordless authentication via SMS OTP. Number normalisation, hash storage, expiry management, rate limiting. NextAuth session management. Dev mode logs OTP to console instead of SMS. Protected route middleware checks session status on every navigation.</div>
+        <span class="feature-tag tag-core">Auth</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">📊</span>
+        <div class="feature-card-title">Admin Analytics Dashboard</div>
+        <div class="feature-card-desc">Real-time metrics: recommendation run counts, average selected rank, install conversion rate, save rate, visualisation rate, regeneration rate, heat reduction delta, MAU. Segment analysis by location, budget, experience. Installer commercial outcomes, cohort retention, and LTV tracking.</div>
+        <span class="feature-tag tag-admin">Admin</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">🔬</span>
+        <div class="feature-card-title">ML Training Pipeline</div>
+        <div class="feature-card-desc">Telemetry export → scikit-learn training (species multi-label classifier + ranking model) → model registry versioning → Python serving endpoint. Automated retraining workflow. Shadow evaluation compares live model vs challenger model on every recommendation run. Verified install outcomes feed back as ground truth.</div>
+        <span class="feature-tag tag-ai">ML</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">🏗</span>
+        <div class="feature-card-title">Android Native App</div>
+        <div class="feature-card-desc">Capacitor wrapper around the Next.js PWA. WebView points at CAP_SERVER_URL. Supports USB adb reverse (localhost:3000), Android emulator (10.0.2.2:3000), and LAN Wi-Fi. Network security config allows HTTP cleartext in dev. One-command sync + Android Studio open workflow.</div>
+        <span class="feature-tag tag-native">Android</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">📅</span>
+        <div class="feature-card-title">Longitudinal Follow-up System</div>
+        <div class="feature-card-desc">After verified installation, schedules follow-up check-ins at 30, 90, and 180 days. Captures remeasurement data (plant survival, cooling delta, maintenance rating). Data feeds back into the ML training pipeline as verified outcome labels to improve future recommendation quality.</div>
+        <span class="feature-tag tag-core">Core</span>
+        <span class="feature-tag tag-ai">ML Data</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">🔒</span>
+        <div class="feature-card-title">Governance & Compliance</div>
+        <div class="feature-card-desc">GDPR-ready consent management, data retention policies, policy flag system, audit event log. User consent records stored with timestamp and scope. Governance review summary endpoint for regulatory reporting. Platform readiness health check endpoint for uptime monitoring.</div>
+        <span class="feature-tag tag-admin">Compliance</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">💰</span>
+        <div class="feature-card-title">Commercial & Pricing Engine</div>
+        <div class="feature-card-desc">Cost estimation per recommendation (species + labour + materials). Budget fit assessment. Pricing preview before commitment. Quote comparison across multiple installers. Revenue event logging, funnel conversion tracking, cohort analysis, and unit economics dashboard for business intelligence.</div>
+        <span class="feature-tag tag-admin">Business</span>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-card-icon">📡</span>
+        <div class="feature-card-title">Supply Chain Integration</div>
+        <div class="feature-card-desc">Real-time species and material availability checks per region. Seasonal planting window validation (prevents recommending out-of-season species). Regional readiness assessment. Supply constraint preview shown to user before finalising recommendation. Webhook integration for partner inventory systems.</div>
+        <span class="feature-tag tag-core">Supply</span>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>HeatWise Platform · Product Documentation</span>
+      <span>CONFIDENTIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 6 — TECH ARCHITECTURE
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="content-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <span class="chapter-tag">04</span>
+        <span class="chapter-title">Technical Architecture</span>
+      </div>
+      <span class="page-num">6 / 12</span>
+    </div>
+
+    <h2>System Architecture Overview</h2>
+
+    <div class="dark-banner">
+      <h3>Full-Stack Monorepo on Next.js Pages Router</h3>
+      <p>The entire platform lives in a single Next.js repository. API routes, frontend components, ML integration, and Capacitor Android wrapper are co-located. Prisma provides type-safe database access. The Python ML serving process is a sidecar that Next.js calls via HTTP on localhost.</p>
+    </div>
+
+    <div style="margin: 4mm 0;">
+      <div class="arch-row">
+        <div class="arch-box" style="background:#e8f5ee; border-color: var(--green);">📱 Android App<br/><small style="color:#666">Capacitor WebView</small></div>
+        <div class="arch-arrow">↔</div>
+        <div class="arch-box" style="background:#e8f0fc; border-color: #6090cc;">🌐 Next.js Frontend<br/><small style="color:#666">React 19 · Three.js · AR</small></div>
+        <div class="arch-arrow">↔</div>
+        <div class="arch-box" style="background:#fdf0e0; border-color: #c08030;">🔌 API Routes<br/><small style="color:#666">80+ Next.js endpoints</small></div>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-row">
+        <div class="arch-box" style="background:#fafdf9; border-color: #aaa;">🗄 Prisma ORM<br/><small style="color:#666">SQLite dev · Postgres prod</small></div>
+        <div class="arch-arrow" style="font-size:11pt;">↔</div>
+        <div class="arch-box" style="background:#fafdf9; border-color: #aaa;">🐍 Python ML Sidecar<br/><small style="color:#666">scikit-learn · Flask serving</small></div>
+        <div class="arch-arrow" style="font-size:11pt;">↔</div>
+        <div class="arch-box" style="background:#fafdf9; border-color: #aaa;">☁️ External APIs<br/><small style="color:#666">Open-Meteo · Nominatim</small></div>
+      </div>
+    </div>
+
+    <div class="section-div"></div>
+
+    <h2>Frontend Stack</h2>
+    <div class="tech-section">
+      <div class="tech-row"><span class="tech-label">Framework</span><span class="tech-value">Next.js 16 with Pages Router. All pages live in <code>/pages/</code>. Main app component is a large screen-switch in <code>components/HeatWiseApp.jsx</code>.</span></div>
+      <div class="tech-row"><span class="tech-label">3D / AR</span><span class="tech-value">Three.js for all 3D scenes (mega city, holo globe, neural brain, garden before/after). WebGL canvas overlays for AR measurement. Custom perspective math using DeviceOrientationEvent.</span></div>
+      <div class="tech-row"><span class="tech-label">State</span><span class="tech-value">Local React state + localStorage for profile/carbon. No global state library. Data fetched per-screen with useEffect + fetch().</span></div>
+      <div class="tech-row"><span class="tech-label">Auth</span><span class="tech-value">NextAuth with custom phone-OTP provider. SessionProvider wraps app in _app.jsx. useSession() used on protected screens.</span></div>
+      <div class="tech-row"><span class="tech-label">Styling</span><span class="tech-value">Inline React styles throughout with design tokens in <code>components/heatwise/theme.js</code>. DM Sans + Space Grotesk + JetBrains Mono fonts. CSS animations via injected &lt;style&gt; tags.</span></div>
+      <div class="tech-row"><span class="tech-label">Path Aliases</span><span class="tech-value">@/* → root, @/models → ./models, @/ar → ./src/ar, @/live-ar/* → ./src/live-ar/*. Configured in jsconfig.json and tsconfig.json.</span></div>
+    </div>
+
+    <div class="section-div"></div>
+
+    <h2>Backend & Database</h2>
+    <div class="tech-section">
+      <div class="tech-row"><span class="tech-label">Runtime</span><span class="tech-value">Next.js API routes (TypeScript). Each route is a serverless function. No separate Express/Fastify server needed.</span></div>
+      <div class="tech-row"><span class="tech-label">ORM</span><span class="tech-value">Prisma 5.x. Schema in prisma/schema.prisma. 55+ models. Dev uses SQLite (file:./dev.db). Production uses PostgreSQL via DATABASE_URL.</span></div>
+      <div class="tech-row"><span class="tech-label">Seed Data</span><span class="tech-value">prisma/data/species_catalog_seed.mjs seeds SpeciesCatalog. Separate alias extensions in species_alias_extensions.json. Generated mapping artifact must be committed.</span></div>
+      <div class="tech-row"><span class="tech-label">Auth Storage</span><span class="tech-value">PhoneOtp table stores hashed OTPs with expiry. User table stores phone, name, profileCompleted flag, city, gardening score. UserSettings and UserConsentRecord for preferences and compliance.</span></div>
+    </div>
+
+    <div class="section-div"></div>
+
+    <h2>Directory Structure</h2>
+    <div class="code-block">
+<span class="cmt">/heatwise</span>
+├── <span class="kw">components/</span>      <span class="cmt"># React components (HeatWiseApp.jsx + sub-components)</span>
+├── <span class="kw">pages/</span>           <span class="cmt"># Next.js pages + 80+ API routes</span>
+│   └── <span class="kw">api/</span>         <span class="cmt"># recommendations/, installers/, admin/, env/, ...</span>
+├── <span class="kw">src/</span>             <span class="cmt"># Live AR screens, tracking, geometry math</span>
+│   └── <span class="kw">live-ar/</span>     <span class="cmt"># LiveARMeasurementScreen.tsx + adapters</span>
+├── <span class="kw">lib/</span>             <span class="cmt"># Recommendation engine, ML, services, auth</span>
+│   └── <span class="kw">recommendation/</span> <span class="cmt"># orchestrate, fallback, eligibility, rollout</span>
+├── <span class="kw">ml/</span>              <span class="cmt"># Python serving: training, inference, evaluation</span>
+├── <span class="kw">ml-models/</span>       <span class="cmt"># Standalone model training scripts</span>
+├── <span class="kw">heatwise-native/</span> <span class="cmt"># Capacitor Android shell</span>
+├── <span class="kw">prisma/</span>          <span class="cmt"># Schema, migrations, seeds</span>
+├── <span class="kw">data/species/</span>    <span class="cmt"># species_catalog_mapping.v1.json (generated)</span>
+└── <span class="kw">models/</span>          <span class="cmt"># Domain type definitions (index.ts)</span></div>
+
+    <div class="page-footer">
+      <span>HeatWise Platform · Product Documentation</span>
+      <span>CONFIDENTIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 7 — RECOMMENDATION ENGINE
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="content-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <span class="chapter-tag">05</span>
+        <span class="chapter-title">Recommendation Engine — Deep Dive</span>
+      </div>
+      <span class="page-num">7 / 12</span>
+    </div>
+
+    <h2>Engine Architecture (3-Tier Hybrid)</h2>
+
+    <div class="callout">
+      <div class="callout-title">Design Principle</div>
+      <p>The engine always returns a result. If the ML model is unavailable, the catalog hybrid fallback fires. If the catalog is incomplete, the rules-only fallback guarantees at least 3 ranked candidates. Every tier produces the same output shape.</p>
+    </div>
+
+    <div class="code-block">
+<span class="cmt">// Full recommendation pipeline — lib/recommendation/orchestrateLayoutRecommendations.ts</span>
+
+<span class="kw">POST</span> <span class="str">/api/recommendations/generate</span>
+  │
+  ├─ <span class="fn">buildRecommendationGenerateRequestFromPhotoSession()</span>
+  │    photoSession → ProjectInput → RecommendationGenerateRequest
+  │
+  ├─ <span class="fn">enrichRecommendationsWithPricing()</span>        <span class="cmt">// cost per candidate</span>
+  ├─ <span class="fn">buildGeoEnrichmentBundle()</span>                 <span class="cmt">// lat/lon → microclimate</span>
+  │
+  ├─ <span class="cmt">// TIER 1: ML (Python sidecar via HTTP)</span>
+  │  <span class="fn">mlRecommendationService.predict()</span>
+  │    → species scores (multi-label classifier)
+  │    → ranking model scores
+  │
+  ├─ <span class="cmt">// TIER 2: Catalog Hybrid Fallback (if ML unavailable)</span>
+  │  <span class="fn">catalogHybridFallback()</span>
+  │    → HARD_PET_UNSAFE_SPECIES exclusion
+  │    → waterScarcityHardExclude (drought-tolerant check)
+  │    → petSafeRankingNudge / reconcileChildPetSafety
+  │    → score candidates by environment match
+  │
+  ├─ <span class="cmt">// TIER 3: Rules-Only Fallback</span>
+  │  <span class="fn">rulesOnlyFallback()</span>                         <span class="cmt">// guaranteed 3+ results</span>
+  │
+  ├─ <span class="fn">layoutEligibility()</span>                        <span class="cmt">// north wall / perimeter / center</span>
+  ├─ <span class="fn">mergeMlIntoLayoutRecommendations()</span>         <span class="cmt">// combine scores + layout</span>
+  ├─ <span class="fn">recommendationRolloutGuardrails()</span>         <span class="cmt">// A/B experiment safety</span>
+  ├─ <span class="fn">attachGeoExplanationToCandidates()</span>        <span class="cmt">// "why this species"</span>
+  └─ <span class="fn">scheduleRecommendationRuntimeObservation()</span> <span class="cmt">// async telemetry</span></div>
+
+    <div class="section-div"></div>
+
+    <h2>Species Scoring Logic</h2>
+    <p>Each species is scored on a weighted combination of environment match signals. The catalog hybrid fallback uses these rules:</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-title">Sun Exposure Match</div>
+        <div class="feature-card-desc">Compares species sunRequirement (shade / partial / full) against the derived sunExposure from UV index or heat exposure. Full sun species are penalised in shaded environments and vice versa.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">Wind Tolerance</div>
+        <div class="feature-card-desc">windExposure (sheltered / moderate / windy / severe) mapped to windLevel (low / medium / high). Species with low wind tolerance are excluded when windExposure ≥ windy.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">Water Scarcity Hard Exclusion</div>
+        <div class="feature-card-desc">If scenario has scarce water: species with droughtTolerant=false AND unknown effective water demand are hard-excluded. Prevents recommending water-hungry plants in arid contexts.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">Pet Safety Hard Exclusion</div>
+        <div class="feature-card-desc">If child_pet_safe_required=1: species with dbPetSafe=false are hard-excluded before ranking. ASPCA toxicity data embedded in seed. Lemongrass and mint are correctly flagged as pet-unsafe (ASPCA-confirmed).</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">Space Type Filtering</div>
+        <div class="feature-card-desc">spaceType (rooftop / terrace / balcony) filters out species with incompatible height, root depth, or weight requirements. Balcony scenarios exclude large-root species automatically.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-title">Layout Zone Eligibility</div>
+        <div class="feature-card-desc">layoutEligibility.ts assigns each species to valid placement zones: north wall (tall climbers), perimeter (medium shrubs), center fill (ground cover). Returns eligibility codes per zone with failure reasons.</div>
+      </div>
+    </div>
+
+    <div class="section-div"></div>
+
+    <h2>A/B Experiment & Rollout System</h2>
+    <div class="tech-section">
+      <div class="tech-row"><span class="tech-label">Assignment</span><span class="tech-value">POST /api/recommendations/assignment returns experiment variant (control / challenger) per user session.</span></div>
+      <div class="tech-row"><span class="tech-label">Guardrails</span><span class="tech-value">recommendationRolloutGuardrails.ts checks: minimum species count, maximum exclusion rate, diversity score floor. Rolls back to control if challenger fails guardrails.</span></div>
+      <div class="tech-row"><span class="tech-label">Shadow Eval</span><span class="tech-value">Every recommendation run optionally runs appendRuntimeEvaluation() which scores the challenger variant without serving it to the user. Results stored in RecommendationRuntimeObservation.</span></div>
+      <div class="tech-row"><span class="tech-label">Telemetry</span><span class="tech-value">RecommendationTelemetrySession (immutable per request) + RecommendationCandidateSnapshot (exact card shown) + RecommendationTelemetryEvent (user signals). All append-only — never updated.</span></div>
+    </div>
+
+    <div class="page-footer">
+      <span>HeatWise Platform · Product Documentation</span>
+      <span>CONFIDENTIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 8 — ML PIPELINE
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="content-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <span class="chapter-tag">06</span>
+        <span class="chapter-title">ML Pipeline & AR System</span>
+      </div>
+      <span class="page-num">8 / 12</span>
+    </div>
+
+    <h2>ML Model Architecture</h2>
+
+    <div class="tech-section">
+      <div class="tech-row"><span class="tech-label">Classifier</span><span class="tech-value">Species multi-label classifier (scikit-learn). Input features: spaceType, sunExposure, windLevel, floorLevel, budgetRange, maintenanceLevel, lat/lon. Output: probability scores for each species code in the catalog.</span></div>
+      <div class="tech-row"><span class="tech-label">Ranker</span><span class="tech-value">Ranking model trained on telemetry: which species the user selected given the ranked list. Optimised for NDCG. Outputs a re-ranking score combined with classifier probability.</span></div>
+      <div class="tech-row"><span class="tech-label">Serving</span><span class="tech-value">Python Flask/FastAPI sidecar in /ml/serving/. TypeScript calls it via HTTP using lib/services/mlRecommendationService.ts. Config via env vars: HEATWISE_ML_CWD, HEATWISE_REGISTRY_DIR, HEATWISE_SPECIES_CSV.</span></div>
+      <div class="tech-row"><span class="tech-label">Registry</span><span class="tech-value">ml/registry/ stores versioned model artefacts. Each version includes: model weights, feature schema, evaluation metrics, training dataset hash. Enables safe rollback.</span></div>
+    </div>
+
+    <h2>Training Data Pipeline</h2>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-line"></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">1. Telemetry Collection</div>
+          <div class="timeline-desc">Every recommendation run creates a RecommendationTelemetrySession. User selections, impressions, and feedback logged as RecommendationTelemetryEvent rows. All immutable and append-only.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-line"></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">2. Outcome Verification</div>
+          <div class="timeline-desc">Installed projects produce VerifiedInstallRecord after installer submits photos. Follow-up check-ins at 30/90/180 days provide survival and cooling delta data as ground truth labels.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-line"></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">3. Export Pipeline</div>
+          <div class="timeline-desc">npm run ml:export-telemetry-pipeline exports labelled training data from Prisma to CSV files in ml/data/. Feature engineering applied: derive heat level from temp, encode categoricals.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-line"></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">4. Model Training</div>
+          <div class="timeline-desc">ml-models/scripts/train_species_model.py runs scikit-learn training. Validated against held-out test set. Metrics (precision@k, NDCG, recall) logged to registry.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-line"></div>
+        <div class="timeline-content">
+          <div class="timeline-phase">5. Deploy & Shadow Eval</div>
+          <div class="timeline-desc">New model deployed to registry. Rollout guardrails activate shadow evaluation: new model runs alongside control without affecting user output. If guardrails pass over N requests, traffic shifted to new model.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-div"></div>
+
+    <h2>AR Measurement System</h2>
+
+    <div class="tech-section">
+      <div class="tech-row"><span class="tech-label">File</span><span class="tech-value">src/live-ar/screens/LiveARMeasurementScreen.tsx — primary AR screen.</span></div>
+      <div class="tech-row"><span class="tech-label">Perspective Math</span><span class="tech-value">screenToWorld() uses full ray-floor intersection. Given a tap (sx, sy) in screen space, device pitch β and roll γ, image width W and height H, derives a unit direction vector and intersects with y=0 floor plane to get real-world (x, z) coordinates.</span></div>
+      <div class="tech-row"><span class="tech-label">Live Mode</span><span class="tech-value">DeviceOrientationEvent provides beta (pitch) and gamma (roll) in real time. Tapping places corner markers. After 4 corners, area = |cross product| / 2 × 2 for rectangle approximation.</span></div>
+      <div class="tech-row"><span class="tech-label">Gallery Mode</span><span class="tech-value">Static photo has no device orientation. getContainedImageBounds() computes objectFit:contain letterbox offset from naturalWidth/Height vs clientWidth/Height. galleryBeta state (default 60°) substitutes for live pitch. 4 preset buttons: Overhead (β=20), High (β=42), Mid (β=60), Low (β=76).</span></div>
+      <div class="tech-row"><span class="tech-label">Canvas Compat</span><span class="tech-value">rRect() helper: uses native ctx.roundRect() if available (Chrome 99+, Safari 15.4+, Firefox 112+), falls back to quadraticCurveTo() for older Android WebViews. All 8 call sites use this helper.</span></div>
+      <div class="tech-row"><span class="tech-label">Overlay</span><span class="tech-value">Canvas drawn on top of camera/image. Corner markers, edge lines, area label, tip banner, mini-map all drawn with requestAnimationFrame loop. DM Sans font loaded for labels.</span></div>
+    </div>
+
+    <div class="page-footer">
+      <span>HeatWise Platform · Product Documentation</span>
+      <span>CONFIDENTIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 9 — API REFERENCE (PART 1)
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="content-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <span class="chapter-tag">07</span>
+        <span class="chapter-title">API Reference — Core Endpoints</span>
+      </div>
+      <span class="page-num">9 / 12</span>
+    </div>
+
+    <h2>Authentication</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/phone-auth/send-otp</td><td>Normalise phone number, generate + hash OTP, send SMS (or console log in dev)</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/phone-auth/verify-otp</td><td>Verify hashed OTP against stored value. On success, create NextAuth session</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/auth/[...nextauth]</td><td>NextAuth catch-all: session management, callbacks, JWT handling</td></tr>
+    </table>
+
+    <h2>User & Profile</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/user/me</td><td>Return authenticated user profile (name, city, gardening score, profileCompleted)</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/user/profile</td><td>Update user profile fields. Sets profileCompleted=true on first save</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/user/settings</td><td>Update notification preferences, units (metric/imperial), theme</td></tr>
+    </table>
+
+    <h2>Projects</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/projects</td><td>List all projects for authenticated user with area, status, last modified</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/projects</td><td>Create project (name, surfaceType, primaryGoal). Returns projectId for session linking</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/projects/[id]</td><td>Fetch single project with full analysis and recommendation history</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/projects/[id]</td><td>Update project metadata, mark as draft/active/archived</td></tr>
+    </table>
+
+    <h2>Recommendation Engine</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/recommendations/generate</td><td><strong>Main endpoint.</strong> Accepts full photo session payload. Runs ML + fallback chain + layout + pricing. Returns ranked candidates with layout slates</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/recommendations/create-session</td><td>Persist recommendation session to DB. Called after generate returns results</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/recommendations/assignment</td><td>Return experiment variant (control/challenger) for this user+session</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/recommendations/mark-selected</td><td>Log which recommendation the user tapped. Updates rank analytics</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/recommendations/log-impression</td><td>Log that a recommendation card was displayed (for impression-level analytics)</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/recommendations/log-interaction</td><td>Log detail expansions, filter changes, saves, share events</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/recommendations/submit-feedback</td><td>Accept user rating (1–5) and optional text feedback on recommendation quality</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/recommendations/explain</td><td>Return natural-language explanation of why a species was recommended</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/recommendations/evaluate</td><td>Run quality evaluation for a recommendation run (for admin review)</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/recommendations/rollout-status</td><td>Check current rollout percentages for active experiments</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/recommendations/submit-install-outcome</td><td>Log verified installation as positive/negative outcome label for ML retraining</td></tr>
+    </table>
+
+    <h2>Environment & Geospatial</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/env/detect</td><td>Accepts {lat, lon}. Fetches Open-Meteo + Nominatim. Returns heatExposure, windExposure, sunExposure, windLevel, locationLabel</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/geospatial/site-exposure</td><td>Compute wind and sun exposure scores for a specific lat/lon site</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/geospatial/microclimate</td><td>Fetch microclimate snapshot (urban heat island factor, albedo, green fraction)</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/geospatial/enrich-project</td><td>Attach geo context bundle to an existing project record</td></tr>
+    </table>
+
+    <h2>Garden Visualisation</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/generate-layout</td><td>Legacy layout generation endpoint (ProjectInput + linkage). Returns zone polygons</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/generate-garden-visual</td><td>Generate 3D before/after garden visual parameters for Three.js scene</td></tr>
+    </table>
+
+    <div class="page-footer">
+      <span>HeatWise Platform · Product Documentation</span>
+      <span>CONFIDENTIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 10 — API REFERENCE (PART 2)
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="content-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <span class="chapter-tag">07</span>
+        <span class="chapter-title">API Reference — Installer, Admin & Supply</span>
+      </div>
+      <span class="page-num">10 / 12</span>
+    </div>
+
+    <h2>Installer Network</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/installers/search</td><td>Find verified installers by city, availability, and service type</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/installers/assign</td><td>Assign installer to a job. Creates InstallerInstallJob record</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/installers/request-quote</td><td>User requests a price quote from a specific installer</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/installers/submit-quote</td><td>Installer submits pricing quote for a job</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/pricing/compare-quote</td><td>Compare quotes from multiple installers side-by-side</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/installers/accept-job</td><td>Installer accepts an assigned job. Updates status to in-progress</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/installers/reject-job</td><td>Installer rejects job. Triggers reassignment to next eligible installer</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/installers/update-job-status</td><td>Update job to: scheduled / in-progress / completed / cancelled</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/installers/submit-verified-install</td><td>Installer submits photo proof + measurements for outcome verification</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/installers/submit-outcome-verification</td><td>Platform verifies install quality. Creates VerifiedInstallRecord</td></tr>
+    </table>
+
+    <h2>Pricing & Cost</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/pricing/estimate</td><td>Estimate total cost (species + materials + labour) for a recommendation</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/pricing/budget-fit</td><td>Assess whether a recommendation fits within the user's stated budget range</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/pricing/pricing-preview</td><td>Show itemised pricing before user commits to installation request</td></tr>
+    </table>
+
+    <h2>Supply Chain</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/supply/species-availability</td><td>Check if recommended species are in stock in the user's region</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/supply/material-availability</td><td>Check planters, growing medium, and structural materials availability</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/supply/seasonal-windows</td><td>Return optimal planting months for each species in the user's climate zone</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/supply/regional-readiness</td><td>Combined check: are species + materials + installer available this month?</td></tr>
+    </table>
+
+    <h2>Admin Analytics</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/admin/analytics</td><td>Full analytics dashboard: runs, conversion, saves, heat reduction, MAU</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/admin/metrics-overview</td><td>KPI summary cards for quick health check</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/admin/recommendation-funnel</td><td>Funnel from generate → impression → selection → install request → verified</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/admin/experiment-summary</td><td>A/B experiment results: control vs challenger click-through, install rate, satisfaction</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/admin/rollout-monitor</td><td>Real-time rollout percentages and guardrail violation counts</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/admin/ranking-dataset</td><td>Export training dataset for offline analysis</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/admin/installer-outcomes</td><td>Installer performance: completion rate, SLA adherence, customer rating</td></tr>
+    </table>
+
+    <h2>Commercial & Follow-ups</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/commercial/log-revenue-event</td><td>Log a revenue transaction (installation fee, subscription, tip)</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/commercial/funnel-summary</td><td>Conversion funnel from lead to paid install</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/commercial/unit-economics</td><td>CAC, LTV, payback period, gross margin per cohort</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/followups/create-schedule</td><td>Schedule 30/90/180-day follow-up check-ins after verified install</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/followups/due-followups</td><td>List follow-ups due today for the notification system</td></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/followups/submit-remeasurement</td><td>User submits plant survival data and cooling observations at follow-up</td></tr>
+    </table>
+
+    <h2>Governance</h2>
+    <table class="api-table">
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+      <tr><td><span class="method post">POST</span></td><td class="endpoint">/api/governance/consent</td><td>Record user consent for data collection, analytics, marketing</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/governance/review-summary</td><td>Compliance review summary for regulatory reporting</td></tr>
+      <tr><td><span class="method get">GET</span></td><td class="endpoint">/api/platform/audit-events</td><td>Append-only audit log of all sensitive operations</td></tr>
+    </table>
+
+    <div class="page-footer">
+      <span>HeatWise Platform · Product Documentation</span>
+      <span>CONFIDENTIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 11 — DATABASE MODELS
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="content-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <span class="chapter-tag">08</span>
+        <span class="chapter-title">Database Models (55+ Prisma Models)</span>
+      </div>
+      <span class="page-num">11 / 12</span>
+    </div>
+
+    <h2>Core Domain Models</h2>
+    <table class="model-table">
+      <tr><th>Model</th><th>Purpose</th><th>Key Fields</th></tr>
+      <tr><td class="model-name">User</td><td>Platform user account</td><td>phone, name, city, age, gardeningScore, profileCompleted</td></tr>
+      <tr><td class="model-name">PhoneOtp</td><td>OTP storage for SMS auth</td><td>phoneNormalized, hash, expiresAt, usedAt, attempts</td></tr>
+      <tr><td class="model-name">UserSettings</td><td>Per-user preferences</td><td>units, notificationsEnabled, theme, language</td></tr>
+      <tr><td class="model-name">Project</td><td>Garden project</td><td>name, surfaceType, primaryGoal, area, status, userId</td></tr>
+      <tr><td class="model-name">PhotoSession</td><td>Measurement session</td><td>widthM, lengthM, floorLevel, captureMode, projectId</td></tr>
+      <tr><td class="model-name">Analysis</td><td>Project analysis result</td><td>recommendationRunId, tempDropC, co2yr, energySavingPct</td></tr>
+      <tr><td class="model-name">SpeciesCatalog</td><td>Plant species registry</td><td>code, name, scientificName, petSafe, droughtTolerant, sunRequirement, waterDemand, coolingScore</td></tr>
+    </table>
+
+    <h2>Recommendation & Telemetry Models</h2>
+    <table class="model-table">
+      <tr><th>Model</th><th>Purpose</th><th>Key Fields</th></tr>
+      <tr><td class="model-name">RecommendationRun</td><td>Single recommendation generation event</td><td>projectId, userId, modelVersion, rulesVersion, duration</td></tr>
+      <tr><td class="model-name">RecommendationTelemetrySession</td><td>Immutable snapshot per request</td><td>sessionId, modelVersion, rulesVersion, experimentVariant</td></tr>
+      <tr><td class="model-name">RecommendationCandidateSnapshot</td><td>Exact card shown to user</td><td>rank, speciesCode, score, cost, layoutZone</td></tr>
+      <tr><td class="model-name">RecommendationTelemetryEvent</td><td>Append-only user/installer signals</td><td>eventType (impression/select/feedback), candidateId, value</td></tr>
+      <tr><td class="model-name">RecommendationRuntimeObservation</td><td>Rollout metrics and guardrail results</td><td>variant, guardRailsPassed, diversityScore, exclusionRate</td></tr>
+    </table>
+
+    <h2>Installer & Commercial Models</h2>
+    <table class="model-table">
+      <tr><th>Model</th><th>Purpose</th><th>Key Fields</th></tr>
+      <tr><td class="model-name">InstallationRequest</td><td>User's installation service request</td><td>projectId, recommendationId, budgetRange, urgency</td></tr>
+      <tr><td class="model-name">InstallerQuoteRequest</td><td>Quote sent to installer</td><td>installerId, installationRequestId, status, sentAt</td></tr>
+      <tr><td class="model-name">InstallerInstallJob</td><td>Active installation job</td><td>installerId, jobStatus, scheduledDate, completedAt</td></tr>
+      <tr><td class="model-name">VerifiedInstallRecord</td><td>Confirmed installation outcome</td><td>photoUrls, measuredAreaM2, plantSurvivalPct, coolingDeltaC</td></tr>
+      <tr><td class="model-name">RevenueEvent</td><td>Commercial transaction</td><td>type, amount, currency, installJobId, userId</td></tr>
+      <tr><td class="model-name">LeadFunnelEvent</td><td>Funnel conversion tracking</td><td>stage (generate/select/request/install), userId, timestamp</td></tr>
+      <tr><td class="model-name">CommercialOutcome</td><td>Aggregated commercial result</td><td>cohort, CAC, LTV, paybackDays, grossMarginPct</td></tr>
+    </table>
+
+    <h2>Geo, Follow-up & Compliance Models</h2>
+    <table class="model-table">
+      <tr><th>Model</th><th>Purpose</th><th>Key Fields</th></tr>
+      <tr><td class="model-name">GeoContext</td><td>Geographic context per project</td><td>latitude, longitude, locationLabel, heatExposure, windExposure</td></tr>
+      <tr><td class="model-name">MicroclimateSnapshot</td><td>Urban heat island data</td><td>heatIslandFactor, albedo, greenFraction, fetchedAt</td></tr>
+      <tr><td class="model-name">CostEstimateSnapshot</td><td>Pricing snapshot per recommendation</td><td>speciesCost, labourCost, materialCost, total, currency</td></tr>
+      <tr><td class="model-name">LongitudinalFollowupSchedule</td><td>Follow-up plan after install</td><td>dueAt (30/90/180d), status, remeasurementId</td></tr>
+      <tr><td class="model-name">FollowupRemeasurement</td><td>User-reported outcome at follow-up</td><td>plantSurvivalPct, coolingSatisfaction, maintenanceRating</td></tr>
+      <tr><td class="model-name">UserConsentRecord</td><td>GDPR consent tracking</td><td>scope, grantedAt, revokedAt, ipAddress</td></tr>
+      <tr><td class="model-name">GovernancePolicyFlag</td><td>Compliance policy violations</td><td>flagType, severity, resolvedAt, reviewedBy</td></tr>
+      <tr><td class="model-name">AuditEvent</td><td>Append-only sensitive op log</td><td>operation, entityType, entityId, actorId, timestamp</td></tr>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Telemetry Immutability Guarantee</div>
+      <p>All telemetry models (RecommendationTelemetrySession, RecommendationCandidateSnapshot, RecommendationTelemetryEvent, RecommendationRuntimeObservation) are append-only. Once written, rows are never updated or deleted. This ensures auditability and reliable ML training data.</p>
+    </div>
+
+    <div class="page-footer">
+      <span>HeatWise Platform · Product Documentation</span>
+      <span>CONFIDENTIAL</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     PAGE 12 — ENVIRONMENT & DEPLOYMENT
+════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="content-page">
+    <div class="page-header">
+      <div class="page-header-left">
+        <span class="chapter-tag">09</span>
+        <span class="chapter-title">Environment, Deployment & CI</span>
+      </div>
+      <span class="page-num">12 / 12</span>
+    </div>
+
+    <h2>Environment Variables</h2>
+    <div class="code-block">
+<span class="cmt"># Database</span>
+<span class="kw">DATABASE_URL</span>=<span class="str">"file:./dev.db"</span>                    <span class="cmt"># SQLite (dev) | postgres://... (prod)</span>
+
+<span class="cmt"># Auth</span>
+<span class="kw">NEXTAUTH_URL</span>=<span class="str">http://localhost:3000</span>
+<span class="kw">NEXTAUTH_SECRET</span>=<span class="str">your-secret-here</span>
+<span class="kw">HEATWISE_DEV_OTP</span>=<span class="str">false</span>              <span class="cmt"># true → log OTP to console (no SMS)</span>
+<span class="kw">HEATWISE_ADMIN_EMAILS</span>=<span class="str">admin@example.com</span>
+
+<span class="cmt"># AI</span>
+<span class="kw">OPENAI_API_KEY</span>=<span class="str">sk-...</span>
+
+<span class="cmt"># ML Serving (Python sidecar)</span>
+<span class="kw">HEATWISE_ML_CWD</span>=<span class="str">./ml</span>
+<span class="kw">HEATWISE_REGISTRY_DIR</span>=<span class="str">./ml/registry</span>
+<span class="kw">HEATWISE_SPECIES_CSV</span>=<span class="str">./ml/data/bootstrap/sample_outputs/demo_pack/species_features.csv</span>
+
+<span class="cmt"># Android / Capacitor</span>
+<span class="kw">CAP_SERVER_URL</span>=<span class="str">http://localhost:3000</span>   <span class="cmt"># WebView target URL</span>
+<span class="kw">HEATWISE_DEV_EXTRA_ORIGINS</span>=<span class="str">http://192.168.1.X:3000</span>  <span class="cmt"># LAN Wi-Fi physical device</span></div>
+
+    <div class="section-div"></div>
+
+    <h2>Development Commands</h2>
+    <table class="model-table">
+      <tr><th>Command</th><th>Purpose</th></tr>
+      <tr><td class="model-name">npm run dev</td><td>Start Next.js dev server on port 3000</td></tr>
+      <tr><td class="model-name">npm run lint</td><td>ESLint check across all source files</td></tr>
+      <tr><td class="model-name">npm run typecheck</td><td>TypeScript validation (tsc --noEmit)</td></tr>
+      <tr><td class="model-name">npm run db:seed</td><td>Seed the database (species catalog + demo data)</td></tr>
+      <tr><td class="model-name">npm run db:migrate</td><td>Run pending Prisma migrations</td></tr>
+      <tr><td class="model-name">npm run gen:species-mapping</td><td>Regenerate data/species/species_catalog_mapping.v1.json (must commit result)</td></tr>
+      <tr><td class="model-name">npm run check:species-mapping</td><td>Verify mapping artifact is up to date (runs in CI)</td></tr>
+      <tr><td class="model-name">npm run test:recommendation</td><td>Integration tests for recommendation engine (requires DATABASE_URL + seeded DB)</td></tr>
+      <tr><td class="model-name">npm run ml:serving-smoke</td><td>Smoke test the Python ML serving endpoint</td></tr>
+      <tr><td class="model-name">npm run dev:android</td><td>Start Next.js for Android (0.0.0.0 bind + adb reverse)</td></tr>
+      <tr><td class="model-name">npm run android:sync</td><td>Install deps + run cap sync android</td></tr>
+      <tr><td class="model-name">npm run android:studio</td><td>Sync + open Android Studio in one command</td></tr>
+    </table>
+
+    <div class="section-div"></div>
+
+    <h2>CI Pipeline (GitHub Actions)</h2>
+    <div class="tech-section">
+      <div class="tech-row"><span class="tech-label">Trigger</span><span class="tech-value">Every push and pull request to main branch.</span></div>
+      <div class="tech-row"><span class="tech-label">Step 1</span><span class="tech-value">npm run check:species-mapping — verifies the generated species catalog mapping JSON is committed and matches current seed data. Fails if stale.</span></div>
+      <div class="tech-row"><span class="tech-label">Step 2</span><span class="tech-value">npm run typecheck — full TypeScript validation. Fails on any type error across all .ts and .tsx files.</span></div>
+    </div>
+
+    <div class="section-div"></div>
+
+    <h2>Android Deployment Targets</h2>
+    <table class="model-table">
+      <tr><th>Target</th><th>CAP_SERVER_URL</th><th>Setup</th></tr>
+      <tr><td>Android Emulator</td><td class="model-name">http://10.0.2.2:3000</td><td>Special emulator loopback. No adb reverse needed.</td></tr>
+      <tr><td>USB Physical Device</td><td class="model-name">http://localhost:3000</td><td>Run: adb reverse tcp:3000 tcp:3000 before launching</td></tr>
+      <tr><td>Wi-Fi Physical Device</td><td class="model-name">http://192.168.1.X:3000</td><td>Set LAN IP in CAP_SERVER_URL and NEXTAUTH_URL. Add to HEATWISE_DEV_EXTRA_ORIGINS.</td></tr>
+    </table>
+
+    <div class="section-div"></div>
+
+    <h2>Production Deployment</h2>
+    <div class="tech-section">
+      <div class="tech-row"><span class="tech-label">Web Hosting</span><span class="tech-value">Vercel (Next.js first-class support). Environment variables set in Vercel dashboard. DATABASE_URL points to managed PostgreSQL (Vercel Postgres or Supabase).</span></div>
+      <div class="tech-row"><span class="tech-label">Database</span><span class="tech-value">PostgreSQL in production. Migrations via npx prisma migrate deploy in CI/CD pipeline before new version deploy.</span></div>
+      <div class="tech-row"><span class="tech-label">ML Serving</span><span class="tech-value">Python sidecar deployed as a separate service (Cloud Run or Railway). HEATWISE_ML_CWD and HEATWISE_REGISTRY_DIR point to cloud storage paths.</span></div>
+      <div class="tech-row"><span class="tech-label">Android Build</span><span class="tech-value">npm run build → cap sync android → Android Studio release build → signed APK/AAB → Google Play Store. CAP_SERVER_URL points to production Vercel URL.</span></div>
+      <div class="tech-row"><span class="tech-label">CORS</span><span class="tech-value">Next.js allows 10.0.2.2 (emulator loopback) and localhost by default in dev. Production origins locked to Vercel URL. Additional origins via HEATWISE_DEV_EXTRA_ORIGINS.</span></div>
+    </div>
+
+    <div class="section-div"></div>
+
+    <div class="callout">
+      <div class="callout-title">Key Architectural Decisions</div>
+      <p>
+        <strong>Monorepo:</strong> All code in one repo reduces integration friction between frontend, API, and ML.<br/>
+        <strong>Pages Router:</strong> Chosen over App Router for stability with NextAuth and the large existing component tree.<br/>
+        <strong>Inline styles:</strong> Eliminates CSS class name collisions in the single-file component architecture of HeatWiseApp.jsx.<br/>
+        <strong>Append-only telemetry:</strong> Prevents data loss and enables reliable ML retraining on immutable historical data.<br/>
+        <strong>3-tier recommendation fallback:</strong> Guarantees a result is always returned, even when ML serving is unavailable.
+      </p>
+    </div>
+
+    <div class="page-footer">
+      <span>HeatWise Platform · Product Documentation</span>
+      <span>CONFIDENTIAL · April 2026</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

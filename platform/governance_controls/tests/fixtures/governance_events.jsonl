@@ -1,0 +1,3 @@
+{"record_type":"consent_record","user_id":"cabcdefghijklmnopqrs012345","consent_scope":"project_media","consent_status":"granted","source_channel":"app","metadata":{"version":1}}
+{"record_type":"policy_flag","flag_type":"pricing_anomaly","severity":"high","status":"open","title":"Quote delta >40% vs estimate","entity_type":"InstallerQuote","entity_id":"cabcdefghijklmnopqrs012346","detail":{"delta_pct":42}}
+{"record_type":"governance_review","review_type":"high_risk_dossier","status":"queued","priority":"high","subject_entity_type":"RecommendationDossier","subject_entity_id":"cabcdefghijklmnopqrs012347"}

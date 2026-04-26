@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/inbound_webhook_v1.json",
+  "title": "InboundWebhookV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["source_system", "event_type", "payload"],
+  "properties": {
+    "source_system": {
+      "type": "string",
+      "enum": [
+        "heatwise_core",
+        "generic_rest_partner",
+        "generic_webhook_source",
+        "crm_sink",
+        "installer_partner_api",
+        "notification_provider",
+        "payment_provider",
+        "analytics_sink",
+        "report_delivery",
+        "user_device"
+      ]
+    },
+    "external_event_id": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "event_type": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "payload": { "type": "object" },
+    "validation_status": {
+      "type": "string",
+      "enum": ["received", "valid", "invalid", "rejected", "duplicate"]
+    },
+    "linkage_project_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "linkage_user_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "linkage_recommendation_session_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "duplicate_of_webhook_id": { "type": "string", "minLength": 1 },
+    "metadata": { "type": "object" }
+  }
+}

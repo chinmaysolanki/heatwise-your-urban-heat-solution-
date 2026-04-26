@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/material_inventory_v1.json",
+  "title": "material_inventory",
+  "type": "object",
+  "required": [
+    "material_inventory_id",
+    "region",
+    "material_type",
+    "material_name",
+    "availability_status",
+    "stock_band",
+    "compatible_solution_types",
+    "supplier_source_type",
+    "updated_at"
+  ],
+  "properties": {
+    "material_inventory_id": { "type": "string", "minLength": 1 },
+    "region": { "type": "string", "minLength": 1 },
+    "material_type": { "type": "string", "minLength": 1 },
+    "material_name": { "type": "string", "minLength": 1 },
+    "availability_status": {
+      "type": "string",
+      "enum": ["available", "limited", "backorder", "unavailable"]
+    },
+    "stock_band": {
+      "type": "string",
+      "enum": ["high", "medium", "low", "out"]
+    },
+    "estimated_lead_time_days": { "type": ["integer", "null"], "minimum": 0 },
+    "compatible_solution_types": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "supplier_source_type": { "type": "string", "minLength": 1 },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "metadata_json": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

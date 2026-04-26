@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>HeatWise — User Flow Document</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --green:   #52B788;
+    --green-d: #2D6A4F;
+    --green-dd:#1A3D2B;
+    --gold:    #D4AF37;
+    --cyan:    #48CAE4;
+    --bg:      #09160E;
+    --bg2:     #0D1F14;
+    --bg3:     #112919;
+    --border:  rgba(82,183,136,.22);
+    --text:    #D8F3DC;
+    --dim:     rgba(216,243,220,.55);
+    --white:   #ffffff;
+    --a4w:     210mm;
+    --a4h:     297mm;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family:'DM Sans',sans-serif;
+    background:#1a1a1a;
+    color:var(--text);
+  }
+
+  /* ── A4 Page ── */
+  .page {
+    width: var(--a4w);
+    min-height: var(--a4h);
+    height: var(--a4h);
+    background: var(--bg);
+    margin: 10mm auto;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  @media print {
+    body { background: none; }
+    .page { margin: 0; box-shadow: none; }
+  }
+
+  /* ── Shared Typography ── */
+  .mono { font-family:'DM Mono',monospace; }
+  .label {
+    font-family:'DM Mono',monospace;
+    font-size:7.5pt;
+    letter-spacing:2.5px;
+    color:var(--green);
+    text-transform:uppercase;
+    font-weight:500;
+  }
+
+  /* ── Page Header Bar ── */
+  .page-header {
+    padding: 7mm 10mm 5mm;
+    border-bottom: 0.4pt solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .page-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .logo-mark {
+    width: 22px; height: 22px;
+    background: linear-gradient(135deg,#2D6A4F,#52B788);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-mark svg { width:13px; height:13px; }
+  .logo-name {
+    font-size: 11pt;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.5px;
+  }
+  .page-header .doc-meta {
+    text-align: right;
+  }
+  .doc-meta .doc-title {
+    font-family:'DM Mono',monospace;
+    font-size: 7pt;
+    color: var(--green);
+    letter-spacing: 1.5px;
+  }
+  .doc-meta .doc-page {
+    font-family:'DM Mono',monospace;
+    font-size: 6.5pt;
+    color: rgba(216,243,220,.35);
+    margin-top: 1px;
+  }
+
+  /* ── Page Footer ── */
+  .page-footer {
+    padding: 4mm 10mm;
+    border-top: 0.4pt solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    margin-top: auto;
+  }
+  .page-footer span {
+    font-family:'DM Mono',monospace;
+    font-size: 6pt;
+    color: rgba(216,243,220,.25);
+    letter-spacing: 1px;
+  }
+
+  /* ── Page Content area ── */
+  .page-content {
+    flex: 1;
+    padding: 6mm 10mm;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Section heading inside content ── */
+  .section-heading {
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--green);
+    font-family:'DM Mono',monospace;
+    margin-bottom: 4mm;
+    padding-bottom: 2mm;
+    border-bottom: 0.4pt solid var(--border);
+  }
+
+  /* ── Screen Node ── */
+  .node {
+    background: var(--bg2);
+    border: 1pt solid var(--border);
+    border-radius: 5px;
+    padding: 4px 7px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+  }
+  .node .node-name {
+    font-size: 6.5pt;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .node .node-tag {
+    font-family:'DM Mono',monospace;
+    font-size: 5pt;
+    color: var(--dim);
+    margin-top: 1px;
+    white-space: nowrap;
+  }
+  .node.highlight {
+    background: rgba(82,183,136,.12);
+    border-color: var(--green);
+  }
+  .node.highlight .node-name { color: var(--green); }
+  .node.gold {
+    background: rgba(212,175,55,.10);
+    border-color: var(--gold);
+  }
+  .node.gold .node-name { color: var(--gold); }
+  .node.cyan {
+    background: rgba(72,202,228,.10);
+    border-color: var(--cyan);
+  }
+  .node.cyan .node-name { color: var(--cyan); }
+  .node.dim {
+    background: rgba(255,255,255,.03);
+    border-color: rgba(255,255,255,.10);
+  }
+  .node.dim .node-name { color: var(--dim); }
+
+  /* ── Arrow ── */
+  .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green);
+    font-size: 8pt;
+    flex-shrink: 0;
+  }
+  .arrow.down { transform: rotate(90deg); }
+  .arrow.label-arrow {
+    flex-direction: column;
+    gap: 1px;
+    font-size: 5pt;
+    color: var(--dim);
+  }
+  .arrow.label-arrow .arr-line {
+    font-size: 8pt;
+    color: var(--green);
+  }
+
+  /* ── Flow Row (horizontal) ── */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 3mm;
+    flex-wrap: nowrap;
+  }
+
+  /* ── Flow Column (vertical) ── */
+  .flow-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5mm;
+  }
+
+  /* ── Journey Block ── */
+  .journey {
+    background: rgba(255,255,255,.02);
+    border: 0.5pt solid var(--border);
+    border-radius: 6px;
+    padding: 4mm 5mm;
+    margin-bottom: 4mm;
+  }
+  .journey-title {
+    font-family:'DM Mono',monospace;
+    font-size: 7pt;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 3mm;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .journey-title .jnum {
+    width: 16px; height: 16px;
+    background: var(--green-d);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 6.5pt;
+    font-weight: 700;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  /* ── Detail Table ── */
+  .detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7pt;
+  }
+  .detail-table th {
+    font-family:'DM Mono',monospace;
+    font-size: 6pt;
+    letter-spacing: 1.5px;
+    color: var(--green);
+    text-align: left;
+    padding: 2.5mm 3mm 1.5mm;
+    border-bottom: 0.4pt solid var(--border);
+    font-weight: 500;
+  }
+  .detail-table td {
+    padding: 2mm 3mm;
+    border-bottom: 0.3pt solid rgba(82,183,136,.08);
+    color: var(--text);
+    line-height: 1.45;
+    vertical-align: top;
+  }
+  .detail-table tr:last-child td { border-bottom: none; }
+  .detail-table td.screen-id {
+    font-family:'DM Mono',monospace;
+    font-size: 6pt;
+    color: var(--green);
+    white-space: nowrap;
+    width: 22mm;
+  }
+  .detail-table td.screen-name {
+    font-weight: 600;
+    width: 32mm;
+  }
+  .detail-table td.desc {
+    color: var(--dim);
+    font-size: 6.5pt;
+  }
+  .detail-table td.nav-to {
+    font-family:'DM Mono',monospace;
+    font-size: 5.5pt;
+    color: rgba(82,183,136,.65);
+    width: 38mm;
+    line-height: 1.6;
+  }
+
+  /* ── Pill tag ── */
+  .pill {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family:'DM Mono',monospace;
+    font-size: 5pt;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .pill.green  { background:rgba(82,183,136,.15); color:var(--green); }
+  .pill.gold   { background:rgba(212,175,55,.15);  color:var(--gold);  }
+  .pill.cyan   { background:rgba(72,202,228,.15);  color:var(--cyan);  }
+  .pill.white  { background:rgba(255,255,255,.08); color:var(--dim);   }
+
+  /* ── Two-column grid ── */
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:4mm; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:3.5mm; }
+
+  /* ── Screen Card (for Screen Inventory) ── */
+  .scard {
+    background: var(--bg2);
+    border: 0.5pt solid var(--border);
+    border-radius: 5px;
+    padding: 3mm;
+  }
+  .scard .scard-id {
+    font-family:'DM Mono',monospace;
+    font-size:5pt;
+    color:var(--green);
+    letter-spacing:1px;
+    margin-bottom:1.5mm;
+  }
+  .scard .scard-name {
+    font-size:7pt;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:1mm;
+    line-height:1.2;
+  }
+  .scard .scard-desc {
+    font-size:6pt;
+    color:var(--dim);
+    line-height:1.4;
+  }
+
+  /* ── Cover page specifics ── */
+  .cover-content {
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:12mm 15mm;
+  }
+  .cover-logo-large {
+    width:52px; height:52px;
+    background:linear-gradient(135deg,#1A3D2B,#52B788);
+    border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:5mm;
+    box-shadow:0 0 36px rgba(82,183,136,.35);
+  }
+  .cover-title {
+    font-size:26pt;
+    font-weight:700;
+    color:var(--text);
+    letter-spacing:-0.5px;
+    line-height:1.1;
+    margin-bottom:2mm;
+  }
+  .cover-sub {
+    font-family:'DM Mono',monospace;
+    font-size:8.5pt;
+    color:var(--green);
+    letter-spacing:3px;
+    text-transform:uppercase;
+    margin-bottom:8mm;
+  }
+  .cover-divider {
+    width:60mm;
+    height:1px;
+    background:linear-gradient(90deg,transparent,var(--green),transparent);
+    margin:6mm auto;
+  }
+  .cover-desc {
+    font-size:9.5pt;
+    color:var(--dim);
+    max-width:130mm;
+    line-height:1.65;
+    margin-bottom:8mm;
+  }
+  .cover-meta-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:4mm;
+    width:100%;
+    max-width:150mm;
+    margin-top:6mm;
+  }
+  .cover-meta-cell {
+    background:rgba(82,183,136,.05);
+    border:0.5pt solid var(--border);
+    border-radius:5px;
+    padding:4mm 3mm;
+    text-align:center;
+  }
+  .cover-meta-cell .val {
+    font-size:13pt;
+    font-weight:700;
+    color:var(--green);
+    line-height:1;
+    margin-bottom:1.5mm;
+  }
+  .cover-meta-cell .key {
+    font-family:'DM Mono',monospace;
+    font-size:5.5pt;
+    color:var(--dim);
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+
+  /* ── Inline diagram structures ── */
+  .flow-diagram {
+    display:flex;
+    align-items:flex-start;
+    gap:3mm;
+    flex-wrap:nowrap;
+    width:100%;
+  }
+  .flow-branch {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2mm;
+  }
+  .v-line {
+    width:0.5pt;
+    background:var(--border);
+    flex:1;
+    min-height:4mm;
+  }
+  .h-connector {
+    height:0.5pt;
+    background:var(--border);
+    flex:1;
+  }
+
+  /* Page toc */
+  .toc-item {
+    display:flex;
+    align-items:baseline;
+    gap:2mm;
+    padding:2mm 0;
+    border-bottom:0.3pt solid rgba(82,183,136,.07);
+  }
+  .toc-item:last-child { border-bottom:none; }
+  .toc-num {
+    font-family:'DM Mono',monospace;
+    font-size:7pt;
+    color:var(--green);
+    width:6mm;
+    flex-shrink:0;
+  }
+  .toc-name {
+    font-size:8.5pt;
+    font-weight:600;
+    color:var(--text);
+    flex:1;
+  }
+  .toc-dots {
+    flex:1;
+    border-bottom:0.5pt dotted rgba(82,183,136,.2);
+    min-width:5mm;
+    margin-bottom:2px;
+  }
+  .toc-page {
+    font-family:'DM Mono',monospace;
+    font-size:7pt;
+    color:var(--dim);
+    width:6mm;
+    text-align:right;
+    flex-shrink:0;
+  }
+
+  /* Wide node for overview diagram */
+  .onode {
+    padding:3mm 4mm;
+    border-radius:5px;
+    text-align:center;
+    flex-shrink:0;
+  }
+  .onode .on-label {
+    font-size:6pt;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-family:'DM Mono',monospace;
+  }
+  .onode .on-name {
+    font-size:7.5pt;
+    font-weight:600;
+    line-height:1.2;
+    margin-top:1px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 1 — COVER
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#D8F3DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      </div>
+      <span class="logo-name">HeatWise</span>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-title">USER FLOW DOCUMENT</div>
+      <div class="doc-page">CONFIDENTIAL · v1.0 · APRIL 2026</div>
+    </div>
+  </div>
+
+  <div class="cover-content">
+    <div class="cover-logo-large">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D8F3DC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+      </svg>
+    </div>
+
+    <div class="cover-title">HeatWise</div>
+    <div class="cover-sub">User Flow Document</div>
+
+    <div class="cover-divider"></div>
+
+    <div class="cover-desc">
+      Complete end-to-end user journey maps for the HeatWise rooftop cooling and garden planning platform — from first launch through scan, recommendation, visualization, and installation.
+    </div>
+
+    <div class="cover-meta-grid">
+      <div class="cover-meta-cell">
+        <div class="val">26</div>
+        <div class="key">Screens</div>
+      </div>
+      <div class="cover-meta-cell">
+        <div class="val">7</div>
+        <div class="key">User Journeys</div>
+      </div>
+      <div class="cover-meta-cell">
+        <div class="val">8</div>
+        <div class="key">Pages</div>
+      </div>
+    </div>
+
+    <div class="cover-divider"></div>
+
+    <div style="margin-top:4mm;">
+      <div class="label" style="margin-bottom:5mm;">Table of Contents</div>
+      <div style="width:140mm;text-align:left;">
+        <div class="toc-item"><span class="toc-num">01</span><span class="toc-name">High-Level Journey Map</span><span class="toc-dots"></span><span class="toc-page">P 2</span></div>
+        <div class="toc-item"><span class="toc-num">02</span><span class="toc-name">Onboarding &amp; Authentication Flow</span><span class="toc-dots"></span><span class="toc-page">P 3</span></div>
+        <div class="toc-item"><span class="toc-num">03</span><span class="toc-name">Scan &amp; Measurement Flow</span><span class="toc-dots"></span><span class="toc-page">P 4</span></div>
+        <div class="toc-item"><span class="toc-num">04</span><span class="toc-name">Recommendation &amp; Analysis Flow</span><span class="toc-dots"></span><span class="toc-page">P 5</span></div>
+        <div class="toc-item"><span class="toc-num">05</span><span class="toc-name">Visualization &amp; Action Flow</span><span class="toc-dots"></span><span class="toc-page">P 6</span></div>
+        <div class="toc-item"><span class="toc-num">06</span><span class="toc-name">Explore &amp; Discovery Flow</span><span class="toc-dots"></span><span class="toc-page">P 7</span></div>
+        <div class="toc-item"><span class="toc-num">07</span><span class="toc-name">Impact &amp; Carbon Flow</span><span class="toc-dots"></span><span class="toc-page">P 7</span></div>
+        <div class="toc-item"><span class="toc-num">08</span><span class="toc-name">Complete Screen Inventory</span><span class="toc-dots"></span><span class="toc-page">P 8</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>HEATWISE · USER FLOW DOCUMENT</span>
+    <span>PAGE 1 OF 8</span>
+    <span>APRIL 2026</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 2 — HIGH-LEVEL JOURNEY MAP
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#D8F3DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      </div>
+      <span class="logo-name">HeatWise</span>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-title">HIGH-LEVEL JOURNEY MAP</div>
+      <div class="doc-page">SECTION 01</div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="section-heading">All User Journeys — Overview</div>
+
+    <!-- Journey 1: Onboarding -->
+    <div class="journey">
+      <div class="journey-title"><span class="jnum">1</span>Onboarding &amp; Authentication</div>
+      <div class="flow-row">
+        <div class="node highlight"><span class="node-name">Splash</span><span class="node-tag">launch</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">Onboarding</span><span class="node-tag">walkthrough</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">Phone Auth</span><span class="node-tag">OTP</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">OTP Verify</span><span class="node-tag">confirm</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">Profile Setup</span><span class="node-tag">name + city</span></div>
+        <div class="arrow">→</div>
+        <div class="node highlight"><span class="node-name">Home</span><span class="node-tag">dashboard</span></div>
+      </div>
+    </div>
+
+    <!-- Journey 2: Core Scan -->
+    <div class="journey">
+      <div class="journey-title"><span class="jnum">2</span>Core Scan &amp; Measurement Flow</div>
+      <div class="flow-row">
+        <div class="node highlight"><span class="node-name">Home</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">Create Project</span><span class="node-tag">setup</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">Photo Capture</span><span class="node-tag">camera</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">AR Measurement</span><span class="node-tag">live/manual</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">Environment</span><span class="node-tag">conditions</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">Analysis</span><span class="node-tag">AI engine</span></div>
+      </div>
+    </div>
+
+    <!-- Journey 3: Recommendation -->
+    <div class="journey">
+      <div class="journey-title"><span class="jnum">3</span>Recommendation &amp; Garden Layout</div>
+      <div class="flow-row">
+        <div class="node"><span class="node-name">Analysis</span></div>
+        <div class="arrow">→</div>
+        <div class="node highlight"><span class="node-name">Garden Layout</span><span class="node-tag">plan canvas</span></div>
+        <div class="arrow">→</div>
+        <div class="node highlight"><span class="node-name">Result</span><span class="node-tag">recommendations</span></div>
+        <div class="arrow">→</div>
+        <div style="display:flex;flex-direction:column;gap:2mm;align-items:flex-start;">
+          <div class="node gold"><span class="node-name">Before / After</span><span class="node-tag">AI visual</span></div>
+          <div class="node"><span class="node-name">Report</span><span class="node-tag">full PDF</span></div>
+          <div class="node cyan"><span class="node-name">Install</span><span class="node-tag">quote</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Journey 4: Explore -->
+    <div class="journey">
+      <div class="journey-title"><span class="jnum">4</span>Explore &amp; Discovery (Bottom Nav)</div>
+      <div class="flow-row">
+        <div class="node"><span class="node-name">City Heat</span><span class="node-tag">explore</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">Species Library</span><span class="node-tag">browse plants</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">Species Detail</span><span class="node-tag">deep info</span></div>
+        <div class="arrow">→</div>
+        <div class="node highlight"><span class="node-name">Create</span><span class="node-tag">start scan</span></div>
+      </div>
+    </div>
+
+    <!-- Journey 5 & 6 side by side -->
+    <div class="grid-2">
+      <div class="journey" style="margin-bottom:0">
+        <div class="journey-title"><span class="jnum">5</span>Impact &amp; Carbon</div>
+        <div class="flow-col" style="align-items:flex-start;gap:2.5mm;">
+          <div class="flow-row" style="gap:2mm;">
+            <div class="node"><span class="node-name">Impact</span><span class="node-tag">dashboard</span></div>
+            <div class="arrow">→</div>
+            <div class="node"><span class="node-name">Carbon</span><span class="node-tag">tracker</span></div>
+          </div>
+          <div class="flow-row" style="gap:2mm;margin-left:10mm;">
+            <div class="arrow" style="transform:rotate(270deg)">→</div>
+            <div class="node dim"><span class="node-name">Carbon Setup</span><span class="node-tag">configure</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="journey" style="margin-bottom:0">
+        <div class="journey-title"><span class="jnum">6</span>Settings &amp; Utility</div>
+        <div style="display:flex;flex-wrap:wrap;gap:2mm;">
+          <div class="node dim"><span class="node-name">Settings</span></div>
+          <div class="node dim"><span class="node-name">Saved</span></div>
+          <div class="node dim"><span class="node-name">Notifications</span></div>
+          <div class="node dim"><span class="node-name">Tips</span></div>
+          <div class="node dim"><span class="node-name">Install Done</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Nav legend -->
+    <div style="margin-top:5mm;">
+      <div class="section-heading">Bottom Navigation — Global Access</div>
+      <div class="flow-row" style="justify-content:space-around;background:rgba(255,255,255,.02);border:0.5pt solid var(--border);border-radius:6px;padding:4mm;">
+        <div style="text-align:center;">
+          <div style="font-size:7pt;font-weight:700;color:var(--text);">Home</div>
+          <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--dim);">dashboard</div>
+        </div>
+        <div style="width:1px;background:var(--border);align-self:stretch;"></div>
+        <div style="text-align:center;">
+          <div style="font-size:7pt;font-weight:700;color:var(--text);">Explore</div>
+          <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--dim);">city heat</div>
+        </div>
+        <div style="width:1px;background:var(--border);align-self:stretch;"></div>
+        <div style="text-align:center;">
+          <div style="font-size:8pt;font-weight:700;color:var(--green);">⬡ Scan</div>
+          <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--green);">primary CTA</div>
+        </div>
+        <div style="width:1px;background:var(--border);align-self:stretch;"></div>
+        <div style="text-align:center;">
+          <div style="font-size:7pt;font-weight:700;color:var(--text);">Impact</div>
+          <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--dim);">dashboard</div>
+        </div>
+        <div style="width:1px;background:var(--border);align-self:stretch;"></div>
+        <div style="text-align:center;">
+          <div style="font-size:7pt;font-weight:700;color:var(--text);">Settings</div>
+          <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--dim);">account</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colour Legend -->
+    <div style="margin-top:5mm;display:flex;gap:5mm;align-items:center;flex-wrap:wrap;">
+      <div class="label">Legend:</div>
+      <div style="display:flex;align-items:center;gap:2mm;"><div style="width:10px;height:10px;background:rgba(82,183,136,.12);border:0.8pt solid var(--green);border-radius:2px;"></div><span style="font-size:6pt;color:var(--dim);">Core Screen</span></div>
+      <div style="display:flex;align-items:center;gap:2mm;"><div style="width:10px;height:10px;background:rgba(212,175,55,.10);border:0.8pt solid var(--gold);border-radius:2px;"></div><span style="font-size:6pt;color:var(--dim);">AI / Visual</span></div>
+      <div style="display:flex;align-items:center;gap:2mm;"><div style="width:10px;height:10px;background:rgba(72,202,228,.10);border:0.8pt solid var(--cyan);border-radius:2px;"></div><span style="font-size:6pt;color:var(--dim);">Commerce</span></div>
+      <div style="display:flex;align-items:center;gap:2mm;"><div style="width:10px;height:10px;background:rgba(255,255,255,.03);border:0.8pt solid rgba(255,255,255,.10);border-radius:2px;"></div><span style="font-size:6pt;color:var(--dim);">Utility</span></div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>HEATWISE · USER FLOW DOCUMENT</span>
+    <span>PAGE 2 OF 8</span>
+    <span>HIGH-LEVEL JOURNEY MAP</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 3 — ONBOARDING & AUTH FLOW
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#D8F3DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      </div>
+      <span class="logo-name">HeatWise</span>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-title">ONBOARDING &amp; AUTHENTICATION FLOW</div>
+      <div class="doc-page">SECTION 02</div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="section-heading">Journey 1 — First-Time User Onboarding</div>
+
+    <!-- Main linear flow -->
+    <div style="background:rgba(255,255,255,.02);border:0.5pt solid var(--border);border-radius:6px;padding:5mm 6mm;margin-bottom:5mm;">
+      <div style="display:flex;align-items:flex-start;gap:0;width:100%;">
+
+        <!-- Step 1 -->
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#1A3D2B,#52B788);display:flex;align-items:center;justify-content:center;margin-bottom:2mm;">
+            <span style="font-size:8pt;font-weight:700;color:#D8F3DC;">1</span>
+          </div>
+          <div style="font-size:7pt;font-weight:700;color:var(--text);text-align:center;margin-bottom:1mm;">Splash</div>
+          <div style="font-size:5.5pt;color:var(--dim);text-align:center;line-height:1.4;">Logo animation<br/>3 s auto-dismiss</div>
+          <div style="margin-top:2mm;"><span class="pill green">AUTO</span></div>
+        </div>
+
+        <div style="flex-shrink:0;padding-top:11px;color:var(--green);font-size:9pt;">→</div>
+
+        <!-- Step 2 -->
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#1A3D2B,#52B788);display:flex;align-items:center;justify-content:center;margin-bottom:2mm;">
+            <span style="font-size:8pt;font-weight:700;color:#D8F3DC;">2</span>
+          </div>
+          <div style="font-size:7pt;font-weight:700;color:var(--text);text-align:center;margin-bottom:1mm;">Onboarding</div>
+          <div style="font-size:5.5pt;color:var(--dim);text-align:center;line-height:1.4;">3-card walkthrough<br/>Swipe or tap →</div>
+          <div style="margin-top:2mm;"><span class="pill green">SWIPE</span></div>
+        </div>
+
+        <div style="flex-shrink:0;padding-top:11px;color:var(--green);font-size:9pt;">→</div>
+
+        <!-- Step 3 -->
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#1A3D2B,#52B788);display:flex;align-items:center;justify-content:center;margin-bottom:2mm;">
+            <span style="font-size:8pt;font-weight:700;color:#D8F3DC;">3</span>
+          </div>
+          <div style="font-size:7pt;font-weight:700;color:var(--text);text-align:center;margin-bottom:1mm;">Phone Number</div>
+          <div style="font-size:5.5pt;color:var(--dim);text-align:center;line-height:1.4;">+91 number entry<br/>Sends SMS OTP</div>
+          <div style="margin-top:2mm;"><span class="pill white">INPUT</span></div>
+        </div>
+
+        <div style="flex-shrink:0;padding-top:11px;color:var(--green);font-size:9pt;">→</div>
+
+        <!-- Step 4 -->
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#1A3D2B,#52B788);display:flex;align-items:center;justify-content:center;margin-bottom:2mm;">
+            <span style="font-size:8pt;font-weight:700;color:#D8F3DC;">4</span>
+          </div>
+          <div style="font-size:7pt;font-weight:700;color:var(--text);text-align:center;margin-bottom:1mm;">OTP Verify</div>
+          <div style="font-size:5.5pt;color:var(--dim);text-align:center;line-height:1.4;">6-digit code<br/>30 s resend timer</div>
+          <div style="margin-top:2mm;"><span class="pill white">VERIFY</span></div>
+        </div>
+
+        <div style="flex-shrink:0;padding-top:11px;color:var(--green);font-size:9pt;">→</div>
+
+        <!-- Step 5 -->
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#1A3D2B,#2D6A4F);display:flex;align-items:center;justify-content:center;margin-bottom:2mm;">
+            <span style="font-size:8pt;font-weight:700;color:#D8F3DC;">5</span>
+          </div>
+          <div style="font-size:7pt;font-weight:700;color:var(--text);text-align:center;margin-bottom:1mm;">Profile Setup</div>
+          <div style="font-size:5.5pt;color:var(--dim);text-align:center;line-height:1.4;">Name + City<br/>2-step form</div>
+          <div style="margin-top:2mm;"><span class="pill green">FORM</span></div>
+        </div>
+
+        <div style="flex-shrink:0;padding-top:11px;color:var(--green);font-size:9pt;">→</div>
+
+        <!-- Step 6 -->
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#52B788,#2D6A4F);display:flex;align-items:center;justify-content:center;margin-bottom:2mm;">
+            <span style="font-size:8pt;font-weight:700;color:#D8F3DC;">✓</span>
+          </div>
+          <div style="font-size:7pt;font-weight:700;color:var(--green);text-align:center;margin-bottom:1mm;">Home</div>
+          <div style="font-size:5.5pt;color:var(--dim);text-align:center;line-height:1.4;">Dashboard<br/>Session active</div>
+          <div style="margin-top:2mm;"><span class="pill green">DONE</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Returning user path -->
+    <div class="journey">
+      <div class="journey-title"><span class="jnum">↩</span>Returning User — Session Restore</div>
+      <div class="flow-row">
+        <div class="node"><span class="node-name">App Open</span><span class="node-tag">re-launch</span></div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="node-name">Session Check</span><span class="node-tag">NextAuth</span></div>
+        <div class="arrow">→</div>
+        <div class="node highlight"><span class="node-name">Home Dashboard</span><span class="node-tag">direct entry</span></div>
+        <div style="font-size:8pt;color:var(--dim);padding:0 3mm;">or</div>
+        <div class="node"><span class="node-name">Phone Auth</span><span class="node-tag">expired session</span></div>
+      </div>
+    </div>
+
+    <!-- Profile Setup Detail -->
+    <div class="section-heading" style="margin-top:4mm;">Profile Setup — 2-Step Form Detail</div>
+    <div class="grid-2" style="margin-bottom:4mm;">
+      <div style="background:rgba(255,255,255,.02);border:0.5pt solid var(--border);border-radius:6px;padding:4mm;">
+        <div style="font-family:'DM Mono',monospace;font-size:6pt;color:var(--green);letter-spacing:1.5px;margin-bottom:2mm;">STEP 1 — YOU</div>
+        <div style="font-size:7pt;color:var(--text);font-weight:600;margin-bottom:1.5mm;">Display Name</div>
+        <div style="font-size:6.5pt;color:var(--dim);line-height:1.5;">Enter full name (min 2 chars)<br/>Validates: non-empty string<br/>Proceeds on "Continue →"</div>
+      </div>
+      <div style="background:rgba(255,255,255,.02);border:0.5pt solid var(--border);border-radius:6px;padding:4mm;">
+        <div style="font-family:'DM Mono',monospace;font-size:6pt;color:var(--green);letter-spacing:1.5px;margin-bottom:2mm;">STEP 2 — LOCATION</div>
+        <div style="font-size:7pt;color:var(--text);font-weight:600;margin-bottom:1.5mm;">City / Area</div>
+        <div style="font-size:6.5pt;color:var(--dim);line-height:1.5;">Enter city name (min 2 chars)<br/>Geolocation optional fallback<br/>Proceeds on "Launch My Dashboard 🌿"</div>
+      </div>
+    </div>
+
+    <!-- Auth Detail Table -->
+    <div class="section-heading">Screen Detail — Onboarding Screens</div>
+    <table class="detail-table">
+      <thead>
+        <tr>
+          <th>SCREEN ID</th>
+          <th>SCREEN NAME</th>
+          <th>PURPOSE</th>
+          <th>NAVIGATES TO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="screen-id">splash</td>
+          <td class="screen-name">Splash Screen</td>
+          <td class="desc">Animated brand logo display on cold launch. Timed 3 s auto-advance or tap to skip.</td>
+          <td class="nav-to">→ onboarding</td>
+        </tr>
+        <tr>
+          <td class="screen-id">onboarding</td>
+          <td class="screen-name">Onboarding Walkthrough</td>
+          <td class="desc">3-card horizontal carousel explaining core value props: Scan → Plan → Cool. Swipe or tap arrows.</td>
+          <td class="nav-to">→ phone auth (last card "Get Started")</td>
+        </tr>
+        <tr>
+          <td class="screen-id">auth/phone</td>
+          <td class="screen-name">Phone Authentication</td>
+          <td class="desc">User enters mobile number. System sends OTP via SMS (Twilio). Dev mode logs OTP to console.</td>
+          <td class="nav-to">→ otp verify</td>
+        </tr>
+        <tr>
+          <td class="screen-id">auth/otp</td>
+          <td class="screen-name">OTP Verification</td>
+          <td class="desc">6-digit code entry. 30 s resend cooldown. Validates against hash+expiry in DB. Creates NextAuth session.</td>
+          <td class="nav-to">→ profileSetup (new user)<br/>→ home (existing user)</td>
+        </tr>
+        <tr>
+          <td class="screen-id">profileSetup</td>
+          <td class="screen-name">Profile Setup</td>
+          <td class="desc">2-step form: name (step 1) and city (step 2). Saves user record. Defaults: experience=intermediate, role=homeowner.</td>
+          <td class="nav-to">→ home</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-footer">
+    <span>HEATWISE · USER FLOW DOCUMENT</span>
+    <span>PAGE 3 OF 8</span>
+    <span>ONBOARDING &amp; AUTHENTICATION</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 4 — SCAN & MEASUREMENT FLOW
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#D8F3DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      </div>
+      <span class="logo-name">HeatWise</span>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-title">SCAN &amp; MEASUREMENT FLOW</div>
+      <div class="doc-page">SECTION 03</div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="section-heading">Journey 2 — From Home to Measured Space</div>
+
+    <!-- Main flow diagram -->
+    <div style="background:rgba(255,255,255,.02);border:0.5pt solid var(--border);border-radius:8px;padding:6mm;margin-bottom:5mm;">
+
+      <!-- Row 1 -->
+      <div class="flow-row" style="justify-content:center;margin-bottom:4mm;">
+        <div class="node highlight" style="min-width:28mm;">
+          <span class="node-name">Home Dashboard</span>
+          <span class="node-tag">tap "Scan" FAB or nav</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node" style="min-width:28mm;">
+          <span class="node-name">Project Creation</span>
+          <span class="node-tag">name · goal · surface type</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node" style="min-width:28mm;">
+          <span class="node-name">Photo Capture</span>
+          <span class="node-tag">camera · frame · shoot</span>
+        </div>
+      </div>
+
+      <!-- Branch after Photo Capture -->
+      <div style="display:flex;justify-content:flex-end;padding-right:14mm;margin-bottom:1mm;">
+        <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--dim);">Choose measurement method ↓</div>
+      </div>
+
+      <!-- Row 2: branching measurement -->
+      <div style="display:flex;justify-content:center;gap:6mm;margin-bottom:4mm;">
+
+        <!-- AR path -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2mm;">
+          <div class="node highlight" style="min-width:32mm;">
+            <span class="node-name">Live AR Measure</span>
+            <span class="node-tag">camera depth · real-time</span>
+          </div>
+          <div class="arrow down">→</div>
+          <div class="node" style="min-width:32mm;">
+            <span class="node-name">AR Photo Measure</span>
+            <span class="node-tag">tap corners on photo</span>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--green);text-align:center;margin-top:1mm;">← Recommended path</div>
+        </div>
+
+        <!-- Divider -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:1mm;padding-top:5mm;">
+          <div style="height:20mm;width:0.5pt;background:var(--border);"></div>
+          <div style="font-size:6pt;color:var(--dim);font-family:'DM Mono',monospace;">OR</div>
+          <div style="height:20mm;width:0.5pt;background:var(--border);"></div>
+        </div>
+
+        <!-- Manual path -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2mm;">
+          <div class="node" style="min-width:32mm;">
+            <span class="node-name">Manual Measure</span>
+            <span class="node-tag">type width × length m</span>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--dim);text-align:center;margin-top:1mm;">Fallback / tape measure</div>
+        </div>
+      </div>
+
+      <!-- Converge arrow -->
+      <div style="text-align:center;margin-bottom:3mm;">
+        <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--dim);">Both paths converge ↓ (dimensions confirmed)</div>
+      </div>
+
+      <!-- Row 3: after measurement -->
+      <div class="flow-row" style="justify-content:center;">
+        <div class="node" style="min-width:28mm;">
+          <span class="node-name">Environment Setup</span>
+          <span class="node-tag">auto-detect + manual</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node highlight" style="min-width:28mm;">
+          <span class="node-name">Analysis</span>
+          <span class="node-tag">AI processing</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen Detail Table -->
+    <div class="section-heading">Screen Detail — Scan &amp; Measurement Screens</div>
+    <table class="detail-table">
+      <thead>
+        <tr>
+          <th>SCREEN ID</th>
+          <th>SCREEN NAME</th>
+          <th>PURPOSE &amp; KEY INTERACTIONS</th>
+          <th>NAVIGATES TO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="screen-id">create</td>
+          <td class="screen-name">Project Creation</td>
+          <td class="desc">User names the project, selects primary goal (cooling / mixed), sets surface type. Creates a PhotoSession record. Existing projects shown as cards.</td>
+          <td class="nav-to">→ photoCapture<br/>→ existing project (tap)</td>
+        </tr>
+        <tr>
+          <td class="screen-id">photoCapture</td>
+          <td class="screen-name">Photo Capture</td>
+          <td class="desc">Full-screen camera with framing guide overlay. User taps shutter to capture JPEG. Option to retake. Stored as base64 data URL on photoSession.</td>
+          <td class="nav-to">→ liveARMeasure<br/>→ photoMeasureAR<br/>→ measure (manual)</td>
+        </tr>
+        <tr>
+          <td class="screen-id">liveARMeasure</td>
+          <td class="screen-name">Live AR Measurement</td>
+          <td class="desc">WebGL Three.js live view with depth-sensing. User points camera at space edges. Real-time distance readout. Tap to confirm corners. Derives widthM × lengthM + floorLevel.</td>
+          <td class="nav-to">→ environment (confirm)</td>
+        </tr>
+        <tr>
+          <td class="screen-id">photoMeasureAR</td>
+          <td class="screen-name">AR Photo Measurement</td>
+          <td class="desc">Shows captured photo. User taps 2 opposing corners on screen. Pixel distance + known reference → metric dimensions. Confidence score displayed.</td>
+          <td class="nav-to">→ environment (confirm)</td>
+        </tr>
+        <tr>
+          <td class="screen-id">measure</td>
+          <td class="screen-name">Manual Measurement</td>
+          <td class="desc">Numeric inputs for width (m) and length (m). Floor level selector. Optional tape-measure guide. Proceeds to environment when both fields filled.</td>
+          <td class="nav-to">→ environment</td>
+        </tr>
+        <tr>
+          <td class="screen-id">environment</td>
+          <td class="screen-name">Environment Setup</td>
+          <td class="desc">Auto-detects location, temperature, UV index, wind speed via geolocation + weather API. User can override sun exposure, wind level, space type sliders. Shows live weather card when detected.</td>
+          <td class="nav-to">→ analysis</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Environment detail callout -->
+    <div style="margin-top:4mm;background:rgba(82,183,136,.04);border:0.5pt solid rgba(82,183,136,.2);border-radius:6px;padding:4mm;">
+      <div style="font-family:'DM Mono',monospace;font-size:6pt;color:var(--green);letter-spacing:1.5px;margin-bottom:2mm;">ENVIRONMENT SCREEN — AUTO-DETECT SIGNALS</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;">
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">Location</div><div style="font-size:6pt;color:var(--dim);">GPS → lat/lng → city label</div></div>
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">Temperature</div><div style="font-size:6pt;color:var(--dim);">Current + daily max °C</div></div>
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">Wind Speed</div><div style="font-size:6pt;color:var(--dim);">km/h → sheltered/windy</div></div>
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">UV Index</div><div style="font-size:6pt;color:var(--dim);">0–11 scale → heat zone</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>HEATWISE · USER FLOW DOCUMENT</span>
+    <span>PAGE 4 OF 8</span>
+    <span>SCAN &amp; MEASUREMENT FLOW</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 5 — RECOMMENDATION & ANALYSIS FLOW
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#D8F3DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      </div>
+      <span class="logo-name">HeatWise</span>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-title">RECOMMENDATION &amp; ANALYSIS FLOW</div>
+      <div class="doc-page">SECTION 04</div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="section-heading">Journey 3 — AI Analysis to Garden Layout</div>
+
+    <!-- Analysis engine flow -->
+    <div style="background:rgba(255,255,255,.02);border:0.5pt solid var(--border);border-radius:8px;padding:5mm 6mm;margin-bottom:5mm;">
+
+      <div style="font-family:'DM Mono',monospace;font-size:6pt;color:var(--green);letter-spacing:1.5px;margin-bottom:3.5mm;">AI RECOMMENDATION ENGINE — 3-TIER PIPELINE</div>
+
+      <div class="flow-row" style="justify-content:center;margin-bottom:4mm;">
+        <div class="node" style="min-width:26mm;">
+          <span class="node-name">Environment Screen</span>
+          <span class="node-tag">inputs locked</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node highlight" style="min-width:30mm;">
+          <span class="node-name">Analysis Screen</span>
+          <span class="node-tag">POST /api/recommendations/generate</span>
+        </div>
+      </div>
+
+      <!-- Engine tiers -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3mm;margin-bottom:4mm;">
+        <div style="background:rgba(82,183,136,.06);border:0.5pt solid rgba(82,183,136,.25);border-radius:5px;padding:3.5mm;text-align:center;">
+          <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--green);margin-bottom:1.5mm;">TIER 1 · PRIMARY</div>
+          <div style="font-size:7pt;font-weight:700;color:var(--text);margin-bottom:1.5mm;">ML Model</div>
+          <div style="font-size:5.5pt;color:var(--dim);line-height:1.4;">Python scoring process<br/>Species feature vectors<br/>Trained on telemetry</div>
+        </div>
+        <div style="background:rgba(82,183,136,.04);border:0.5pt solid rgba(82,183,136,.15);border-radius:5px;padding:3.5mm;text-align:center;">
+          <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--dim);margin-bottom:1.5mm;">TIER 2 · FALLBACK</div>
+          <div style="font-size:7pt;font-weight:700;color:var(--text);margin-bottom:1.5mm;">Catalog Hybrid</div>
+          <div style="font-size:5.5pt;color:var(--dim);line-height:1.4;">Rules + catalog merge<br/>Pet-safe · drought filter<br/>Heat-zone hard exclusions</div>
+        </div>
+        <div style="background:rgba(255,255,255,.02);border:0.5pt solid rgba(255,255,255,.08);border-radius:5px;padding:3.5mm;text-align:center;">
+          <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--dim);margin-bottom:1.5mm;">TIER 3 · LAST RESORT</div>
+          <div style="font-size:7pt;font-weight:700;color:var(--text);margin-bottom:1.5mm;">Rules Only</div>
+          <div style="font-size:5.5pt;color:var(--dim);line-height:1.4;">Deterministic rules<br/>Always produces results<br/>Lower confidence score</div>
+        </div>
+      </div>
+
+      <!-- After analysis -->
+      <div class="flow-row" style="justify-content:center;">
+        <div class="node" style="min-width:26mm;">
+          <span class="node-name">Analysis</span>
+          <span class="node-tag">results ready</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node highlight" style="min-width:26mm;">
+          <span class="node-name">Garden Layout</span>
+          <span class="node-tag">architectural plan</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node highlight" style="min-width:26mm;">
+          <span class="node-name">Result Screen</span>
+          <span class="node-tag">recommendation cards</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Garden Layout callout -->
+    <div class="section-heading">Garden Layout Screen — Plan Canvas</div>
+    <div style="background:rgba(82,183,136,.04);border:0.5pt solid rgba(82,183,136,.2);border-radius:6px;padding:4mm;margin-bottom:4mm;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4mm;">
+        <div>
+          <div style="font-size:6.5pt;font-weight:600;color:var(--text);margin-bottom:2mm;">Canvas Elements</div>
+          <div style="font-size:6pt;color:var(--dim);line-height:1.7;">
+            · Architectural top-down plan (HiDPI canvas)<br/>
+            · Perimeter border beds (14% wide on all walls)<br/>
+            · 4 raised centre beds (A/B/C/D) in 2×2 grid<br/>
+            · Plant symbols: concentric rings (canopy/trunk)<br/>
+            · Compass rose, dimension lines with arrowheads<br/>
+            · Scale bar at bottom of canvas
+          </div>
+        </div>
+        <div>
+          <div style="font-size:6.5pt;font-weight:600;color:var(--text);margin-bottom:2mm;">Zone Legend &amp; Actions</div>
+          <div style="font-size:6pt;color:var(--dim);line-height:1.7;">
+            · PLANTING ZONES panel with coloured dots<br/>
+            · Species per zone with count badges<br/>
+            · Tap zone → expanded detail panel<br/>
+            · "View Detailed Recommendations →" CTA<br/>
+            · "View Full Report" secondary CTA
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Screen detail -->
+    <div class="section-heading">Result Screen — Recommendation Cards</div>
+    <table class="detail-table">
+      <thead>
+        <tr>
+          <th>SCREEN ID</th>
+          <th>SCREEN NAME</th>
+          <th>PURPOSE &amp; KEY INTERACTIONS</th>
+          <th>NAVIGATES TO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="screen-id">analysis</td>
+          <td class="screen-name">Analysis Screen</td>
+          <td class="desc">Shows animated progress while the 3-tier recommendation engine runs. Displays intermediate status (ML → hybrid → rules). Loading states with estimated °C reduction preview.</td>
+          <td class="nav-to">→ gardenLayout</td>
+        </tr>
+        <tr>
+          <td class="screen-id">gardenLayout</td>
+          <td class="screen-name">Garden Layout Screen</td>
+          <td class="desc">Renders architectural top-down canvas plan from layoutSchema. Shows zone labels, plant symbols, compass, scale. Swipeable zone detail panel at bottom.</td>
+          <td class="nav-to">→ result<br/>→ report</td>
+        </tr>
+        <tr>
+          <td class="screen-id">result</td>
+          <td class="screen-name">Result Screen</td>
+          <td class="desc">Horizontally scrollable recommendation cards. Each card shows layout name, heat reduction (°C), cost range, top plants, confidence badge. Tap card → selected. Shows live AI-generated before/after thumbnail.</td>
+          <td class="nav-to">→ beforeAfter<br/>→ report<br/>→ install</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Recommendation card anatomy -->
+    <div style="margin-top:4mm;background:rgba(255,255,255,.02);border:0.5pt solid var(--border);border-radius:6px;padding:4mm;">
+      <div style="font-family:'DM Mono',monospace;font-size:6pt;color:var(--green);letter-spacing:1.5px;margin-bottom:3mm;">RECOMMENDATION CARD — DATA FIELDS</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3mm;">
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">Layout Name</div><div style="font-size:6pt;color:var(--dim);">Template or headline string</div></div>
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">Heat Reduction</div><div style="font-size:6pt;color:var(--dim);">−X.X°C surface cooling</div></div>
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">Cost Estimate</div><div style="font-size:6pt;color:var(--dim);">Materials + labour ₹ range</div></div>
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">Confidence</div><div style="font-size:6pt;color:var(--dim);">high / medium / low badge</div></div>
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">Coverage %</div><div style="font-size:6pt;color:var(--dim);">Plant / shade / reflective</div></div>
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">Top Plants</div><div style="font-size:6pt;color:var(--dim);">Up to 3 species names</div></div>
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">ROI</div><div style="font-size:6pt;color:var(--dim);">Payback months estimate</div></div>
+        <div><div style="font-size:6.5pt;font-weight:600;color:var(--text);">Modules</div><div style="font-size:6pt;color:var(--dim);">Count of cooling modules</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>HEATWISE · USER FLOW DOCUMENT</span>
+    <span>PAGE 5 OF 8</span>
+    <span>RECOMMENDATION &amp; ANALYSIS FLOW</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 6 — VISUALIZATION & ACTION FLOW
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#D8F3DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      </div>
+      <span class="logo-name">HeatWise</span>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-title">VISUALIZATION &amp; ACTION FLOW</div>
+      <div class="doc-page">SECTION 05</div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="section-heading">Journey 4 — From Result to Garden Visual to Installation</div>
+
+    <!-- Main flow -->
+    <div style="background:rgba(255,255,255,.02);border:0.5pt solid var(--border);border-radius:8px;padding:5mm 6mm;margin-bottom:5mm;">
+      <div class="flow-row" style="justify-content:center;margin-bottom:4mm;">
+        <div class="node highlight" style="min-width:26mm;">
+          <span class="node-name">Result Screen</span>
+          <span class="node-tag">select recommendation</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node gold" style="min-width:30mm;">
+          <span class="node-name">Before / After Visualization</span>
+          <span class="node-tag">AI garden transformation</span>
+        </div>
+      </div>
+
+      <!-- Three view modes -->
+      <div style="margin-left:12mm;margin-bottom:4mm;">
+        <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--dim);margin-bottom:2mm;">THREE VIEW MODES WITHIN BEFORE/AFTER SCREEN:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3mm;">
+          <div style="background:rgba(82,183,136,.06);border:0.5pt solid rgba(82,183,136,.25);border-radius:5px;padding:3.5mm;text-align:center;">
+            <div style="font-size:7pt;font-weight:700;color:var(--green);margin-bottom:1.5mm;">SLIDER</div>
+            <div style="font-size:5.5pt;color:var(--dim);line-height:1.4;">Drag-to-reveal split<br/>Before left / After right<br/>Touch and mouse support</div>
+          </div>
+          <div style="background:rgba(82,183,136,.04);border:0.5pt solid rgba(82,183,136,.15);border-radius:5px;padding:3.5mm;text-align:center;">
+            <div style="font-size:7pt;font-weight:700;color:var(--text);margin-bottom:1.5mm;">SIDE BY SIDE</div>
+            <div style="font-size:5.5pt;color:var(--dim);line-height:1.4;">2-column grid view<br/>Before left / After right<br/>190px thumbnail height</div>
+          </div>
+          <div style="background:rgba(212,175,55,.06);border:0.5pt solid rgba(212,175,55,.25);border-radius:5px;padding:3.5mm;text-align:center;">
+            <div style="font-size:7pt;font-weight:700;color:var(--gold);margin-bottom:1.5mm;">LAYOUT OVERLAY</div>
+            <div style="font-size:5.5pt;color:var(--dim);line-height:1.4;">Photo + zone canvas<br/>Perspective-mapped anchors<br/>Coloured zone footprints</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions from Before/After -->
+      <div style="font-family:'DM Mono',monospace;font-size:5.5pt;color:var(--dim);margin-bottom:2mm;text-align:center;">Actions from Before/After screen ↓</div>
+      <div class="flow-row" style="justify-content:center;gap:5mm;">
+        <div class="node" style="min-width:26mm;">
+          <span class="node-name">Report Screen</span>
+          <span class="node-tag">full PDF report</span>
+        </div>
+        <div class="node cyan" style="min-width:26mm;">
+          <span class="node-name">Install Screen</span>
+          <span class="node-tag">request quote</span>
+        </div>
+        <div class="node dim" style="min-width:26mm;">
+          <span class="node-name">Regenerate</span>
+          <span class="node-tag">new AI visual</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Visualization detail -->
+    <div class="section-heading">AI Visualization — gpt-image-1 Pipeline</div>
+    <div style="background:rgba(212,175,55,.04);border:0.5pt solid rgba(212,175,55,.2);border-radius:6px;padding:4mm;margin-bottom:4mm;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5mm;">
+        <div>
+          <div style="font-size:6.5pt;font-weight:600;color:var(--gold);margin-bottom:2mm;">Input Signals to Prompt</div>
+          <div style="font-size:6pt;color:var(--dim);line-height:1.7;">
+            · Space dimensions (widthM × lengthM m²)<br/>
+            · Floor level → elevation context<br/>
+            · Space type (rooftop / balcony / terrace)<br/>
+            · Environment (sun exposure, wind, temp °C)<br/>
+            · Scored plants (up to 12): type + visual descriptor<br/>
+            · Layout zones: positions as % of total space<br/>
+            · Infrastructure: planter module positions<br/>
+            · Heat reduction targets (coverage%, shade%, °C)
+          </div>
+        </div>
+        <div>
+          <div style="font-size:6.5pt;font-weight:600;color:var(--gold);margin-bottom:2mm;">Output &amp; Storage</div>
+          <div style="font-size:6pt;color:var(--dim);line-height:1.7;">
+            · gpt-image-1 → 1024×1024 PNG (base64)<br/>
+            · Stored as VisualizationRecord in DB<br/>
+            · SourcePhotoRef (128 char ref)<br/>
+            · LayoutSchema + SpatialMapping JSON<br/>
+            · VisualizationPrompt (2000 chars)<br/>
+            · GenerationVersion counter per session<br/>
+            · Displayed auto on screen entry (once)<br/>
+            · Manual "Regenerate" triggers new call
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report & Install screens -->
+    <div class="section-heading">Report &amp; Installation Screens</div>
+    <table class="detail-table">
+      <thead>
+        <tr>
+          <th>SCREEN ID</th>
+          <th>SCREEN NAME</th>
+          <th>PURPOSE &amp; KEY INTERACTIONS</th>
+          <th>NAVIGATES TO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="screen-id">beforeAfter</td>
+          <td class="screen-name">Before/After Visualization</td>
+          <td class="desc">Auto-generates AI garden photo on entry. Three modes: Slider (drag-reveal), Side-by-Side (grid), Layout Overlay (canvas zone markers on photo). Shows recommendation summary, cost, modules, plants, confidence.</td>
+          <td class="nav-to">→ report<br/>→ install<br/>→ result (back)</td>
+        </tr>
+        <tr>
+          <td class="screen-id">report</td>
+          <td class="screen-name">Report Screen</td>
+          <td class="desc">Full recommendation report. Heat reduction breakdown, zone-by-zone plant list, cost breakdown (materials + labour + maintenance), ROI timeline chart, installation notes. Download PDF or share.</td>
+          <td class="nav-to">→ install (Get Quote)<br/>→ result (back)</td>
+        </tr>
+        <tr>
+          <td class="screen-id">install</td>
+          <td class="screen-name">Install Screen</td>
+          <td class="desc">Request installation quote form. User selects preferred timing, budget flexibility, notes. Assigns nearest installer from system pool. Sends notification to installer.</td>
+          <td class="nav-to">→ installDone</td>
+        </tr>
+        <tr>
+          <td class="screen-id">installDone</td>
+          <td class="screen-name">Install Success Screen</td>
+          <td class="desc">Confirmation screen with installer contact details, expected timeline, next steps. Option to view impact dashboard or return to home.</td>
+          <td class="nav-to">→ home<br/>→ impact</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-footer">
+    <span>HEATWISE · USER FLOW DOCUMENT</span>
+    <span>PAGE 6 OF 8</span>
+    <span>VISUALIZATION &amp; ACTION FLOW</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 7 — EXPLORE, IMPACT & CARBON FLOWS
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#D8F3DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      </div>
+      <span class="logo-name">HeatWise</span>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-title">EXPLORE · IMPACT · CARBON FLOWS</div>
+      <div class="doc-page">SECTIONS 06 &amp; 07</div>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- Journey 5: Explore -->
+    <div class="section-heading">Journey 5 — Explore &amp; Discovery (City Heat Tab)</div>
+    <div style="background:rgba(255,255,255,.02);border:0.5pt solid var(--border);border-radius:8px;padding:5mm;margin-bottom:5mm;">
+      <div class="flow-row" style="justify-content:flex-start;margin-bottom:3mm;">
+        <div class="node" style="min-width:26mm;">
+          <span class="node-name">City Heat Screen</span>
+          <span class="node-tag">heatmap · explore tab</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node" style="min-width:26mm;">
+          <span class="node-name">Species Library</span>
+          <span class="node-tag">browse all plants</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node" style="min-width:26mm;">
+          <span class="node-name">Species Detail</span>
+          <span class="node-tag">deep plant info</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node highlight" style="min-width:26mm;">
+          <span class="node-name">Create / Scan</span>
+          <span class="node-tag">"Include in New Scan →"</span>
+        </div>
+      </div>
+      <table class="detail-table">
+        <thead>
+          <tr><th>SCREEN ID</th><th>SCREEN NAME</th><th>PURPOSE &amp; KEY INTERACTIONS</th><th>NAVIGATES TO</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="screen-id">cityHeat</td>
+            <td class="screen-name">City Heat Screen</td>
+            <td class="desc">City-scale heat map overlay. Shows urban heat island zones, rooftop temperature readings, and neighbourhood cooling potential. Filter by zone type. Entry point to species library.</td>
+            <td class="nav-to">→ speciesLib<br/>→ create</td>
+          </tr>
+          <tr>
+            <td class="screen-id">speciesLib</td>
+            <td class="screen-name">Species Library</td>
+            <td class="desc">Searchable grid of all cooling plants in catalog. Filter by type (herb, climber, succulent…), pet-safe, drought-tolerant, sun requirement. Tap card → detail.</td>
+            <td class="nav-to">→ speciesDetail<br/>→ cityHeat (back)</td>
+          </tr>
+          <tr>
+            <td class="screen-id">speciesDetail</td>
+            <td class="screen-name">Species Detail Screen</td>
+            <td class="desc">Full plant profile: photo, scientific name, heat reduction index, water needs, maintenance level, pet-safe status, drought tolerance, seasonal behaviour, planting tips.</td>
+            <td class="nav-to">→ create (CTA)<br/>→ speciesLib (back)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Journey 6: Impact -->
+    <div class="section-heading">Journey 6 — Impact Dashboard</div>
+    <div style="background:rgba(255,255,255,.02);border:0.5pt solid var(--border);border-radius:8px;padding:5mm;margin-bottom:5mm;">
+      <div class="flow-row" style="justify-content:flex-start;margin-bottom:3mm;">
+        <div class="node" style="min-width:26mm;">
+          <span class="node-name">Impact Dashboard</span>
+          <span class="node-tag">leaf tab</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node" style="min-width:26mm;">
+          <span class="node-name">Carbon Dashboard</span>
+          <span class="node-tag">emissions tracker</span>
+        </div>
+        <div class="arrow">→</div>
+        <div class="node" style="min-width:26mm;">
+          <span class="node-name">Carbon Setup</span>
+          <span class="node-tag">configure baseline</span>
+        </div>
+      </div>
+      <table class="detail-table">
+        <thead>
+          <tr><th>SCREEN ID</th><th>SCREEN NAME</th><th>PURPOSE &amp; KEY INTERACTIONS</th><th>NAVIGATES TO</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="screen-id">impact</td>
+            <td class="screen-name">Impact Dashboard</td>
+            <td class="desc">Cumulative cooling impact across all user projects. Shows total area greened (m²), estimated °C reduction, kg CO₂ sequestered, water saved (L). Animated stat cards. Gamification badges.</td>
+            <td class="nav-to">→ carbon<br/>→ create</td>
+          </tr>
+          <tr>
+            <td class="screen-id">carbon</td>
+            <td class="screen-name">Carbon Dashboard</td>
+            <td class="desc">Monthly carbon offset chart. Current vs baseline emissions. Breakdown by project. Shows trees-equivalent and energy-saved kWh metrics. Links to setup if baseline not configured.</td>
+            <td class="nav-to">→ carbonSetup<br/>→ home (back)</td>
+          </tr>
+          <tr>
+            <td class="screen-id">carbonSetup</td>
+            <td class="screen-name">Carbon Setup</td>
+            <td class="desc">User inputs electricity consumption (kWh/month), AC usage hours/day, household size. System calculates baseline carbon footprint and cooling offset potential.</td>
+            <td class="nav-to">→ carbon (save)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Journey 7: Utility Screens -->
+    <div class="section-heading">Journey 7 — Utility &amp; Settings Screens</div>
+    <table class="detail-table">
+      <thead>
+        <tr><th>SCREEN ID</th><th>SCREEN NAME</th><th>PURPOSE &amp; KEY INTERACTIONS</th><th>NAVIGATES TO</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="screen-id">settings</td>
+          <td class="screen-name">Settings Screen</td>
+          <td class="desc">Account info, notifications toggle, unit preferences (metric/imperial), connected accounts, privacy, sign out. Edit profile link.</td>
+          <td class="nav-to">→ home<br/>→ phone auth (sign out)</td>
+        </tr>
+        <tr>
+          <td class="screen-id">saved</td>
+          <td class="screen-name">Saved Projects Screen</td>
+          <td class="desc">List of all completed photo sessions and their recommendations. Tap to resume or view report. Sort by date or heat reduction.</td>
+          <td class="nav-to">→ result (tap project)<br/>→ create</td>
+        </tr>
+        <tr>
+          <td class="screen-id">notifications</td>
+          <td class="screen-name">Notifications Screen</td>
+          <td class="desc">System notifications: new installer quote, seasonal plant tips, weather alerts for user's region, badge unlocks. Mark as read / clear all.</td>
+          <td class="nav-to">→ home<br/>→ install (quote notif)</td>
+        </tr>
+        <tr>
+          <td class="screen-id">tips</td>
+          <td class="screen-name">Tips Screen</td>
+          <td class="desc">Curated gardening and cooling tips. Personalised to user's space type and region. Expandable tip cards with action buttons.</td>
+          <td class="nav-to">→ home<br/>→ speciesLib</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-footer">
+    <span>HEATWISE · USER FLOW DOCUMENT</span>
+    <span>PAGE 7 OF 8</span>
+    <span>EXPLORE · IMPACT · CARBON</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE 8 — COMPLETE SCREEN INVENTORY
+════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#D8F3DC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </svg>
+      </div>
+      <span class="logo-name">HeatWise</span>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-title">COMPLETE SCREEN INVENTORY</div>
+      <div class="doc-page">SECTION 08</div>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="section-heading">All 26 Screens — Categorised</div>
+
+    <!-- Onboarding group -->
+    <div style="margin-bottom:4mm;">
+      <div style="font-family:'DM Mono',monospace;font-size:6pt;color:var(--green);letter-spacing:1.5px;margin-bottom:2mm;display:flex;align-items:center;gap:5px;">
+        <span class="pill green">ONBOARDING</span> First-time &amp; auth screens
+      </div>
+      <div class="grid-3">
+        <div class="scard"><div class="scard-id">splash</div><div class="scard-name">Splash Screen</div><div class="scard-desc">Animated logo · auto-dismiss</div></div>
+        <div class="scard"><div class="scard-id">onboarding</div><div class="scard-name">Onboarding Walkthrough</div><div class="scard-desc">3-card value prop carousel</div></div>
+        <div class="scard"><div class="scard-id">profileSetup</div><div class="scard-name">Profile Setup</div><div class="scard-desc">Name + city · 2-step form</div></div>
+      </div>
+    </div>
+
+    <!-- Core flow group -->
+    <div style="margin-bottom:4mm;">
+      <div style="font-family:'DM Mono',monospace;font-size:6pt;color:var(--green);letter-spacing:1.5px;margin-bottom:2mm;display:flex;align-items:center;gap:5px;">
+        <span class="pill green">CORE FLOW</span> Primary scan-to-recommendation pipeline
+      </div>
+      <div class="grid-3">
+        <div class="scard" style="border-color:rgba(82,183,136,.4);"><div class="scard-id">home</div><div class="scard-name">Home Dashboard</div><div class="scard-desc">Activity feed · quick CTA · carbon strip</div></div>
+        <div class="scard"><div class="scard-id">create</div><div class="scard-name">Project Creation</div><div class="scard-desc">Name · goal · existing projects</div></div>
+        <div class="scard"><div class="scard-id">photoCapture</div><div class="scard-name">Photo Capture</div><div class="scard-desc">Camera · frame guide · retake</div></div>
+        <div class="scard"><div class="scard-id">liveARMeasure</div><div class="scard-name">Live AR Measure</div><div class="scard-desc">Three.js depth · real-time dims</div></div>
+        <div class="scard"><div class="scard-id">photoMeasureAR</div><div class="scard-name">AR Photo Measure</div><div class="scard-desc">Tap corners on captured photo</div></div>
+        <div class="scard"><div class="scard-id">measure</div><div class="scard-name">Manual Measurement</div><div class="scard-desc">Numeric width × length inputs</div></div>
+        <div class="scard"><div class="scard-id">environment</div><div class="scard-name">Environment Setup</div><div class="scard-desc">Auto-detect + manual override</div></div>
+        <div class="scard"><div class="scard-id">analysis</div><div class="scard-name">Analysis Screen</div><div class="scard-desc">3-tier AI engine · progress UI</div></div>
+        <div class="scard" style="border-color:rgba(82,183,136,.4);"><div class="scard-id">gardenLayout</div><div class="scard-name">Garden Layout</div><div class="scard-desc">Architectural plan canvas · zones</div></div>
+        <div class="scard" style="border-color:rgba(82,183,136,.4);"><div class="scard-id">result</div><div class="scard-name">Result Screen</div><div class="scard-desc">Recommendation cards · select</div></div>
+      </div>
+    </div>
+
+    <!-- Visualization & Action group -->
+    <div style="margin-bottom:4mm;">
+      <div style="font-family:'DM Mono',monospace;font-size:6pt;color:var(--gold);letter-spacing:1.5px;margin-bottom:2mm;display:flex;align-items:center;gap:5px;">
+        <span class="pill gold">VISUAL &amp; ACTION</span> Post-recommendation screens
+      </div>
+      <div class="grid-3">
+        <div class="scard" style="border-color:rgba(212,175,55,.35);"><div class="scard-id">beforeAfter</div><div class="scard-name">Before / After</div><div class="scard-desc">AI visual · slider · overlay modes</div></div>
+        <div class="scard"><div class="scard-id">report</div><div class="scard-name">Report Screen</div><div class="scard-desc">Full PDF · cost · ROI · zones</div></div>
+        <div class="scard" style="border-color:rgba(72,202,228,.35);"><div class="scard-id">install</div><div class="scard-name">Install Screen</div><div class="scard-desc">Quote request · installer assign</div></div>
+        <div class="scard"><div class="scard-id">installDone</div><div class="scard-name">Install Success</div><div class="scard-desc">Confirmation · contact details</div></div>
+      </div>
+    </div>
+
+    <!-- Explore group -->
+    <div style="margin-bottom:4mm;">
+      <div style="font-family:'DM Mono',monospace;font-size:6pt;color:var(--cyan);letter-spacing:1.5px;margin-bottom:2mm;display:flex;align-items:center;gap:5px;">
+        <span class="pill cyan">EXPLORE</span> Discovery &amp; species catalog
+      </div>
+      <div class="grid-3">
+        <div class="scard" style="border-color:rgba(72,202,228,.25);"><div class="scard-id">cityHeat</div><div class="scard-name">City Heat Screen</div><div class="scard-desc">Urban heat map · zone explorer</div></div>
+        <div class="scard"><div class="scard-id">speciesLib</div><div class="scard-name">Species Library</div><div class="scard-desc">Searchable plant catalog grid</div></div>
+        <div class="scard"><div class="scard-id">speciesDetail</div><div class="scard-name">Species Detail</div><div class="scard-desc">Full plant profile · traits · tips</div></div>
+      </div>
+    </div>
+
+    <!-- Impact & Utility -->
+    <div style="margin-bottom:0;">
+      <div style="font-family:'DM Mono',monospace;font-size:6pt;color:rgba(216,243,220,.4);letter-spacing:1.5px;margin-bottom:2mm;display:flex;align-items:center;gap:5px;">
+        <span class="pill white">IMPACT &amp; UTILITY</span> Impact tracking, settings, support
+      </div>
+      <div class="grid-3">
+        <div class="scard"><div class="scard-id">impact</div><div class="scard-name">Impact Dashboard</div><div class="scard-desc">Cumulative cooling · CO₂ · badges</div></div>
+        <div class="scard"><div class="scard-id">carbon</div><div class="scard-name">Carbon Dashboard</div><div class="scard-desc">Monthly offset chart · kWh saved</div></div>
+        <div class="scard"><div class="scard-id">carbonSetup</div><div class="scard-name">Carbon Setup</div><div class="scard-desc">Electricity baseline · household</div></div>
+        <div class="scard"><div class="scard-id">saved</div><div class="scard-name">Saved Projects</div><div class="scard-desc">Past scans · resume · sort</div></div>
+        <div class="scard"><div class="scard-id">notifications</div><div class="scard-name">Notifications</div><div class="scard-desc">Alerts · quotes · tips · badges</div></div>
+        <div class="scard"><div class="scard-id">tips</div><div class="scard-name">Tips Screen</div><div class="scard-desc">Personalised gardening tips</div></div>
+        <div class="scard"><div class="scard-id">settings</div><div class="scard-name">Settings</div><div class="scard-desc">Account · prefs · sign out</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>HEATWISE · USER FLOW DOCUMENT</span>
+    <span>PAGE 8 OF 8</span>
+    <span>COMPLETE SCREEN INVENTORY · 26 SCREENS</span>
+  </div>
+</div>
+
+</body>
+</html>

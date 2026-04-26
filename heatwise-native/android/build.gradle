@@ -1,0 +1,40 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:9.1.0'
+        classpath 'com.google.gms:google-services:4.4.4'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+apply from: "variables.gradle"
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// Capacitor 8 / AGP 9 expect Java 21. Foojay resolver (settings.gradle) downloads a JDK if needed.
+subprojects { sub ->
+    sub.afterEvaluate {
+        sub.tasks.withType(JavaCompile).configureEach { task ->
+            task.javaCompiler = sub.javaToolchains.compilerFor {
+                languageVersion = org.gradle.jvm.toolchain.JavaLanguageVersion.of(21)
+            }
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/species_availability_v1.json",
+  "title": "species_availability",
+  "type": "object",
+  "required": [
+    "availability_id",
+    "species_name",
+    "region",
+    "supplier_source_type",
+    "availability_status",
+    "availability_confidence",
+    "updated_at"
+  ],
+  "properties": {
+    "availability_id": { "type": "string", "minLength": 1 },
+    "species_name": { "type": "string", "minLength": 1 },
+    "region": { "type": "string", "minLength": 1 },
+    "city_tier": { "type": ["string", "null"] },
+    "supplier_source_type": { "type": "string", "minLength": 1 },
+    "availability_status": {
+      "type": "string",
+      "enum": ["available", "limited", "backorder", "unavailable"]
+    },
+    "availability_confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "estimated_lead_time_days": { "type": ["integer", "null"], "minimum": 0 },
+    "seasonal_availability_note": { "type": ["string", "null"] },
+    "substitute_species_json": { "type": ["string", "null"] },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "metadata_json": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

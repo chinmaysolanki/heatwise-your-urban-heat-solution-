@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/revenue_event_v1.json",
+  "title": "revenue_event",
+  "type": "object",
+  "required": [
+    "revenue_event_id",
+    "event_type",
+    "event_timestamp",
+    "currency",
+    "revenue_status",
+    "revenue_source"
+  ],
+  "properties": {
+    "revenue_event_id": { "type": "string" },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "quote_fee_charged",
+        "subscription_started",
+        "subscription_renewed",
+        "subscription_cancelled",
+        "installer_lead_fee",
+        "installer_commission_earned",
+        "installer_commission_refunded",
+        "consultation_fee",
+        "design_fee",
+        "install_conversion_revenue",
+        "maintenance_plan_started",
+        "maintenance_plan_renewed",
+        "maintenance_plan_cancelled",
+        "refund_issued"
+      ]
+    },
+    "event_timestamp": { "type": "string", "format": "date-time" },
+    "user_id": { "type": ["string", "null"] },
+    "project_id": { "type": ["string", "null"] },
+    "recommendation_session_id": { "type": ["string", "null"] },
+    "quote_request_id": { "type": ["string", "null"] },
+    "installer_quote_id": { "type": ["string", "null"] },
+    "install_job_id": { "type": ["string", "null"] },
+    "installer_id": { "type": ["string", "null"] },
+    "currency": { "type": "string", "minLength": 3, "maxLength": 3 },
+    "gross_amount": { "type": ["number", "null"] },
+    "net_amount": { "type": ["number", "null"] },
+    "commission_amount": { "type": ["number", "null"], "minimum": 0 },
+    "platform_fee_amount": { "type": ["number", "null"], "minimum": 0 },
+    "discount_amount": { "type": ["number", "null"], "minimum": 0 },
+    "refund_amount": { "type": ["number", "null"], "minimum": 0 },
+    "tax_amount": { "type": ["number", "null"], "minimum": 0 },
+    "revenue_status": {
+      "type": "string",
+      "enum": ["recorded", "pending_settlement", "settled", "void", "disputed", "reversed"]
+    },
+    "payment_status": { "type": ["string", "null"] },
+    "revenue_source": { "type": "string", "minLength": 1 },
+    "metadata_json": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

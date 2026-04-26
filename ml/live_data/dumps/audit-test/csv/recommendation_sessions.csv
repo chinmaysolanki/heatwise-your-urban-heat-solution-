@@ -1,0 +1,3 @@
+recommendation_session_id,id,project_id,user_id,photo_session_id,model_version,rules_version,generator_source,project_snapshot_json,environment_snapshot_json,preference_snapshot_json,total_candidates,latency_ms,legacy_recommendation_run_id,legacyRecommendationRunId
+lfb_sess_64dc19f545456ddce150351e,lfb_sess_64dc19f545456ddce150351e,modular_tray_system,,,legacy_feedback_bridge_v1,legacy_feedback_bridge_v1,legacy_recommendation_feedback,"{""bridged"":true,""recommendationId"":""modular_tray_system""}",{},{},5,0,,
+lfb_sess_9b7122fa4446ea2966649835,lfb_sess_9b7122fa4446ea2966649835,extensive_sedum_mat,,,legacy_feedback_bridge_v1,legacy_feedback_bridge_v1,legacy_recommendation_feedback,"{""bridged"":true,""recommendationId"":""extensive_sedum_mat""}",{},{},3,0,,

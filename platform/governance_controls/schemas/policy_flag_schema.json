@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/policy_flag_v1.json",
+  "title": "GovernancePolicyFlagV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["flag_type", "severity", "title"],
+  "properties": {
+    "flag_type": {
+      "type": "string",
+      "enum": [
+        "risky_record",
+        "missing_evidence",
+        "low_confidence_output",
+        "pricing_anomaly",
+        "installer_mismatch",
+        "governance_review_needed"
+      ]
+    },
+    "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "status": { "type": "string", "enum": ["open", "acknowledged", "resolved", "waived"] },
+    "title": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "entity_type": { "type": "string", "maxLength": 128 },
+    "entity_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "user_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "project_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "detail": { "type": "object" },
+    "metadata": { "type": "object" }
+  }
+}

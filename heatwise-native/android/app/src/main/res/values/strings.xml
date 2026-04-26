@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">HeatWise</string>
+    <string name="title_activity_main">HeatWise</string>
+    <string name="package_name">com.chinmaysolanki.heatwise</string>
+    <string name="custom_url_scheme">com.chinmaysolanki.heatwise</string>
+</resources>

@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/runtime_recommendation_v1.json",
+  "title": "HeatWise runtime recommendation API (v1)",
+  "type": "object",
+  "definitions": {
+    "projectSnapshot": {
+      "type": "object",
+      "description": "Physical site / product inputs (aligned with training feature names where possible)",
+      "additionalProperties": true
+    },
+    "environmentSnapshot": { "type": "object", "additionalProperties": true },
+    "preferenceSnapshot": { "type": "object", "additionalProperties": true }
+  },
+  "properties": {
+    "request": {
+      "type": "object",
+      "required": ["project", "environment", "preferences"],
+      "properties": {
+        "project": { "$ref": "#/definitions/projectSnapshot" },
+        "environment": { "$ref": "#/definitions/environmentSnapshot" },
+        "preferences": { "$ref": "#/definitions/preferenceSnapshot" },
+        "projectId": { "type": "string" },
+        "userId": { "type": ["string", "null"] },
+        "maxCandidates": { "type": "integer", "minimum": 1, "maximum": 20, "default": 8 },
+        "blendWeights": {
+          "type": "object",
+          "properties": {
+            "rules": { "type": "number", "minimum": 0, "maximum": 1 },
+            "feasibilityMl": { "type": "number", "minimum": 0, "maximum": 1 },
+            "heatMl": { "type": "number", "minimum": 0, "maximum": 1 },
+            "rankingMl": { "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "rulesVersion": { "type": "string" },
+        "registryDir": { "type": "string", "description": "Override HEATWISE_REGISTRY_DIR" },
+        "speciesCsvPath": { "type": "string", "description": "Optional species_features.csv for derived columns" },
+        "supplyConstraints": {
+          "type": "object",
+          "description": "Optional v1 supply/seasonal constraint envelope from Node (see recommendationConstraintService)"
+        },
+        "skipSupplyConstraints": { "type": "boolean" },
+        "skipPricingEnrichment": { "type": "boolean", "description": "When true, Node skips per-candidate pricing block" }
+      }
+    },
+    "response": {
+      "type": "object",
+      "required": ["candidates", "telemetryMeta", "mode"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["full_ml", "rules_only", "partial_ml"] },
+        "heatwiseServingOk": {
+          "type": "boolean",
+          "description": "True when ``python -m serving`` wrote this body to stdout with exit code 0 (usable slate)."
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["candidateId", "rank", "scores", "blocked"],
+            "properties": {
+              "candidateId": { "type": "string" },
+              "rank": { "type": "integer" },
+              "blocked": { "type": "boolean" },
+              "blockReasons": { "type": "array", "items": { "type": "string" } },
+              "scores": { "type": "object" },
+              "candidatePayload": {
+                "type": "object",
+                "description": "Rule/ML feature row; includes species_primary and, when unambiguously mapped, species_catalog_code (canonical SpeciesCatalog.code, aligned with TS hybrid path).",
+                "additionalProperties": true
+              },
+              "explanation": { "type": "object" },
+              "pricing": { "type": "object", "description": "Optional install/maintenance bands + budget fit (Node pricing layer)" }
+            }
+          }
+        },
+        "telemetryMeta": {
+          "type": "object",
+          "properties": {
+            "generatorSource": { "type": "string" },
+            "rulesVersion": { "type": "string" },
+            "modelVersionFeasibility": { "type": ["string", "null"] },
+            "modelVersionHeat": { "type": ["string", "null"] },
+            "modelVersionRanking": { "type": ["string", "null"] },
+            "mlErrors": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "errors": { "type": "array", "items": { "type": "string" } },
+        "supplyIntelligenceMeta": { "type": "object", "description": "Echo of applied supply context when supplyConstraints v1 present" },
+        "pricingIntelligenceMeta": { "type": "object", "description": "Pricing rules version + enrichment summary when enabled" }
+      }
+    }
+  }
+}

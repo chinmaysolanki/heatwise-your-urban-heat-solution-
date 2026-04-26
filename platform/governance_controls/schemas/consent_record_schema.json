@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/consent_record_v1.json",
+  "title": "ConsentRecordV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["user_id", "consent_scope", "consent_status"],
+  "properties": {
+    "user_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "consent_scope": {
+      "type": "string",
+      "enum": [
+        "project_media",
+        "recommendation_telemetry",
+        "installer_sharing",
+        "followup_outreach",
+        "analytics_usage"
+      ]
+    },
+    "consent_status": {
+      "type": "string",
+      "enum": ["granted", "denied", "withdrawn", "pending"]
+    },
+    "source_channel": { "type": "string", "maxLength": 64 },
+    "granted_at": { "type": "string", "format": "date-time" },
+    "withdrawn_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "legal_basis": { "type": "string", "maxLength": 128 },
+    "metadata": { "type": "object" }
+  }
+}

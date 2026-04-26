@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "followup_schedule",
+  "type": "object",
+  "required": ["followup_schedule_id", "project_id", "baseline_at", "offsets_days"],
+  "properties": {
+    "followup_schedule_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "user_id": { "type": ["string", "null"] },
+    "verified_install_id": { "type": ["string", "null"] },
+    "baseline_at": { "type": "string", "format": "date-time" },
+    "schedule_status": {
+      "type": "string",
+      "enum": ["active", "completed", "cancelled", "paused"]
+    },
+    "offsets_days": {
+      "type": "array",
+      "items": { "type": "integer", "enum": [7, 30, 90, 180] },
+      "minItems": 1,
+      "maxItems": 8
+    },
+    "checkpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["checkpoint_id", "offset_days", "window_label", "due_at", "checkpoint_status"],
+        "properties": {
+          "checkpoint_id": { "type": "string" },
+          "offset_days": { "type": "integer" },
+          "window_label": { "type": "string", "pattern": "^[0-9]+d$" },
+          "due_at": { "type": "string", "format": "date-time" },
+          "checkpoint_status": {
+            "type": "string",
+            "enum": ["pending", "completed", "missed", "rescheduled", "unreachable", "skipped"]
+          },
+          "rescheduled_due_at": { "type": ["string", "null"], "format": "date-time" },
+          "completed_at": { "type": ["string", "null"], "format": "date-time" }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

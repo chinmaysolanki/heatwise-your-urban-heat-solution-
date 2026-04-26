@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/inference_bundle_manifest.json",
+  "title": "HeatWise inference bundle manifest",
+  "type": "object",
+  "required": [
+    "bundle_version",
+    "model_id",
+    "task",
+    "model_version",
+    "training_snapshot_id",
+    "artifact_files",
+    "expected_input_schema",
+    "output_schema"
+  ],
+  "properties": {
+    "bundle_version": { "type": "string" },
+    "model_id": { "type": "string" },
+    "task": { "type": "string" },
+    "model_version": { "type": "string" },
+    "training_snapshot_id": { "type": "string" },
+    "trained_at": { "type": "string" },
+    "artifact_files": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "feature_manifest_path": { "type": "string" },
+    "preprocessing_metadata_path": { "type": "string" },
+    "inference_config": { "type": "object" },
+    "categorical_vocabulary": { "type": "object" },
+    "expected_input_schema": { "type": "object" },
+    "output_schema": { "type": "object" },
+    "model_metadata": { "type": "object" }
+  },
+  "additionalProperties": true
+}

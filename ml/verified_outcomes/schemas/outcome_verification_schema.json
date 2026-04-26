@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "outcome_verification",
+  "type": "object",
+  "required": [
+    "outcome_verification_id",
+    "verified_install_id",
+    "project_id",
+    "verified_by_type",
+    "verification_date",
+    "verification_window_days",
+    "verification_confidence_tier"
+  ],
+  "properties": {
+    "outcome_verification_id": { "type": "string" },
+    "verified_install_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "verified_by_type": { "type": "string", "enum": ["user", "installer", "ops", "sensor_feed", "third_party_audit"] },
+    "verified_by_id": { "type": ["string", "null"] },
+    "verification_date": { "type": "string" },
+    "verification_window_days": { "type": "integer", "minimum": 1, "maximum": 730 },
+    "measured_temp_change_c": { "type": ["number", "null"], "minimum": -15, "maximum": 15 },
+    "measured_surface_temp_change_c": { "type": ["number", "null"], "minimum": -25, "maximum": 25 },
+    "user_satisfaction_score": { "type": ["number", "null"], "minimum": 0, "maximum": 5 },
+    "installer_feasibility_rating": { "type": ["number", "null"], "minimum": 0, "maximum": 5 },
+    "plant_survival_rate_30d": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "plant_survival_rate_90d": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "maintenance_adherence_score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "water_use_assessment": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "shading_effectiveness_score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "biodiversity_observation_score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "verification_confidence_tier": { "type": "string", "enum": ["low", "medium", "high", "gold"] },
+    "evidence_refs_json": {},
+    "notes": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

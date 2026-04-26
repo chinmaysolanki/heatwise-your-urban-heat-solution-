@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/error_contract_v1.json",
+  "title": "StructuredErrorContractV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["code", "message"],
+  "properties": {
+    "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,63}$" },
+    "message": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "severity": { "type": "string", "enum": ["debug", "info", "warning", "error", "critical"] },
+    "retriable": { "type": "boolean" },
+    "http_status_hint": { "type": "integer", "minimum": 400, "maximum": 599 },
+    "details": {},
+    "correlation_id": { "type": "string", "maxLength": 128 },
+    "subsystem": {
+      "type": "string",
+      "enum": [
+        "recommendation_runtime",
+        "pricing",
+        "supply",
+        "installer_ops",
+        "reporting",
+        "retraining_registry",
+        "integrations",
+        "analytics"
+      ]
+    }
+  }
+}

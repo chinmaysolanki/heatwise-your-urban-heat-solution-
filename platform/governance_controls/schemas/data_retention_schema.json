@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/data_retention_v1.json",
+  "title": "DataRetentionCategoryV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_category", "default_retention_days"],
+  "properties": {
+    "entity_category": {
+      "type": "string",
+      "enum": [
+        "user_profile",
+        "project_media",
+        "recommendation_telemetry",
+        "installer_commercial",
+        "verified_outcomes",
+        "integration_events",
+        "platform_audit",
+        "governance_records"
+      ]
+    },
+    "default_retention_days": { "type": "integer", "minimum": 1, "maximum": 36500 },
+    "archive_after_days": { "type": "integer", "minimum": 0, "maximum": 36500 },
+    "hard_delete_after_days": { "type": "integer", "minimum": 0, "maximum": 36500 },
+    "policy_version": { "type": "string", "maxLength": 32 },
+    "notes": { "type": "object" }
+  }
+}

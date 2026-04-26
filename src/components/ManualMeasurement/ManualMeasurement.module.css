@@ -1,0 +1,190 @@
+/* src/components/ManualMeasurement/ManualMeasurement.module.css */
+
+.container {
+  display:        flex;
+  flex-direction: column;
+  gap:            1.1rem;
+  padding:        1.5rem 1.25rem;
+  background:     var(--surface, #111827);
+  border-radius:  20px 20px 0 0;
+  min-height:     420px;
+}
+
+.header {
+  display:     flex;
+  align-items: flex-start;
+  gap:         0.85rem;
+}
+
+.headerIcon { font-size: 1.6rem; flex-shrink: 0; }
+
+.headerTitle {
+  font-size:   0.95rem;
+  font-weight: 700;
+  color:       #e2e8f0;
+  margin:      0 0 0.15rem;
+}
+
+.headerSub {
+  font-size:  0.78rem;
+  color:      rgba(148,163,184,0.7);
+  margin:     0;
+  line-height: 1.5;
+}
+
+/* ── Diagram ─────────────────────────────────────────────── */
+
+.diagram {
+  background:    rgba(52,211,153,0.04);
+  border:        1px solid rgba(52,211,153,0.12);
+  border-radius: 12px;
+  padding:       0.5rem;
+}
+
+.diagramSvg {
+  width:  100%;
+  height: auto;
+}
+
+/* ── Fields ─────────────────────────────────────────────── */
+
+.field {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.35rem;
+}
+
+.label {
+  font-size:   0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:       rgba(52,211,153,0.8);
+}
+
+.inputRow {
+  display:       flex;
+  align-items:   center;
+  gap:           0.5rem;
+  background:    rgba(255,255,255,0.04);
+  border:        1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  overflow:      hidden;
+  transition:    border-color 0.2s;
+}
+
+.inputRow:focus-within {
+  border-color: rgba(52,211,153,0.5);
+}
+
+.inputRow.hasError {
+  border-color: rgba(251,113,133,0.5);
+}
+
+.stepper {
+  width:            44px;
+  height:           48px;
+  background:       rgba(255,255,255,0.04);
+  border:           none;
+  color:            rgba(203,213,225,0.8);
+  font-size:        1.25rem;
+  font-weight:      300;
+  cursor:           pointer;
+  flex-shrink:      0;
+  transition:       background 0.15s;
+  display:          flex;
+  align-items:      center;
+  justify-content:  center;
+}
+
+.stepper:hover  { background: rgba(52,211,153,0.1); }
+.stepper:active { background: rgba(52,211,153,0.2); }
+
+.inputWrap {
+  flex:      1;
+  display:   flex;
+  align-items: center;
+  gap:       0.25rem;
+}
+
+.input {
+  flex:         1;
+  background:   transparent;
+  border:       none;
+  outline:      none;
+  color:        #e2e8f0;
+  font-size:    1.15rem;
+  font-weight:  600;
+  text-align:   center;
+  padding:      0;
+  -moz-appearance: textfield;
+}
+
+.input::-webkit-inner-spin-button,
+.input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+.unit {
+  font-size:   0.85rem;
+  font-weight: 600;
+  color:       rgba(52,211,153,0.7);
+  padding-right: 0.5rem;
+}
+
+.error {
+  font-size:  0.72rem;
+  color:      rgba(251,113,133,0.9);
+  padding:    0 0.25rem;
+}
+
+/* ── Area Badge ─────────────────────────────────────────── */
+
+.areaBadge {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  background:      rgba(52,211,153,0.07);
+  border:          1px solid rgba(52,211,153,0.2);
+  border-radius:   10px;
+  padding:         0.65rem 1rem;
+}
+
+.areaLabel {
+  font-size:   0.75rem;
+  font-weight: 600;
+  color:       rgba(52,211,153,0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.areaValue {
+  font-size:   1.25rem;
+  font-weight: 800;
+  color:       rgba(52,211,153,1);
+}
+
+/* ── Submit ─────────────────────────────────────────────── */
+
+.submitBtn {
+  width:         100%;
+  padding:       0.85rem;
+  background:    linear-gradient(135deg, #0e9488, #14b8a6);
+  color:         #fff;
+  font-size:     0.9rem;
+  font-weight:   700;
+  border:        none;
+  border-radius: 14px;
+  cursor:        pointer;
+  margin-top:    0.25rem;
+  transition:    opacity 0.2s, transform 0.15s;
+  box-shadow:    0 4px 20px rgba(20,184,166,0.3);
+}
+
+.submitBtn:hover   { opacity: 0.9; }
+.submitBtn:active  { transform: scale(0.98); }
+.submitBtn:disabled {
+  opacity: 0.35;
+  cursor:  not-allowed;
+  box-shadow: none;
+}

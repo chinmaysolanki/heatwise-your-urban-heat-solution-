@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/partner_capability_v1.json",
+  "title": "PartnerCapabilityMatrixV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["installer_id"],
+  "properties": {
+    "installer_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "project_types": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "string",
+        "enum": [
+          "residential_rooftop",
+          "commercial_rooftop",
+          "terrace",
+          "ground",
+          "vertical_green"
+        ]
+      }
+    },
+    "solution_types": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "string",
+        "enum": [
+          "container_garden",
+          "raised_beds",
+          "irrigation",
+          "shade_structure",
+          "edible",
+          "native_mix"
+        ]
+      }
+    },
+    "complexity_bands": {
+      "type": "array",
+      "maxItems": 16,
+      "items": { "type": "string", "enum": ["low", "medium", "high", "custom"] }
+    },
+    "seasonal_constraints": { "type": "object" },
+    "service_readiness": {
+      "type": "string",
+      "enum": ["ready", "constrained", "not_accepting"]
+    },
+    "matrix_extras": { "type": "object" }
+  }
+}

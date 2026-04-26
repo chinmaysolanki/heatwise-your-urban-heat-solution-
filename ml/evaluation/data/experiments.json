@@ -1,0 +1,30 @@
+{
+  "experiments": [
+    {
+      "experiment_id": "exp_hybrid_shadow_default",
+      "experiment_name": "Hybrid v1 shadow vs rules control",
+      "status": "draft",
+      "description": "Enable when ready; flip status to active for shadow dual-run.",
+      "created_at": "2025-01-01T00:00:00+00:00",
+      "primary_variant": "hybrid_v1",
+      "control_variant": "rules_only",
+      "treatment_variants": ["hybrid_v1", "ml_heavy_v1"],
+      "allocation_policy": "deterministic_hash",
+      "traffic_allocation": {
+        "rules_only": 50,
+        "hybrid_v1": 50
+      },
+      "target_population_filters": {},
+      "start_at": "2025-01-01T00:00:00+00:00",
+      "end_at": null,
+      "success_metrics": ["select_rate", "install_conversion_rate"],
+      "guardrail_metrics": ["p95_latency_ms", "fallback_rate", "unsafe_incidents"],
+      "shadow_config": {
+        "enabled": true,
+        "shadow_variant": "hybrid_v1",
+        "primary_is_user_visible": true
+      },
+      "notes": "v1 template — tune traffic_allocation before activation."
+    }
+  ]
+}

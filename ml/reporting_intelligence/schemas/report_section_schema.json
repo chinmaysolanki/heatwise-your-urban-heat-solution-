@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/report_section_v1.json",
+  "title": "report_section",
+  "type": "object",
+  "required": [
+    "report_section_id",
+    "recommendation_dossier_id",
+    "section_key",
+    "section_order",
+    "section_title",
+    "section_type",
+    "section_payload_json",
+    "visibility_scope",
+    "created_at"
+  ],
+  "properties": {
+    "report_section_id": { "type": "string" },
+    "recommendation_dossier_id": { "type": "string" },
+    "section_key": {
+      "type": "string",
+      "enum": [
+        "project_summary",
+        "space_analysis",
+        "recommendation_overview",
+        "candidate_breakdown",
+        "cost_summary",
+        "maintenance_summary",
+        "cooling_impact_summary",
+        "supply_constraints_summary",
+        "personalization_summary",
+        "geospatial_summary",
+        "phased_plan_summary",
+        "installer_execution_notes",
+        "admin_risk_review",
+        "evidence_and_confidence"
+      ]
+    },
+    "section_order": { "type": "integer", "minimum": 0 },
+    "section_title": { "type": "string" },
+    "section_type": { "type": "string" },
+    "section_payload_json": { "type": "string" },
+    "explanation_refs_json": { "type": ["string", "null"] },
+    "visibility_scope": { "type": "string", "enum": ["user", "installer", "admin", "shared"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

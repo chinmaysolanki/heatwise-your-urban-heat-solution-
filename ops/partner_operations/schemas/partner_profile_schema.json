@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/partner_profile_v1.json",
+  "title": "PartnerProfileV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["installer_id"],
+  "properties": {
+    "installer_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "organization_name": { "type": "string", "maxLength": 256 },
+    "legal_entity_name": { "type": "string", "maxLength": 256 },
+    "service_areas": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["region_code"],
+        "properties": {
+          "region_code": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "label": { "type": "string", "maxLength": 256 },
+          "priority": { "type": "integer", "minimum": 0, "maximum": 1000 },
+          "service_tier": { "type": "string", "enum": ["standard", "priority", "pilot"] }
+        }
+      }
+    },
+    "compliance_status": {
+      "type": "string",
+      "enum": ["pending", "verified", "suspended", "revoked"]
+    },
+    "partner_active_status": {
+      "type": "string",
+      "enum": ["onboarding", "operational", "limited", "paused"]
+    },
+    "primary_contact": { "type": "object" },
+    "metadata": { "type": "object" }
+  }
+}

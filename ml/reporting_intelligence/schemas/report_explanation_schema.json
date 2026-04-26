@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/report_explanation_v1.json",
+  "title": "report_explanation",
+  "type": "object",
+  "required": [
+    "report_explanation_id",
+    "recommendation_dossier_id",
+    "related_section_key",
+    "explanation_type",
+    "source_layer",
+    "explanation_payload_json",
+    "created_at"
+  ],
+  "properties": {
+    "report_explanation_id": { "type": "string" },
+    "recommendation_dossier_id": { "type": "string" },
+    "related_section_key": { "type": "string" },
+    "explanation_type": { "type": "string" },
+    "source_layer": {
+      "type": "string",
+      "enum": [
+        "rules",
+        "ml_model",
+        "pricing",
+        "supply_intelligence",
+        "personalization",
+        "geospatial",
+        "installer_ops",
+        "verified_outcomes",
+        "scenario_engine"
+      ]
+    },
+    "source_reference_id": { "type": ["string", "null"] },
+    "explanation_payload_json": { "type": "string" },
+    "confidence_band": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

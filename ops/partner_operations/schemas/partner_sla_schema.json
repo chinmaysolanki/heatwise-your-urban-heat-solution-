@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/partner_sla_v1.json",
+  "title": "PartnerSLAMetricsV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["installer_id", "window_start", "window_end"],
+  "properties": {
+    "installer_id": { "type": "string", "pattern": "^c[a-z0-9]{24,}$" },
+    "window_start": { "type": "string", "format": "date-time" },
+    "window_end": { "type": "string", "format": "date-time" },
+    "response_time_ms_p50": { "type": "integer", "minimum": 0, "maximum": 864000000 },
+    "quote_turnaround_hours_p50": { "type": "number", "minimum": 0, "maximum": 8760 },
+    "site_visit_completion_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+    "install_start_delay_days_p50": { "type": "number", "minimum": 0, "maximum": 730 },
+    "verification_delay_days_p50": { "type": "number", "minimum": 0, "maximum": 365 },
+    "job_sample_size": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+    "metadata": { "type": "object" }
+  }
+}

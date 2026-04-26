@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/commercial_outcome_v1.json",
+  "title": "commercial_outcome",
+  "type": "object",
+  "required": ["commercial_outcome_id", "project_id", "quotes_received_count", "commercial_status"],
+  "properties": {
+    "commercial_outcome_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "user_id": { "type": ["string", "null"] },
+    "installer_id": { "type": ["string", "null"] },
+    "region": { "type": ["string", "null"] },
+    "project_type": { "type": ["string", "null"] },
+    "first_recommendation_at": { "type": ["string", "null"], "format": "date-time" },
+    "first_quote_requested_at": { "type": ["string", "null"], "format": "date-time" },
+    "first_quote_received_at": { "type": ["string", "null"], "format": "date-time" },
+    "quote_accepted_at": { "type": ["string", "null"], "format": "date-time" },
+    "install_completed_at": { "type": ["string", "null"], "format": "date-time" },
+    "time_to_quote_hours": { "type": ["number", "null"], "minimum": 0 },
+    "time_to_install_days": { "type": ["number", "null"], "minimum": 0 },
+    "quotes_received_count": { "type": "integer", "minimum": 0 },
+    "quote_acceptance_rate": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "gross_revenue_inr": { "type": ["number", "null"] },
+    "net_revenue_inr": { "type": ["number", "null"] },
+    "platform_margin_inr": { "type": ["number", "null"] },
+    "total_discount_inr": { "type": ["number", "null"], "minimum": 0 },
+    "refund_total_inr": { "type": ["number", "null"], "minimum": 0 },
+    "customer_ltv_inr": { "type": ["number", "null"] },
+    "installer_revenue_inr": { "type": ["number", "null"] },
+    "commercial_status": {
+      "type": "string",
+      "enum": ["exploring", "quoted", "accepted", "installed", "churned", "refunded", "unknown"]
+    },
+    "metadata_json": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

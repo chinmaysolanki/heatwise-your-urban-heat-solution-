@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "followup_event",
+  "type": "object",
+  "required": ["followup_event_id", "checkpoint_id", "event_type", "event_at"],
+  "properties": {
+    "followup_event_id": { "type": "string" },
+    "checkpoint_id": { "type": "string" },
+    "event_type": {
+      "type": "string",
+      "enum": ["completion", "missed", "rescheduled", "unreachable", "qualitative_note", "skipped"]
+    },
+    "event_at": { "type": "string", "format": "date-time" },
+    "metadata_json": { "type": "object" },
+    "qualitative_note": { "type": ["string", "null"], "maxLength": 8000 }
+  },
+  "additionalProperties": true
+}

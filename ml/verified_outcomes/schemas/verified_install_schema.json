@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "verified_install",
+  "type": "object",
+  "required": [
+    "verified_install_id",
+    "install_job_id",
+    "project_id",
+    "installer_id",
+    "verified_at",
+    "installed_solution_type",
+    "installed_area_sqft",
+    "installed_planter_type",
+    "installed_irrigation_type",
+    "installed_shade_solution",
+    "installed_species_json",
+    "installed_materials_json",
+    "matches_recommended_candidate",
+    "mismatch_reason_codes_json",
+    "installer_confidence_score"
+  ],
+  "properties": {
+    "verified_install_id": { "type": "string" },
+    "install_job_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "installer_id": { "type": "string" },
+    "verified_at": { "type": "string" },
+    "installed_solution_type": { "type": "string" },
+    "installed_area_sqft": { "type": "number", "exclusiveMinimum": 0, "maximum": 1000000 },
+    "installed_planter_type": { "type": "string" },
+    "installed_irrigation_type": { "type": "string" },
+    "installed_shade_solution": { "type": "string" },
+    "installed_species_json": {},
+    "installed_materials_json": {},
+    "installed_layout_json": {},
+    "matches_recommended_candidate": { "type": "boolean" },
+    "mismatch_reason_codes_json": { "type": "array", "items": { "type": "string" } },
+    "installer_confidence_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "evidence_photo_refs_json": { "type": "array" },
+    "notes": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

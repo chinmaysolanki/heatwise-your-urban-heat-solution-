@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/cost_estimate_snapshot_v1.json",
+  "title": "cost_estimate_snapshot",
+  "type": "object",
+  "required": [
+    "cost_estimate_id",
+    "region",
+    "climate_zone",
+    "project_type",
+    "solution_type",
+    "estimate_source",
+    "estimated_install_cost_min_inr",
+    "estimated_install_cost_median_inr",
+    "estimated_install_cost_max_inr",
+    "estimated_annual_maintenance_min_inr",
+    "estimated_annual_maintenance_median_inr",
+    "estimated_annual_maintenance_max_inr",
+    "estimate_confidence_band",
+    "quote_volatility_score",
+    "estimate_generated_at"
+  ],
+  "properties": {
+    "cost_estimate_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": ["string", "null"] },
+    "recommendation_session_id": { "type": ["string", "null"] },
+    "candidate_snapshot_id": { "type": ["string", "null"] },
+    "estimate_generated_at": { "type": "string", "format": "date-time" },
+    "pricing_model_version": { "type": ["string", "null"] },
+    "pricing_rules_version": { "type": ["string", "null"] },
+    "region": { "type": "string", "minLength": 1 },
+    "climate_zone": { "type": "string", "minLength": 1 },
+    "project_type": { "type": "string" },
+    "solution_type": { "type": "string" },
+    "estimate_source": {
+      "type": "string",
+      "enum": ["rules", "hybrid", "ml", "installer_benchmark"]
+    },
+    "estimated_install_cost_min_inr": { "type": "number", "minimum": 0 },
+    "estimated_install_cost_median_inr": { "type": "number", "minimum": 0 },
+    "estimated_install_cost_max_inr": { "type": "number", "minimum": 0 },
+    "estimated_annual_maintenance_min_inr": { "type": "number", "minimum": 0 },
+    "estimated_annual_maintenance_median_inr": { "type": "number", "minimum": 0 },
+    "estimated_annual_maintenance_max_inr": { "type": "number", "minimum": 0 },
+    "material_cost_component_inr": { "type": ["number", "null"], "minimum": 0 },
+    "labor_cost_component_inr": { "type": ["number", "null"], "minimum": 0 },
+    "irrigation_cost_component_inr": { "type": ["number", "null"], "minimum": 0 },
+    "shade_system_cost_component_inr": { "type": ["number", "null"], "minimum": 0 },
+    "logistics_cost_component_inr": { "type": ["number", "null"], "minimum": 0 },
+    "contingency_pct": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "estimate_confidence_band": {
+      "type": "string",
+      "enum": ["tight", "medium", "wide", "very_wide"]
+    },
+    "quote_volatility_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "budget_fit_score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "notes": { "type": ["string", "null"] },
+    "metadata_json": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

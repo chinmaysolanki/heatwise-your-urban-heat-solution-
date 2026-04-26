@@ -1,0 +1,107 @@
+{
+  "models": [
+    {
+      "model_id": "species_scorer-v1",
+      "model_name": "species_scorer",
+      "task": "species_relevance_regression",
+      "version": "v1.0",
+      "status": "production",
+      "trained_at": "2026-04-03T08:02:46.577857+00:00",
+      "training_snapshot_id": "rule_based_species_v1",
+      "artifact_paths": {
+        "model": "/Users/chinmaysolanki/Desktop/startup/new app/heatwise/ml/registry/artifacts/species_scorer/model.joblib",
+        "metadata": "/Users/chinmaysolanki/Desktop/startup/new app/heatwise/ml/registry/artifacts/species_scorer/metadata.json"
+      },
+      "training_code_version": "train_species_recommender.py@v1",
+      "data_sources_used": [
+        "rule_based_species_catalog",
+        "/Users/chinmaysolanki/Desktop/startup/new app/heatwise/ml/data/bootstrap/sample_outputs/demo_pack/species_features.csv"
+      ],
+      "source_mix_summary": {
+        "synthetic_rule_based_pct": 100,
+        "live_telemetry_pct": 0
+      },
+      "metrics_summary": {
+        "train_mae": 0.023026719801600235,
+        "train_rmse": 0.028852107672911038,
+        "val_mae": 0.023289197072714856,
+        "val_rmse": 0.02920471307090494,
+        "n_estimators_used": 200
+      },
+      "feature_count": 42,
+      "hyperparams": {
+        "n_estimators": 200,
+        "max_depth": 5,
+        "learning_rate": 0.05
+      }
+    },
+    {
+      "model_id": "heat_scorer-v1",
+      "model_name": "heat_scorer",
+      "task": "heat_mitigation_regression",
+      "version": "v1.0",
+      "status": "production",
+      "trained_at": "2026-04-03T08:02:46.577857+00:00",
+      "training_snapshot_id": "rule_based_species_v1",
+      "artifact_paths": {
+        "model": "/Users/chinmaysolanki/Desktop/startup/new app/heatwise/ml/registry/artifacts/heat_scorer/model.joblib",
+        "metadata": "/Users/chinmaysolanki/Desktop/startup/new app/heatwise/ml/registry/artifacts/heat_scorer/metadata.json"
+      },
+      "training_code_version": "train_species_recommender.py@v1",
+      "data_sources_used": [
+        "rule_based_species_catalog",
+        "/Users/chinmaysolanki/Desktop/startup/new app/heatwise/ml/data/bootstrap/sample_outputs/demo_pack/species_features.csv"
+      ],
+      "source_mix_summary": {
+        "synthetic_rule_based_pct": 100,
+        "live_telemetry_pct": 0
+      },
+      "metrics_summary": {
+        "train_mae": 0.002896032516375766,
+        "train_rmse": 0.0036561794913718922,
+        "val_mae": 0.002902028365285567,
+        "val_rmse": 0.0036632103710649323,
+        "n_estimators_used": 81
+      },
+      "feature_count": 42,
+      "hyperparams": {
+        "n_estimators": 200,
+        "max_depth": 5,
+        "learning_rate": 0.05
+      }
+    },
+    {
+      "model_id": "species_ranker-v1",
+      "model_name": "species_ranker",
+      "task": "species_pairwise_ranking",
+      "version": "v1.0",
+      "status": "production",
+      "trained_at": "2026-04-03T08:02:46.577857+00:00",
+      "training_snapshot_id": "rule_based_species_v1",
+      "artifact_paths": {
+        "model": "/Users/chinmaysolanki/Desktop/startup/new app/heatwise/ml/registry/artifacts/species_ranker/model.joblib",
+        "metadata": "/Users/chinmaysolanki/Desktop/startup/new app/heatwise/ml/registry/artifacts/species_ranker/metadata.json"
+      },
+      "training_code_version": "train_species_recommender.py@v1",
+      "data_sources_used": [
+        "rule_based_species_catalog",
+        "/Users/chinmaysolanki/Desktop/startup/new app/heatwise/ml/data/bootstrap/sample_outputs/demo_pack/species_features.csv"
+      ],
+      "source_mix_summary": {
+        "synthetic_rule_based_pct": 100,
+        "live_telemetry_pct": 0
+      },
+      "metrics_summary": {
+        "val_accuracy": 1.0,
+        "val_roc_auc": 1.0,
+        "n_estimators_used": 195
+      },
+      "feature_count": 89,
+      "hyperparams": {
+        "n_estimators": 200,
+        "max_depth": 5,
+        "learning_rate": 0.05
+      }
+    }
+  ]
+}

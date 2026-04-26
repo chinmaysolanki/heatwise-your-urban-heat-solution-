@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/budget_fit_assessment_v1.json",
+  "title": "budget_fit_assessment",
+  "type": "object",
+  "required": [
+    "budget_fit_id",
+    "project_id",
+    "user_budget_inr",
+    "estimated_install_cost_median_inr",
+    "estimated_install_cost_max_inr",
+    "budget_fit_band",
+    "budget_fit_score",
+    "stretch_budget_required",
+    "affordability_risk_level",
+    "created_at"
+  ],
+  "properties": {
+    "budget_fit_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string" },
+    "candidate_snapshot_id": { "type": ["string", "null"] },
+    "user_budget_inr": { "type": "number", "minimum": 0 },
+    "estimated_install_cost_median_inr": { "type": "number", "minimum": 0 },
+    "estimated_install_cost_max_inr": { "type": "number", "minimum": 0 },
+    "budget_fit_band": {
+      "type": "string",
+      "enum": [
+        "comfortably_within_budget",
+        "near_budget_limit",
+        "stretch_required",
+        "over_budget",
+        "high_uncertainty"
+      ]
+    },
+    "budget_fit_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "stretch_budget_required": { "type": "boolean" },
+    "affordability_risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "downgrade_suggestion_json": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/readiness_check_v1.json",
+  "title": "ReadinessCheckResultV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["check_id", "subsystem", "status", "latency_ms", "message"],
+  "properties": {
+    "check_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "subsystem": {
+      "type": "string",
+      "enum": [
+        "recommendation_runtime",
+        "pricing",
+        "supply",
+        "installer_ops",
+        "reporting",
+        "retraining_registry",
+        "integrations",
+        "analytics"
+      ]
+    },
+    "status": { "type": "string", "enum": ["pass", "fail", "degraded", "skipped", "unknown"] },
+    "latency_ms": { "type": "number", "minimum": 0 },
+    "message": { "type": "string", "maxLength": 2048 },
+    "details": { "type": "object" }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/idempotency_v1.json",
+  "title": "IdempotencyDescriptorV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scope", "policy"],
+  "properties": {
+    "scope": {
+      "type": "string",
+      "enum": [
+        "telemetry_event",
+        "quote_action",
+        "install_submission",
+        "outcome_submission",
+        "revenue_event"
+      ]
+    },
+    "operation": { "type": "string", "maxLength": 128 },
+    "idempotency_key": { "type": "string", "maxLength": 256 },
+    "policy": { "type": "string", "enum": ["required", "optional"] },
+    "request_hash": { "type": "string", "maxLength": 128 }
+  }
+}

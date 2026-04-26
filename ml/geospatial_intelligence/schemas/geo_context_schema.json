@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/geo_context_v1.json",
+  "title": "geo_context",
+  "type": "object",
+  "required": ["geo_context_id", "project_id", "region", "city", "climate_zone", "source_confidence", "created_at"],
+  "properties": {
+    "geo_context_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "region": { "type": "string" },
+    "city": { "type": "string" },
+    "city_tier": { "type": ["string", "null"] },
+    "climate_zone": { "type": "string" },
+    "latitude": { "type": ["number", "null"], "minimum": -90, "maximum": 90 },
+    "longitude": { "type": ["number", "null"], "minimum": -180, "maximum": 180 },
+    "elevation_m": { "type": ["number", "null"] },
+    "urban_density_band": { "type": ["string", "null"] },
+    "built_up_index": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "neighborhood_heat_risk_band": { "type": ["string", "null"] },
+    "rainfall_band": { "type": ["string", "null"] },
+    "wind_exposure_region_band": { "type": ["string", "null"] },
+    "air_quality_band": { "type": ["string", "null"] },
+    "water_stress_band": { "type": ["string", "null"] },
+    "source_confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "metadata_json": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/recommendation_experiment.json",
+  "title": "HeatWise recommendation experiment",
+  "type": "object",
+  "required": [
+    "experiment_id",
+    "experiment_name",
+    "status",
+    "primary_variant",
+    "allocation_policy",
+    "traffic_allocation"
+  ],
+  "properties": {
+    "experiment_id": { "type": "string", "minLength": 4 },
+    "experiment_name": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "paused", "completed", "archived"]
+    },
+    "description": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "primary_variant": {
+      "type": "string",
+      "enum": ["rules_only", "hybrid_v1", "ml_heavy_v1", "shadow_only"]
+    },
+    "control_variant": { "type": "string" },
+    "treatment_variants": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "allocation_policy": {
+      "type": "string",
+      "enum": ["deterministic_hash", "random_cookie", "manual"]
+    },
+    "traffic_allocation": {
+      "type": "object",
+      "description": "variant -> percent 0-100",
+      "additionalProperties": { "type": "number", "minimum": 0, "maximum": 100 }
+    },
+    "target_population_filters": {
+      "type": "object",
+      "properties": {
+        "project_types": { "type": "array", "items": { "type": "string" } },
+        "climate_zones": { "type": "array", "items": { "type": "string" } },
+        "city_tiers": { "type": "array", "items": { "type": "string" } },
+        "internal_only": { "type": "boolean" },
+        "allow_user_ids": { "type": "array", "items": { "type": "string" } },
+        "deny_user_ids": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "start_at": { "type": "string", "format": "date-time" },
+    "end_at": { "type": ["string", "null"], "format": "date-time" },
+    "success_metrics": { "type": "array", "items": { "type": "string" } },
+    "guardrail_metrics": { "type": "array", "items": { "type": "string" } },
+    "shadow_config": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "shadow_variant": { "type": "string" },
+        "primary_is_user_visible": { "type": "boolean" }
+      }
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": true
+}

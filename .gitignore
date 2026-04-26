@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+**/.pytest_cache/
 
 # next.js
 /.next/
@@ -39,3 +40,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local sqlite databases
+*.db
+*.db-journal
+prisma/dev.db
+prisma/*.db
+
+# heatwise native android build artifacts
+heatwise-native/android/app/build/
+heatwise-native/android/.gradle/
+heatwise-native/android/local.properties
+
+# Python (commercial_intelligence local venv)
+business/**/.venv/
+ml/.venv/
+ml/reporting_intelligence/.venv/
+ml/learning_insights/.venv/

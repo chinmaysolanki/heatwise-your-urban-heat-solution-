@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.local/schemas/outbound_sync_v1.json",
+  "title": "OutboundSyncV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["target_system", "entity_type", "entity_id", "payload_snapshot"],
+  "properties": {
+    "target_system": {
+      "type": "string",
+      "enum": [
+        "heatwise_core",
+        "generic_rest_partner",
+        "generic_webhook_source",
+        "crm_sink",
+        "installer_partner_api",
+        "notification_provider",
+        "payment_provider",
+        "analytics_sink",
+        "report_delivery",
+        "user_device"
+      ]
+    },
+    "entity_type": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "entity_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "payload_snapshot": { "type": "object" },
+    "sync_status": {
+      "type": "string",
+      "enum": ["pending", "in_progress", "succeeded", "failed", "dead_letter"]
+    },
+    "attempt_count": { "type": "integer", "minimum": 0 },
+    "last_attempt_at": { "type": "string", "format": "date-time" },
+    "next_retry_at": { "type": "string", "format": "date-time" },
+    "error_code": { "type": "string", "maxLength": 64 },
+    "error_detail": { "type": "object" },
+    "idempotency_key": { "type": "string", "maxLength": 256 },
+    "metadata": { "type": "object" }
+  }
+}

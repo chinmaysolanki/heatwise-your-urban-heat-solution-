@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/admin_review_dossier_v1.json",
+  "title": "admin_review_dossier",
+  "type": "object",
+  "required": [
+    "admin_review_dossier_id",
+    "recommendation_dossier_id",
+    "review_payload_json",
+    "created_at"
+  ],
+  "properties": {
+    "admin_review_dossier_id": { "type": "string" },
+    "recommendation_dossier_id": { "type": "string" },
+    "review_payload_json": { "type": "string" },
+    "risk_assessment_json": { "type": ["string", "null"] },
+    "provenance_audit_json": { "type": ["string", "null"] },
+    "metadata_json": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

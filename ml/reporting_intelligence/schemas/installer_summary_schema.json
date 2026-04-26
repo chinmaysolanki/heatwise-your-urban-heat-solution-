@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heatwise.app/schemas/installer_execution_summary_v1.json",
+  "title": "installer_execution_summary",
+  "type": "object",
+  "required": [
+    "installer_execution_summary_id",
+    "recommendation_dossier_id",
+    "project_id",
+    "execution_payload_json",
+    "created_at"
+  ],
+  "properties": {
+    "installer_execution_summary_id": { "type": "string" },
+    "recommendation_dossier_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "install_job_id": { "type": ["string", "null"] },
+    "execution_payload_json": { "type": "string" },
+    "readiness_checklist_json": { "type": ["string", "null"] },
+    "metadata_json": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}
