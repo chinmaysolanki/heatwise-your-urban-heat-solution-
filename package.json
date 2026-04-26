@@ -47,7 +47,7 @@
     "demo:setup": "npm run db:seed && npm run demo:seed",
     "demo:start": "npm run dev",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && next build"
+    "vercel-build": "node scripts/patch-prisma-for-prod.js && prisma generate && next build"
   },
   "dependencies": {
     "@capacitor/geolocation": "^8.2.0",

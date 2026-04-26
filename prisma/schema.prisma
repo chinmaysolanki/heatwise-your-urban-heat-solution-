@@ -1,9 +1,8 @@
 // Operational schema: same models deploy to Postgres in production (set provider + DATABASE_URL).
 // Local dev may use SQLite; enums use String where SQLite lacks native enum.
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
