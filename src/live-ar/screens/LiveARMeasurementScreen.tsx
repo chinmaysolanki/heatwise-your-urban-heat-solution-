@@ -584,6 +584,10 @@ export function LiveARMeasurementScreen({ projectId, photoSessionId, onApplied, 
   /** Simulated beta angle for gallery photos (no live device orientation available). */
   const [galleryBeta,  setGalleryBeta]  = useState<number>(60);  // 60° ≈ "mid" angle
   const [arucoDetected, setArucoDetected] = useState(false);
+  /** Frame captured from live camera — shown frozen so user can tap corners precisely. */
+  const [capturedLiveFrame, setCapturedLiveFrame] = useState<string | null>(null);
+  /** Brief white flash shown when user taps the shutter button. */
+  const [captureFlash, setCaptureFlash] = useState(false);
 
   // Keep cornersRef in sync
   useEffect(() => { cornersRef.current = corners; }, [corners]);
@@ -670,6 +674,32 @@ export function LiveARMeasurementScreen({ projectId, photoSessionId, onApplied, 
     };
     img.src = galleryPhoto;
   }, [galleryPhoto, stopCamera]);
+
+  // Handle captured live frame — like gallery mode but PRESERVES existing corners.
+  useEffect(() => {
+    if (!capturedLiveFrame) return;
+    const img = new Image();
+    img.onload = () => {
+      galleryImgRef.current = img;
+      stopCamera();
+      setCaptureMode("gallery");
+      setPhase("active");
+      // Intentionally do NOT reset corners — user may have pre-placed some
+    };
+    img.src = capturedLiveFrame;
+  }, [capturedLiveFrame, stopCamera]);
+
+  /** Capture the current live video frame, flash, then freeze it for precise corner tapping. */
+  const handleCaptureLive = useCallback(() => {
+    const video = videoRef.current;
+    if (!video || video.readyState < 2) return;
+    const dataUrl = captureVideoFrame(video);
+    if (!dataUrl) return;
+    // White flash feedback
+    setCaptureFlash(true);
+    setTimeout(() => setCaptureFlash(false), 280);
+    setCapturedLiveFrame(dataUrl);
+  }, []);
 
   // ── Device orientation ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -942,12 +972,12 @@ export function LiveARMeasurementScreen({ projectId, photoSessionId, onApplied, 
     const result = resultRef.current;
     if (!result) return;
 
-    // Capture photo: live camera frame OR the gallery image
+    // Capture photo: live camera frame, frozen live capture, OR gallery image
     let capturedPhoto: string | null = null;
     if (captureMode === "live" && videoRef.current) {
       capturedPhoto = captureVideoFrame(videoRef.current);
-    } else if (captureMode === "gallery" && galleryPhoto) {
-      capturedPhoto = galleryPhoto;
+    } else if (captureMode === "gallery") {
+      capturedPhoto = capturedLiveFrame ?? galleryPhoto;
     }
 
     // Crop to the quadrilateral defined by the 4 AR corner dots
@@ -1153,15 +1183,34 @@ export function LiveARMeasurementScreen({ projectId, photoSessionId, onApplied, 
         {captureMode === "live" && (
           <video ref={videoRef} style={S.video} playsInline muted autoPlay />
         )}
-        {captureMode === "gallery" && galleryPhoto && (
+        {captureMode === "gallery" && (capturedLiveFrame || galleryPhoto) && (
           <img
             ref={imgRef}
-            src={galleryPhoto}
+            src={capturedLiveFrame ?? galleryPhoto!}
             alt=""
             style={S.galleryImg}
             onLoad={() => { if (imgRef.current) galleryImgRef.current = imgRef.current; }}
           />
         )}
+
+        {/* ── Capture flash overlay ─────────────────────────────────────── */}
+        {captureFlash && (
+          <div style={{
+            position: "absolute", inset: 0, background: "rgba(255,255,255,0.85)",
+            zIndex: 50, pointerEvents: "none",
+            animation: "hw-flash 0.28s ease-out forwards",
+          }} />
+        )}
+        <style>{`
+          @keyframes hw-flash {
+            0%   { opacity: 1; }
+            100% { opacity: 0; }
+          }
+          @keyframes hw-shutter-ring {
+            0%   { transform: scale(1);   opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+          }
+        `}</style>
 
         {/* AR overlay canvas */}
         <canvas
@@ -1195,8 +1244,8 @@ export function LiveARMeasurementScreen({ projectId, photoSessionId, onApplied, 
                   display: "inline-block",
                 }} />
               )}
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "2px", color: phase === "confirmed" ? "#52B788" : captureMode === "gallery" ? C.sky : "rgba(216,243,220,0.95)" }}>
-                {phase === "confirmed" ? "✓ CONFIRMED" : captureMode === "gallery" ? "GALLERY MODE" : "LIVE SCAN"}
+              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "2px", color: phase === "confirmed" ? "#52B788" : capturedLiveFrame ? "#52B788" : captureMode === "gallery" ? C.sky : "rgba(216,243,220,0.95)" }}>
+                {phase === "confirmed" ? "✓ CONFIRMED" : capturedLiveFrame ? "FROZEN FRAME" : captureMode === "gallery" ? "GALLERY MODE" : "LIVE SCAN"}
               </span>
             </div>
             {/* ArUco marker detection badge */}
@@ -1223,8 +1272,23 @@ export function LiveARMeasurementScreen({ projectId, photoSessionId, onApplied, 
             )}
           </div>
 
-          {/* Right: gallery switch + reset */}
+          {/* Right: gallery switch + reset + re-shoot */}
           <div style={{ display: "flex", gap: 6 }}>
+            {/* Re-shoot: shown when frame is frozen from live capture */}
+            {capturedLiveFrame && captureMode === "gallery" && phase === "active" && (
+              <button
+                onClick={() => {
+                  setCapturedLiveFrame(null);
+                  setCorners([]);
+                  resultRef.current = null;
+                  startCamera();
+                }}
+                style={{ ...S.btn, padding: "7px 10px", fontSize: 11, fontWeight: 700, background: "rgba(82,183,136,0.15)", color: "#52B788", border: "1px solid rgba(82,183,136,0.35)", borderRadius: 12, letterSpacing: "0.3px" }}
+                title="Return to live camera"
+              >
+                ↩ Live
+              </button>
+            )}
             {captureMode === "live" && phase === "active" && (
               <button
                 onClick={openGallery}
@@ -1373,6 +1437,52 @@ export function LiveARMeasurementScreen({ projectId, photoSessionId, onApplied, 
               </div>
             );
           })()}
+
+          {/* ── Live capture shutter button ─────────────────────────────── */}
+          {captureMode === "live" && phase === "active" && (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingTop: 4, paddingBottom: 2 }}>
+              {/* Outer label row */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "2px", color: "rgba(216,243,220,0.45)" }}>
+                  CAPTURE & MEASURE
+                </div>
+                {/* Shutter button — classic camera ring design */}
+                <button
+                  onClick={handleCaptureLive}
+                  style={{
+                    position: "relative",
+                    width: 72, height: 72,
+                    borderRadius: "50%",
+                    border: "3px solid rgba(255,255,255,0.90)",
+                    background: "rgba(255,255,255,0.0)",
+                    cursor: "pointer",
+                    padding: 0,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    boxShadow: "0 0 0 2px rgba(255,255,255,0.25), 0 4px 24px rgba(0,0,0,0.35)",
+                    WebkitTapHighlightColor: "transparent",
+                    transition: "transform .1s, box-shadow .1s",
+                  }}
+                  onPointerDown={e => (e.currentTarget.style.transform = "scale(0.93)")}
+                  onPointerUp={e => (e.currentTarget.style.transform = "scale(1)")}
+                  onPointerLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+                  title="Capture frame and measure"
+                >
+                  {/* Inner white disc */}
+                  <div style={{
+                    width: 52, height: 52, borderRadius: "50%",
+                    background: "rgba(255,255,255,0.95)",
+                    boxShadow: "0 0 12px rgba(255,255,255,0.3)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <span style={{ fontSize: 20 }}>📷</span>
+                  </div>
+                </button>
+                <div style={{ fontSize: 9, color: "rgba(216,243,220,0.35)", letterSpacing: "0.5px" }}>
+                  {corners.length > 0 ? "Freeze frame · keep corners" : "Freeze frame to pin corners"}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ── Confirm / status ────────────────────────────────────────── */}
           {canConfirm && (
