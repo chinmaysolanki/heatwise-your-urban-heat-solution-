@@ -19,6 +19,8 @@ export type EnvDetectResult = {
   locationLabel: string;
   currentTempC: number;
   dailyMaxTempC: number;
+  /** Annual mean temperature from previous full calendar year (Open-Meteo archive). Used for species matching. */
+  annualAvgTempC: number;
   windSpeedKmh: number;
   uvIndex: number | null;
   heatExposure: "low" | "medium" | "high" | "extreme";
@@ -30,6 +32,15 @@ export type EnvDetectResult = {
   fetchedAt: string;
 };
 
+/** For species matching — uses annual average temperature (Köppen-aligned thresholds) */
+function deriveHeatExposureFromAnnual(annualAvgC: number): EnvDetectResult["heatExposure"] {
+  if (annualAvgC >= 30) return "extreme"; // BWh hot desert / very hot tropical
+  if (annualAvgC >= 25) return "high";    // Aw/Am hot tropical / semi-arid
+  if (annualAvgC >= 18) return "medium";  // Cfa/Csa warm subtropical / Mediterranean
+  return "low";                           // Temperate / cool
+}
+
+/** Fallback when archive is unavailable — uses today's daily max */
 function deriveHeatExposure(dailyMaxC: number): EnvDetectResult["heatExposure"] {
   if (dailyMaxC >= 38) return "extreme";
   if (dailyMaxC >= 33) return "high";
@@ -74,7 +85,6 @@ async function fetchWeather(lat: number, lon: number) {
 
   const res = await fetch(url.toString(), {
     headers: { "Accept": "application/json" },
-    // 8-second timeout via AbortSignal
     signal: AbortSignal.timeout(8000),
   });
   if (!res.ok) throw new Error(`Open-Meteo error ${res.status}`);
@@ -82,6 +92,33 @@ async function fetchWeather(lat: number, lon: number) {
     current: { temperature_2m: number; wind_speed_10m: number; uv_index?: number };
     daily: { temperature_2m_max: number[] };
   }>;
+}
+
+/**
+ * Fetches the previous full calendar year's daily mean temperatures from
+ * Open-Meteo's historical archive and computes the annual average.
+ * This gives a stable climate signal for year-round plant species matching.
+ */
+async function fetchAnnualClimate(lat: number, lon: number): Promise<{ annualAvgTempC: number }> {
+  const prevYear = new Date().getFullYear() - 1;
+  const url = new URL("https://archive-api.open-meteo.com/v1/archive");
+  url.searchParams.set("latitude", String(lat));
+  url.searchParams.set("longitude", String(lon));
+  url.searchParams.set("start_date", `${prevYear}-01-01`);
+  url.searchParams.set("end_date", `${prevYear}-12-31`);
+  url.searchParams.set("daily", "temperature_2m_mean");
+  url.searchParams.set("timezone", "auto");
+
+  const res = await fetch(url.toString(), {
+    headers: { "Accept": "application/json" },
+    signal: AbortSignal.timeout(12000),
+  });
+  if (!res.ok) throw new Error(`Open-Meteo archive error ${res.status}`);
+  const data: any = await res.json();
+  const temps: number[] = (data?.daily?.temperature_2m_mean ?? []).filter((v: any) => typeof v === "number");
+  if (temps.length === 0) return { annualAvgTempC: 0 };
+  const annualAvgTempC = Math.round((temps.reduce((a, b) => a + b, 0) / temps.length) * 10) / 10;
+  return { annualAvgTempC };
 }
 
 async function reverseGeocode(lat: number, lon: number): Promise<string> {
@@ -121,9 +158,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const [weather, locationLabel] = await Promise.all([
+    const [weather, locationLabel, annual] = await Promise.all([
       fetchWeather(lat, lon),
       reverseGeocode(lat, lon),
+      // Archive call is best-effort — never blocks the response
+      fetchAnnualClimate(lat, lon).catch(() => ({ annualAvgTempC: 0 })),
     ]);
 
     const currentTempC = Math.round(weather.current.temperature_2m * 10) / 10;
@@ -138,7 +177,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ? Math.round(dailyMaxRaw * 10) / 10
         : currentTempC + 3;
 
-    const heatExposure = deriveHeatExposure(dailyMaxTempC);
+    const annualAvgTempC = annual.annualAvgTempC;
+
+    // Use annual average for species heat-exposure classification (stable, climate-zone accurate).
+    // Fall back to today's daily max if archive fetch failed (annualAvgTempC === 0).
+    const heatExposure = annualAvgTempC > 0
+      ? deriveHeatExposureFromAnnual(annualAvgTempC)
+      : deriveHeatExposure(dailyMaxTempC);
+
     const windExposure = deriveWindExposure(windSpeedKmh);
     const sunExposure = deriveSunExposure(uvIndex, heatExposure);
     const windLevel = deriveWindLevel(windExposure);
@@ -149,6 +195,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       locationLabel,
       currentTempC,
       dailyMaxTempC,
+      annualAvgTempC,
       windSpeedKmh,
       uvIndex,
       heatExposure,

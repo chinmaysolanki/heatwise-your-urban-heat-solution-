@@ -1823,6 +1823,7 @@ const GardenScene3D = ({ species = [], progress = 1, photoTexture = null, spatia
     {type:'climber',   emoji:'🍃', label:'Climber'},
     {type:'vegetable', emoji:'🥬', label:'Veggie'},
     {type:'grass',     emoji:'🌾', label:'Grass'},
+    {type:'foliage',   emoji:'🍃', label:'Foliage'},
   ];
 
   return (
@@ -1858,8 +1859,8 @@ const GardenScene3D = ({ species = [], progress = 1, photoTexture = null, spatia
             <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:2}}>
               {EDIT_PLANTS.map(({type,emoji,label})=>(
                 <button key={type} onClick={()=>addPlantRef.current?.(type)}
-                  style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'7px 10px',minWidth:54,background:T.bgAlt,border:`1px solid ${T.border}`,borderRadius:12,cursor:'pointer',flexShrink:0}}>
-                  <span style={{fontSize:22,lineHeight:1}}>{emoji}</span>
+                  style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,padding:'6px 8px',minWidth:56,background:T.bgAlt,border:`1px solid ${T.border}`,borderRadius:12,cursor:'pointer',flexShrink:0,overflow:'hidden'}}>
+                  <PlantImg code={type} type={type} emoji={emoji} size={36} round={8}/>
                   <span style={{fontSize:9,color:T.textDim,fontWeight:600,whiteSpace:'nowrap'}}>{label}</span>
                 </button>
               ))}
@@ -5857,7 +5858,7 @@ const ClimateSpeciesScreen = ({ navigate }) => {
             <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
             <div style={{width:56,height:56,borderRadius:'50%',border:'2px solid rgba(82,232,160,0.2)',borderTopColor:'#52E8A0',animation:'spin 1s linear infinite'}}/>
             <div style={{color:'#52E8A0',fontWeight:700,fontSize:15}}>Reading your climate…</div>
-            <div style={{color:'rgba(255,255,255,0.3)',fontSize:12,textAlign:'center',maxWidth:220}}>Fetching live + 20-year average climate data to find perfect plants</div>
+            <div style={{color:'rgba(255,255,255,0.3)',fontSize:12,textAlign:'center',maxWidth:220}}>Fetching live conditions + full-year climate archive to match plants to your location</div>
           </div>
         )}
 
@@ -5890,8 +5891,8 @@ const ClimateSpeciesScreen = ({ navigate }) => {
                     <div style={{width:28,height:28,borderRadius:'50%',background:i<3?'rgba(82,232,160,0.15)':'rgba(255,255,255,0.06)',border:`1px solid ${i<3?'rgba(82,232,160,0.35)':'rgba(255,255,255,0.1)'}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                       <span style={{fontSize:11,fontWeight:800,color:i<3?'#52E8A0':'rgba(255,255,255,0.4)'}}>{i+1}</span>
                     </div>
-                    {/* Emoji */}
-                    <div style={{fontSize:28,flexShrink:0,lineHeight:1}}>{plant.emoji}</div>
+                    {/* Plant photo */}
+                    <PlantImg code={plant.id} type={plant.id} emoji={plant.emoji} size={44} round={10}/>
                     {/* Name + tagline */}
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{fontSize:14,fontWeight:700,color:'#FFFFFF',lineHeight:1.2,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{plant.name}</div>
@@ -6833,6 +6834,81 @@ const CityHeatScreen=({navigate})=>{
 };
 
 /* ══════════════════════════════════════════════════════════════════
+   PLANT PHOTO MAP — Wikimedia Commons Special:FilePath thumbnails
+   onError fallback → emoji, so broken URLs are invisible to users
+══════════════════════════════════════════════════════════════════ */
+const PLANT_PHOTOS = {
+  // By species code
+  tulsi_holy:    'https://commons.wikimedia.org/wiki/Special:FilePath/Ocimum_tenuiflorum3.jpg?width=200',
+  basil_sweet:   'https://commons.wikimedia.org/wiki/Special:FilePath/Sweet_basil_(Ocimum_basilicum)_2.jpg?width=200',
+  mint:          'https://commons.wikimedia.org/wiki/Special:FilePath/Mentha_piperita.jpg?width=200',
+  lemongrass:    'https://commons.wikimedia.org/wiki/Special:FilePath/Cymbopogon.citratus.jpg?width=200',
+  sedum:         'https://commons.wikimedia.org/wiki/Special:FilePath/Sedum_spectabile_flowers.jpg?width=200',
+  prickly_pear:  'https://commons.wikimedia.org/wiki/Special:FilePath/Opuntia_ficus-indica_1.jpg?width=200',
+  portulaca:     'https://commons.wikimedia.org/wiki/Special:FilePath/Portulaca_grandiflora.jpg?width=200',
+  marigold:      'https://commons.wikimedia.org/wiki/Special:FilePath/Tagetes_erecta_flowers.jpg?width=200',
+  bougainvillea: 'https://commons.wikimedia.org/wiki/Special:FilePath/Bougainvillea_Spectabilis.jpg?width=200',
+  pothos:        'https://commons.wikimedia.org/wiki/Special:FilePath/Epipremnum_aureum_31082012.jpg?width=200',
+  snake_plant:   'https://commons.wikimedia.org/wiki/Special:FilePath/Sansevieria_trifasciata_Prain.jpg?width=200',
+  areca_palm_dwarf: 'https://commons.wikimedia.org/wiki/Special:FilePath/Chrysalidocarpus_lutescens.jpg?width=200',
+  vetiver:       'https://commons.wikimedia.org/wiki/Special:FilePath/Chrysopogon_zizanioides.jpg?width=200',
+  bamboo_dwarf:  'https://commons.wikimedia.org/wiki/Special:FilePath/Pleioblastus_variegatus.jpg?width=200',
+  cherry_tomato: 'https://commons.wikimedia.org/wiki/Special:FilePath/Tomato_je.jpg?width=200',
+  curry_leaf:    'https://commons.wikimedia.org/wiki/Special:FilePath/Murraya_koenigii.jpg?width=200',
+  aloe_vera:     'https://commons.wikimedia.org/wiki/Special:FilePath/Aloe_vera_flower_inset.png?width=200',
+  zinnia:        'https://commons.wikimedia.org/wiki/Special:FilePath/Zinnia_elegans_001.jpg?width=200',
+  // By climate-plant id
+  aloe:          'https://commons.wikimedia.org/wiki/Special:FilePath/Aloe_vera_flower_inset.png?width=200',
+  jasmine:       'https://commons.wikimedia.org/wiki/Special:FilePath/Jasminum_sambac.jpg?width=200',
+  lavender:      'https://commons.wikimedia.org/wiki/Special:FilePath/Lavandula_angustifolia_-_bloem_01.jpg?width=200',
+  hibiscus:      'https://commons.wikimedia.org/wiki/Special:FilePath/Hibiscus_rosa-sinensis.jpg?width=200',
+  chrysanth:     'https://commons.wikimedia.org/wiki/Special:FilePath/Chrysanthemum_-_floriade_canberra.jpg?width=200',
+  rosemary:      'https://commons.wikimedia.org/wiki/Special:FilePath/Rosemary_bush.jpg?width=200',
+  agave:         'https://commons.wikimedia.org/wiki/Special:FilePath/Agave_americana_2.jpg?width=200',
+  snake:         'https://commons.wikimedia.org/wiki/Special:FilePath/Sansevieria_trifasciata_Prain.jpg?width=200',
+  tulsi:         'https://commons.wikimedia.org/wiki/Special:FilePath/Ocimum_tenuiflorum3.jpg?width=200',
+  turmeric:      'https://commons.wikimedia.org/wiki/Special:FilePath/Curcuma_longa_roots.jpg?width=200',
+  fern:          'https://commons.wikimedia.org/wiki/Special:FilePath/Nephrolepis_exaltata_HabitusLeaf_BotGardBln0906.jpg?width=200',
+  bougain:       'https://commons.wikimedia.org/wiki/Special:FilePath/Bougainvillea_Spectabilis.jpg?width=200',
+  geranium:      'https://commons.wikimedia.org/wiki/Special:FilePath/Pelargonium_zonale2.jpg?width=200',
+  // By plant type (for EDIT palette)
+  tree:          'https://commons.wikimedia.org/wiki/Special:FilePath/Murraya_koenigii.jpg?width=200',
+  shrub:         'https://commons.wikimedia.org/wiki/Special:FilePath/Hibiscus_rosa-sinensis.jpg?width=200',
+  ornamental:    'https://commons.wikimedia.org/wiki/Special:FilePath/Tagetes_erecta_flowers.jpg?width=200',
+  herb:          'https://commons.wikimedia.org/wiki/Special:FilePath/Sweet_basil_(Ocimum_basilicum)_2.jpg?width=200',
+  succulent:     'https://commons.wikimedia.org/wiki/Special:FilePath/Aloe_vera_flower_inset.png?width=200',
+  climber:       'https://commons.wikimedia.org/wiki/Special:FilePath/Bougainvillea_Spectabilis.jpg?width=200',
+  vegetable:     'https://commons.wikimedia.org/wiki/Special:FilePath/Tomato_je.jpg?width=200',
+  grass:         'https://commons.wikimedia.org/wiki/Special:FilePath/Chrysopogon_zizanioides.jpg?width=200',
+  foliage:       'https://commons.wikimedia.org/wiki/Special:FilePath/Epipremnum_aureum_31082012.jpg?width=200',
+};
+
+/**
+ * Renders a real plant photo; falls back to emoji if the image fails to load.
+ * size  — pixel dimensions of the square image
+ * round — border-radius value
+ */
+const PlantImg = ({ code, type, emoji, size = 56, round = 10, style = {} }) => {
+  const [err, setErr] = React.useState(false);
+  const src = PLANT_PHOTOS[code] || PLANT_PHOTOS[type];
+  if (!src || err) {
+    return (
+      <span style={{ fontSize: size * 0.55, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: size, height: size, ...style }}>
+        {emoji}
+      </span>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={code || type}
+      onError={() => setErr(true)}
+      style={{ width: size, height: size, objectFit: 'cover', borderRadius: round, display: 'block', flexShrink: 0, ...style }}
+    />
+  );
+};
+
+/* ══════════════════════════════════════════════════════════════════
    SCREEN 20 — SPECIES LIBRARY
 ══════════════════════════════════════════════════════════════════ */
 const SPECIES_CATALOG=[
@@ -6893,10 +6969,10 @@ const SpeciesLibraryScreen=({navigate,setSelectedSpecies})=>{
         {visible.map((sp,i)=>(
           <div key={sp.code} className="spc-card" style={{animationDelay:`${i*.04}s`}}
             onClick={()=>{ setSelectedSpecies(sp); navigate('speciesDetail'); }}>
-            {/* Header gradient */}
-            <div style={{height:72,background:`linear-gradient(135deg,${(typeColor[sp.type]||T.green)}18,${(typeColor[sp.type]||T.green)}08)`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:36,position:'relative'}}>
-              {sp.emoji}
-              {sp.drought&&<div style={{position:'absolute',top:8,right:8,fontSize:10,background:'rgba(251,191,36,.2)',border:'1px solid rgba(251,191,36,.4)',borderRadius:12,padding:'2px 7px',color:T.earth,fontFamily:"'DM Sans',sans-serif",fontWeight:600}}>Drought ✓</div>}
+            {/* Header — plant photo or emoji fallback */}
+            <div style={{height:80,background:`linear-gradient(135deg,${(typeColor[sp.type]||T.green)}18,${(typeColor[sp.type]||T.green)}08)`,display:'flex',alignItems:'center',justifyContent:'center',position:'relative',overflow:'hidden'}}>
+              <PlantImg code={sp.code} type={sp.type} emoji={sp.emoji} size={80} round={0} style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:0}}/>
+              {sp.drought&&<div style={{position:'absolute',top:8,right:8,fontSize:10,background:'rgba(9,22,14,0.82)',border:'1px solid rgba(251,191,36,.5)',borderRadius:12,padding:'2px 7px',color:T.earth,fontFamily:"'DM Sans',sans-serif",fontWeight:600}}>Drought ✓</div>}
             </div>
             <div style={{padding:'10px 12px'}}>
               <div style={{fontSize:13,fontWeight:700,color:T.textBright,marginBottom:2,fontFamily:"'Space Grotesk',sans-serif"}}>{sp.name}</div>
@@ -6954,7 +7030,9 @@ const SpeciesDetailScreen=({navigate,selectedSpecies})=>{
           ))}
         </div>
         <div style={{position:'relative',zIndex:2,padding:'32px 24px',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center'}}>
-          <div style={{fontSize:72,marginBottom:16,animation:'leafFloat 3s ease-in-out infinite'}}>{sp.emoji}</div>
+          <div style={{marginBottom:16,animation:'leafFloat 3s ease-in-out infinite',borderRadius:18,overflow:'hidden',boxShadow:`0 4px 24px ${tc}44`}}>
+            <PlantImg code={sp.code} type={sp.type} emoji={sp.emoji} size={96} round={18}/>
+          </div>
           <div style={{fontSize:22,fontWeight:800,color:T.textBright,fontFamily:"'Space Grotesk',sans-serif",marginBottom:4}}>{sp.name}</div>
           <div style={{fontSize:11,color:T.textDim,fontStyle:'italic',fontFamily:"'DM Sans',sans-serif",marginBottom:12}}>{sp.sci}</div>
           <div style={{display:'flex',gap:8,flexWrap:'wrap',justifyContent:'center'}}>
@@ -10096,6 +10174,13 @@ const EnvironmentScreen = ({ navigate, photoSession, setPhotoSession, persistPho
                   <div className="mono" style={{fontSize:22,fontWeight:700,color:tc}}>{detectedEnv.dailyMaxTempC}°C</div>
                   <div className="mono" style={{fontSize:9,color:T.textDim}}>Peak today</div>
                 </div>
+                {detectedEnv.annualAvgTempC > 0 && (
+                  <div style={{background:'rgba(82,183,136,.08)',border:'1px solid rgba(82,183,136,.22)',padding:'10px 12px',borderRadius:8}}>
+                    <div className="mono" style={{fontSize:8,color:T.textDim,letterSpacing:'1.5px',marginBottom:4}}>ANNUAL AVG</div>
+                    <div className="mono" style={{fontSize:22,fontWeight:700,color:T.green}}>{detectedEnv.annualAvgTempC}°C</div>
+                    <div className="mono" style={{fontSize:9,color:T.textDim}}>Used for species match</div>
+                  </div>
+                )}
                 <div style={{background:'rgba(56,189,248,.06)',border:'1px solid rgba(56,189,248,.14)',padding:'10px 12px',borderRadius:8}}>
                   <div className="mono" style={{fontSize:8,color:T.textDim,letterSpacing:'1.5px',marginBottom:4}}>WIND</div>
                   <div className="mono" style={{fontSize:18,fontWeight:700,color:T.textBright}}>{detectedEnv.windSpeedKmh} <span style={{fontSize:10}}>km/h</span></div>
