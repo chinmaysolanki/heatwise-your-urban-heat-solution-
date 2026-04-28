@@ -6891,7 +6891,7 @@ const PLANT_PHOTOS = {
  */
 const PlantImg = ({ code, type, emoji, size = 56, round = 10, style = {} }) => {
   const src = PLANT_PHOTOS[code] || PLANT_PHOTOS[type];
-  const [err, setErr] = React.useState(false);
+  const [err, setErr] = useState(false);
   if (!src || err) {
     return (
       <span style={{ fontSize: size * 0.55, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: size, height: size, flexShrink: 0, ...style }}>
