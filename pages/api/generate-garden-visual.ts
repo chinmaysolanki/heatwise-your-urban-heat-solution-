@@ -1,7 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
 import { toFile } from "openai/uploads";
-import { db } from "@/lib/db";
+// lazy import to avoid crash when DATABASE_URL is not set
+async function getDb() {
+  const { db } = await import("@/lib/db");
+  return db;
+}
 
 // Allow large payloads — base64 JPEG from camera can reach 8–12 MB encoded
 export const config = {
@@ -268,20 +272,22 @@ export default async function handler(
         recommendation?.candidate?.template?.name ??
         "unknown-recommendation";
 
-      const count = await db.visualizationRecord.count({ where: { photoSessionId } });
-
-      await db.visualizationRecord.create({
-        data: {
-          photoSessionId,
-          sourcePhotoRef: typeof photo === "string" ? photo.slice(0, 128) : null,
-          recommendationId,
-          layoutSchema:      JSON.stringify(recommendation.layoutSchema),
-          spatialMapping:    JSON.stringify(spatialMapping),
-          visualizationPrompt: editPrompt.slice(0, 2000),
-          generatedImageUrl: imageUrl ? imageUrl.slice(0, 512) : null,
-          generationVersion: count + 1,
-        },
-      });
+      try {
+        const db = await getDb();
+        const count = await db.visualizationRecord.count({ where: { photoSessionId } });
+        await db.visualizationRecord.create({
+          data: {
+            photoSessionId,
+            sourcePhotoRef: typeof photo === "string" ? photo.slice(0, 128) : null,
+            recommendationId,
+            layoutSchema:      JSON.stringify(recommendation.layoutSchema),
+            spatialMapping:    JSON.stringify(spatialMapping),
+            visualizationPrompt: editPrompt.slice(0, 2000),
+            generatedImageUrl: imageUrl ? imageUrl.slice(0, 512) : null,
+            generationVersion: count + 1,
+          },
+        });
+      } catch { /* DB not available — skip persistence */ }
     }
 
     res.status(200).json({ prompt: editPrompt.slice(0, 500), imageUrl });

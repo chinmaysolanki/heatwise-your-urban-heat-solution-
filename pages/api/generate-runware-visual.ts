@@ -1,15 +1,16 @@
 /**
- * generate-runware-visual.ts
+ * generate-runware-visual.ts  (now powered by OpenAI)
  *
- * Mode A (img2img): captured photo → imageUpload → imageUUID → FLUX Dev img2img
- *   Model: runware:101@1 (FLUX Dev) — Runware's primary img2img model
- *   Preserves space structure, adds recommended species as garden
+ * Mode A (img2img): captured photo present → gpt-image-1 edit (inpainting)
+ *   Falls back to DALL-E 3 text-to-image if edit fails or gpt-image-1 unavailable.
  *
- * Mode B (text-to-image fallback): no photo → runware:100@1
+ * Mode B (text-to-image): no photo → DALL-E 3
  */
 
 import type { NextApiRequest, NextApiResponse } from "next";
-import { randomUUID } from "crypto";
+import OpenAI from "openai";
+import { toFile } from "openai";
+import { Readable } from "stream";
 
 export const config = {
   api: { bodyParser: { sizeLimit: "12mb" } },
@@ -67,33 +68,10 @@ type ScoredPlantEntry = {
   relevanceScore?: number;
 };
 
-// ── Img2img prompt — focused on what to ADD to the existing space ──
-function buildImg2ImgPrompt(plants: ScoredPlantEntry[], meta?: SessionMeta): string {
-  const env      = meta?.environment ?? {};
-  const wM       = meta?.widthM  ?? 5;
-  const lM       = meta?.lengthM ?? 6;
-  const areaM2   = meta?.areaM2  ?? Math.round(wM * lM);
-  const spaceRaw = env.spaceType ?? "outdoor_rooftop";
-
-  const spaceLabel =
-    spaceRaw === "outdoor_balcony" ? "balcony" :
-    spaceRaw === "outdoor_terrace" ? "terrace" :
-    spaceRaw === "indoor"          ? "indoor space" :
-    "rooftop";
-
-  const sunRaw = (env.sunExposure ?? "full").toLowerCase();
-  const light  =
-    sunRaw === "shade"   ? "soft diffused light" :
-    sunRaw === "partial" ? "dappled natural light" :
-    "bright natural sunlight";
-
-  const loc = env.locationLabel ? `in ${env.locationLabel}, ` : "";
-
-  const sorted = [...plants]
+function buildPlantList(plants: ScoredPlantEntry[], limit = 8): string {
+  return [...plants]
     .sort((a, b) => (b.relevanceScore ?? 0) - (a.relevanceScore ?? 0))
-    .slice(0, 8);
-
-  const plantList = sorted
+    .slice(0, limit)
     .map(sp => {
       const p = sp?.plant;
       if (!p?.name) return null;
@@ -105,17 +83,9 @@ function buildImg2ImgPrompt(plants: ScoredPlantEntry[], meta?: SessionMeta): str
     })
     .filter(Boolean)
     .join("; ");
-
-  return [
-    `Photorealistic established ${spaceLabel} garden, ${loc}${light}.`,
-    `Transform this space: keep ALL existing walls, floor, pillars, ceiling, doors, windows, and structural elements exactly unchanged.`,
-    `Add lush plants and garden only on the floor surface: ${plantList || "mixed tropical herbs, ornamental grasses, and flowering shrubs"}.`,
-    `Place plants in terracotta pots and low raised timber planters, ${areaM2} m² area (${wM.toFixed(1)} m × ${lM.toFixed(1)} m).`,
-    `Realistic photography, mature plants (2-3 years), natural cast shadows, soil visible between plants, 8K sharp detail.`,
-  ].join(" ");
 }
 
-// ── Text-to-image fallback ─────────────────────────────────────
+// ── DALL-E 3 text-to-image prompt ─────────────────────────────
 function buildT2IPrompt(plants: ScoredPlantEntry[], meta?: SessionMeta): string {
   const env      = meta?.environment ?? {};
   const wM       = meta?.widthM  ?? 5;
@@ -138,82 +108,55 @@ function buildT2IPrompt(plants: ScoredPlantEntry[], meta?: SessionMeta): string 
     sunRaw === "partial" ? "dappled sun and shadow" :
     "bright full sunlight, golden-hour warmth";
 
-  const sorted = [...plants]
-    .sort((a, b) => (b.relevanceScore ?? 0) - (a.relevanceScore ?? 0))
-    .slice(0, 10);
-
-  const plantLines = sorted
-    .map(sp => {
-      const p = sp?.plant;
-      if (!p?.name) return null;
-      const visual = PLANT_VISUALS[p.type ?? "herb"] ?? "lush green plant";
-      const h      = typeof p.heightM === "number" ? `, ${Math.round(p.heightM * 100)} cm tall` : "";
-      const qty    = (sp.quantity ?? 1) > 1 ? ` ×${sp.quantity}` : "";
-      const zone   = ZONE_LABELS[sp.placementZone ?? "perimeter"] ?? "in the garden";
-      return `• ${p.name}${qty}: ${visual}${h}, ${zone}`;
-    })
-    .filter(Boolean)
-    .join(". ");
+  const plantList = buildPlantList(plants, 10);
 
   return [
-    `Professional photo of a lush ${elevLabel} ${spaceLabel}, ${loc}${light}.`,
-    plantLines || "Dense mixed herbs, grasses, and ornamental shrubs.",
-    `${areaM2} m² (${wM.toFixed(1)} × ${lM.toFixed(1)} m), timber planter beds along perimeter, stone-tile paths, terracotta pots, dark mulched soil.`,
-    `Photorealistic landscape photography, mature plants, sharp focus, 8K quality.`,
+    `Professional photograph of a lush ${elevLabel} ${spaceLabel}, ${loc}${light}.`,
+    plantList
+      ? `Featured plants: ${plantList}.`
+      : "Dense mixed herbs, ornamental grasses, and flowering shrubs.",
+    `${areaM2} m² space (${wM.toFixed(1)} × ${lM.toFixed(1)} m), timber planter beds along the perimeter, stone-tile paths, terracotta pots, dark mulched soil.`,
+    `Photorealistic landscape photography, mature plants, natural cast shadows, sharp focus, 8K quality, no text, no watermarks.`,
   ].join(" ");
 }
 
-function buildNegativePrompt(): string {
-  return "cartoon, illustration, painting, sketch, 3D render, CGI, blurry, watermark, text, logo, plastic plants, fake greenery, altered walls, changed architecture, removed structures, changed background, fantasy, oversized plants, oversaturated, low quality";
+// ── Image-edit prompt (used when captured photo is supplied) ──
+function buildEditPrompt(plants: ScoredPlantEntry[], meta?: SessionMeta): string {
+  const env      = meta?.environment ?? {};
+  const wM       = meta?.widthM  ?? 5;
+  const lM       = meta?.lengthM ?? 6;
+  const areaM2   = meta?.areaM2  ?? Math.round(wM * lM);
+  const spaceRaw = env.spaceType ?? "outdoor_rooftop";
+
+  const spaceLabel =
+    spaceRaw === "outdoor_balcony" ? "balcony" :
+    spaceRaw === "outdoor_terrace" ? "terrace" :
+    spaceRaw === "indoor"          ? "indoor space" :
+    "rooftop";
+
+  const loc = env.locationLabel ? `in ${env.locationLabel}, ` : "";
+  const sunRaw = (env.sunExposure ?? "full").toLowerCase();
+  const light  =
+    sunRaw === "shade"   ? "soft diffused light" :
+    sunRaw === "partial" ? "dappled natural light" :
+    "bright natural sunlight";
+
+  const plantList = buildPlantList(plants, 8);
+
+  return [
+    `Transform this ${spaceLabel}${loc ? " " + loc.replace(/, $/, "") : ""} into a photorealistic garden, ${light}.`,
+    `Keep ALL existing walls, floor, pillars, ceiling, doors, windows, and structural elements exactly unchanged.`,
+    `Add lush planted garden only on the floor: ${plantList || "mixed tropical herbs, ornamental grasses, and flowering shrubs"}.`,
+    `Terracotta pots and low timber planters, ${areaM2} m² (${wM.toFixed(1)} m × ${lM.toFixed(1)} m).`,
+    `Realistic photography, mature plants, natural shadows, 8K sharp detail, no text, no watermarks.`,
+  ].join(" ");
 }
 
-// ── Runware API ────────────────────────────────────────────────
-interface RunwareUploadResponse {
-  data?: Array<{ taskType?: string; taskUUID?: string; imageUUID?: string }>;
-  errors?: Array<{ message: string }>;
-}
-
-interface RunwareInferResponse {
-  data?: Array<{ imageURL?: string }>;
-  errors?: Array<{ message: string }>;
-}
-
-async function runwareRequest<T>(apiKey: string, tasks: unknown[]): Promise<T> {
-  const res = await fetch("https://api.runware.ai/v1", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(tasks),
-  });
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Runware ${res.status}: ${text.slice(0, 400)}`);
-  }
-
-  const json = await res.json();
-  if (json?.errors?.length) {
-    throw new Error(json.errors.map((e: { message: string }) => e.message).join("; "));
-  }
-  if (json?.data?.[0]?.error) {
-    throw new Error(json.data[0].message ?? json.data[0].error);
-  }
-  return json as T;
-}
-
-// ── Upload image → get imageUUID for seedImage ─────────────────
-async function uploadImage(apiKey: string, dataUri: string): Promise<string> {
-  const json = await runwareRequest<RunwareUploadResponse>(apiKey, [{
-    taskType:  "imageUpload",
-    taskUUID:  randomUUID(),
-    image:     dataUri,  // full data URI: data:image/jpeg;base64,...
-  }]);
-
-  const imageUUID = json.data?.[0]?.imageUUID;
-  if (!imageUUID) throw new Error("imageUpload returned no imageUUID");
-  return imageUUID;
+/** Convert a base64 data URI to a Buffer */
+function dataUriToBuffer(dataUri: string): { buffer: Buffer; mimeType: string } {
+  const match = dataUri.match(/^data:(image\/\w+);base64,(.+)$/);
+  if (!match) throw new Error("Invalid data URI");
+  return { buffer: Buffer.from(match[2]!, "base64"), mimeType: match[1]! };
 }
 
 // ── Handler ────────────────────────────────────────────────────
@@ -227,9 +170,9 @@ export default async function handler(
     return;
   }
 
-  const apiKey = process.env.RUNWARE_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    res.status(500).json({ message: "RUNWARE_API_KEY is not configured" });
+    res.status(500).json({ message: "OPENAI_API_KEY is not configured" });
     return;
   }
 
@@ -245,110 +188,86 @@ export default async function handler(
     return;
   }
 
+  const openai = new OpenAI({ apiKey });
   const hasPhoto = typeof seedImage === "string" && seedImage.startsWith("data:") && seedImage.length > 500;
 
   try {
-    let imageURL: string | null = null;
-    let mode = "generation";
+    let imageUrl: string | null = null;
     let prompt: string;
+    let mode = "generation";
 
     if (hasPhoto) {
-      // ── Mode A: img2img — upload image first, then run inference ──
+      // ── Mode A: image edit with gpt-image-1 ──────────────────
       mode   = "img2img";
-      prompt = buildImg2ImgPrompt(scoredPlants, sessionMeta ?? undefined);
+      prompt = buildEditPrompt(scoredPlants, sessionMeta ?? undefined);
+      console.log("[openai] attempting gpt-image-1 image edit…");
 
-      // Step 1: upload — strip data: prefix, send raw base64 only
-      const base64Only = seedImage.replace(/^data:image\/\w+;base64,/, "");
-      console.log("[runware] imageUpload, base64 length:", base64Only.length);
-
-      let imageUUID: string | null = null;
       try {
-        const uploadJson = await runwareRequest<RunwareUploadResponse>(apiKey, [{
-          taskType: "imageUpload",
-          taskUUID: randomUUID(),
-          image:    base64Only,   // raw base64 without data: prefix
-        }]);
-        imageUUID = uploadJson.data?.[0]?.imageUUID ?? null;
-      } catch (uploadErr) {
-        console.warn("[runware] imageUpload failed, falling back to text-to-image:", uploadErr instanceof Error ? uploadErr.message : uploadErr);
-      }
+        const { buffer, mimeType } = dataUriToBuffer(seedImage);
+        const ext = mimeType === "image/png" ? "png" : "jpg";
+        const imageFile = await toFile(Readable.from(buffer), `photo.${ext}`, { type: mimeType });
 
-      if (imageUUID) {
-        // Step 2: img2img inference using imageUUID as seedImage
-        console.log("[runware] img2img inference, imageUUID:", imageUUID);
-        const inferJson = await runwareRequest<RunwareInferResponse>(apiKey, [{
-          taskType:       "imageInference",
-          taskUUID:       randomUUID(),
-          model:          "runware:101@1",
-          positivePrompt: prompt,
-          negativePrompt: buildNegativePrompt(),
-          seedImage:      imageUUID,
-          strength:       0.65,
-          width:          1024,
-          height:         1024,
-          numberResults:  1,
-          outputType:     ["URL"],
-          outputFormat:   "WEBP",
-          steps:          28,
-          CFGScale:       3.5,
-        }]);
-        imageURL = inferJson.data?.[0]?.imageURL ?? null;
-      } else {
-        // Fallback: text-to-image with grounded prompt
-        console.log("[runware] falling back to text-to-image after upload failure");
+        const editRes = await openai.images.edit({
+          model:  "gpt-image-1",
+          image:  imageFile,
+          prompt,
+          n:      1,
+          size:   "1024x1024",
+        } as Parameters<typeof openai.images.edit>[0]);
+
+        // gpt-image-1 returns base64 by default
+        const item = editRes.data?.[0];
+        if (item?.url) {
+          imageUrl = item.url;
+        } else if ((item as any)?.b64_json) {
+          imageUrl = `data:image/png;base64,${(item as any).b64_json}`;
+        }
+        console.log("[openai] gpt-image-1 edit success");
+      } catch (editErr) {
+        const msg = editErr instanceof Error ? editErr.message : String(editErr);
+        console.warn("[openai] image edit failed, falling back to DALL-E 3:", msg);
+        // Fallback to DALL-E 3 text-to-image
         mode   = "generation";
         prompt = buildT2IPrompt(scoredPlants, sessionMeta ?? undefined);
-        const inferJson = await runwareRequest<RunwareInferResponse>(apiKey, [{
-          taskType:       "imageInference",
-          taskUUID:       randomUUID(),
-          model:          "runware:100@1",
-          positivePrompt: prompt,
-          negativePrompt: buildNegativePrompt(),
-          width:          1024,
-          height:         1024,
-          numberResults:  1,
-          outputType:     ["URL"],
-          outputFormat:   "WEBP",
-          steps:          28,
-          CFGScale:       7.5,
-        }]);
-        imageURL = inferJson.data?.[0]?.imageURL ?? null;
       }
-
-    } else {
-      // ── Mode B: text-to-image ──
-      prompt = buildT2IPrompt(scoredPlants, sessionMeta ?? undefined);
-      console.log("[runware] text-to-image with runware:100@1…");
-
-      const inferJson = await runwareRequest<RunwareInferResponse>(apiKey, [{
-        taskType:       "imageInference",
-        taskUUID:       randomUUID(),
-        model:          "runware:100@1",
-        positivePrompt: prompt,
-        negativePrompt: buildNegativePrompt(),
-        width:          1024,
-        height:         1024,
-        numberResults:  1,
-        outputType:     ["URL"],
-        outputFormat:   "WEBP",
-        steps:          28,
-        CFGScale:       7.5,
-      }]);
-
-      imageURL = inferJson.data?.[0]?.imageURL ?? null;
     }
 
-    if (!imageURL) {
-      res.status(500).json({ message: "Runware returned no image URL" });
+    if (!imageUrl) {
+      // ── Mode B: DALL-E 3 text-to-image ───────────────────────
+      if (mode !== "img2img") {
+        prompt = buildT2IPrompt(scoredPlants, sessionMeta ?? undefined);
+      } else {
+        prompt = buildT2IPrompt(scoredPlants, sessionMeta ?? undefined);
+        mode = "generation";
+      }
+      console.log("[openai] DALL-E 3 text-to-image…");
+
+      const genRes = await openai.images.generate({
+        model:           "dall-e-3",
+        prompt:          prompt!,
+        n:               1,
+        size:            "1024x1024",
+        quality:         "hd",
+        response_format: "url",
+      });
+
+      imageUrl = genRes.data?.[0]?.url ?? null;
+      // Use the revised prompt from DALL-E 3 if available
+      const revisedPrompt = genRes.data?.[0]?.revised_prompt;
+      if (revisedPrompt) prompt = revisedPrompt;
+      console.log("[openai] DALL-E 3 success");
+    }
+
+    if (!imageUrl) {
+      res.status(500).json({ message: "OpenAI returned no image" });
       return;
     }
 
-    console.log("[runware] success:", imageURL.slice(0, 80));
-    res.status(200).json({ imageUrl: imageURL, prompt: prompt.slice(0, 800), mode });
+    res.status(200).json({ imageUrl, prompt: prompt!.slice(0, 800), mode });
 
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Runware generation failed";
-    console.error("[runware] error:", message);
+    const message = err instanceof Error ? err.message : "Image generation failed";
+    console.error("[openai] error:", message);
     res.status(500).json({ message });
   }
 }
