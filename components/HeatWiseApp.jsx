@@ -3991,11 +3991,20 @@ const ResultScreen = ({ navigate, selectedRecommendation, photoSession, setActiv
           </div>
         )}
         <button
-          disabled={runwareLoading || !selectedRecommendation}
+          disabled={runwareLoading || allPlants.length === 0}
           onClick={async () => {
             setRunwareError(null);
             setRunwareLoading(true);
-            const result = await generateRunwareVisualization?.({});
+            // If no selectedRecommendation, pass allPlants directly so generation still works
+            const opts = selectedRecommendation ? {} : {
+              scoredPlants: allPlants.map((p, i) => ({
+                plant: { name: p.name, type: p.type ?? 'herb', heightM: p.heightM ?? 0.5 },
+                quantity: 2,
+                placementZone: ['perimeter','center','container'][i % 3],
+                relevanceScore: p.coolingScore ?? 50,
+              })),
+            };
+            const result = await generateRunwareVisualization?.(opts);
             setRunwareLoading(false);
             if (result?.error) setRunwareError(result.error);
           }}
@@ -4007,7 +4016,7 @@ const ResultScreen = ({ navigate, selectedRecommendation, photoSession, setActiv
             color: runwareLoading ? '#e8c14e' : '#0A0A0A',
             fontSize:14,fontWeight:700,fontFamily:"'DM Sans',sans-serif",
             letterSpacing:'0.3px',
-            opacity: (!selectedRecommendation) ? 0.4 : 1,
+            opacity: runwareLoading ? 0.7 : 1,
             display:'flex',alignItems:'center',justifyContent:'center',gap:8,
             transition:'all .2s',
           }}
@@ -10745,22 +10754,29 @@ export default function App(){
 
   const generateRunwareVisualization = useCallback(async (overrides = {}) => {
     const rec = photoSession.selectedRecommendation;
-    if (!rec) return null;
 
-    // Extract scored plants with full detail (name, type, heightM, quantity, zone)
-    const scoredPlants = (rec?.candidate?.scoredPlants ?? rec?.scoredPlants ?? [])
-      .map((sp) => ({
-        plant: {
-          name:    sp?.plant?.name    ?? sp?.name    ?? null,
-          type:    sp?.plant?.type    ?? sp?.type    ?? "herb",
-          heightM: sp?.plant?.heightM ?? sp?.heightM ?? null,
-          catalogCode: sp?.plant?.catalogCode ?? sp?.catalogCode ?? null,
-        },
-        quantity:      sp?.quantity      ?? 1,
-        placementZone: sp?.placementZone ?? "perimeter",
-        relevanceScore: sp?.relevanceScore ?? 0,
-      }))
-      .filter(sp => sp.plant.name);
+    // Allow caller to pass scoredPlants directly (e.g. when selectedRecommendation is null
+    // but fallback species are available from the result screen)
+    let scoredPlants;
+    if (Array.isArray(overrides.scoredPlants) && overrides.scoredPlants.length > 0) {
+      scoredPlants = overrides.scoredPlants;
+    } else if (rec) {
+      scoredPlants = (rec?.candidate?.scoredPlants ?? rec?.scoredPlants ?? [])
+        .map((sp) => ({
+          plant: {
+            name:    sp?.plant?.name    ?? sp?.name    ?? null,
+            type:    sp?.plant?.type    ?? sp?.type    ?? "herb",
+            heightM: sp?.plant?.heightM ?? sp?.heightM ?? null,
+            catalogCode: sp?.plant?.catalogCode ?? sp?.catalogCode ?? null,
+          },
+          quantity:      sp?.quantity      ?? 1,
+          placementZone: sp?.placementZone ?? "perimeter",
+          relevanceScore: sp?.relevanceScore ?? 0,
+        }))
+        .filter(sp => sp.plant.name);
+    } else {
+      return null;
+    }
 
     const widthM  = photoSession.widthM  ?? null;
     const lengthM = photoSession.lengthM ?? null;
