@@ -6834,75 +6834,132 @@ const CityHeatScreen=({navigate})=>{
 };
 
 /* ══════════════════════════════════════════════════════════════════
-   PLANT PHOTO MAP — Wikimedia Commons Special:FilePath thumbnails
-   onError fallback → emoji, so broken URLs are invisible to users
+   PLANT PHOTOS — Wikipedia REST API (CORS-safe, real CDN thumbnails)
+   Maps each plant code / climate-id / type → Wikipedia article title.
+   PlantImg fetches thumbnail.source at mount, caches in _wikiImgCache.
 ══════════════════════════════════════════════════════════════════ */
-const PLANT_PHOTOS = {
-  // By species code
-  tulsi_holy:    'https://commons.wikimedia.org/wiki/Special:FilePath/Ocimum_tenuiflorum3.jpg?width=200',
-  basil_sweet:   'https://commons.wikimedia.org/wiki/Special:FilePath/Sweet_basil_(Ocimum_basilicum)_2.jpg?width=200',
-  mint:          'https://commons.wikimedia.org/wiki/Special:FilePath/Mentha_piperita.jpg?width=200',
-  lemongrass:    'https://commons.wikimedia.org/wiki/Special:FilePath/Cymbopogon.citratus.jpg?width=200',
-  sedum:         'https://commons.wikimedia.org/wiki/Special:FilePath/Sedum_spectabile_flowers.jpg?width=200',
-  prickly_pear:  'https://commons.wikimedia.org/wiki/Special:FilePath/Opuntia_ficus-indica_1.jpg?width=200',
-  portulaca:     'https://commons.wikimedia.org/wiki/Special:FilePath/Portulaca_grandiflora.jpg?width=200',
-  marigold:      'https://commons.wikimedia.org/wiki/Special:FilePath/Tagetes_erecta_flowers.jpg?width=200',
-  bougainvillea: 'https://commons.wikimedia.org/wiki/Special:FilePath/Bougainvillea_Spectabilis.jpg?width=200',
-  pothos:        'https://commons.wikimedia.org/wiki/Special:FilePath/Epipremnum_aureum_31082012.jpg?width=200',
-  snake_plant:   'https://commons.wikimedia.org/wiki/Special:FilePath/Sansevieria_trifasciata_Prain.jpg?width=200',
-  areca_palm_dwarf: 'https://commons.wikimedia.org/wiki/Special:FilePath/Chrysalidocarpus_lutescens.jpg?width=200',
-  vetiver:       'https://commons.wikimedia.org/wiki/Special:FilePath/Chrysopogon_zizanioides.jpg?width=200',
-  bamboo_dwarf:  'https://commons.wikimedia.org/wiki/Special:FilePath/Pleioblastus_variegatus.jpg?width=200',
-  cherry_tomato: 'https://commons.wikimedia.org/wiki/Special:FilePath/Tomato_je.jpg?width=200',
-  curry_leaf:    'https://commons.wikimedia.org/wiki/Special:FilePath/Murraya_koenigii.jpg?width=200',
-  aloe_vera:     'https://commons.wikimedia.org/wiki/Special:FilePath/Aloe_vera_flower_inset.png?width=200',
-  zinnia:        'https://commons.wikimedia.org/wiki/Special:FilePath/Zinnia_elegans_001.jpg?width=200',
-  // By climate-plant id
-  aloe:          'https://commons.wikimedia.org/wiki/Special:FilePath/Aloe_vera_flower_inset.png?width=200',
-  jasmine:       'https://commons.wikimedia.org/wiki/Special:FilePath/Jasminum_sambac.jpg?width=200',
-  lavender:      'https://commons.wikimedia.org/wiki/Special:FilePath/Lavandula_angustifolia_-_bloem_01.jpg?width=200',
-  hibiscus:      'https://commons.wikimedia.org/wiki/Special:FilePath/Hibiscus_rosa-sinensis.jpg?width=200',
-  chrysanth:     'https://commons.wikimedia.org/wiki/Special:FilePath/Chrysanthemum_-_floriade_canberra.jpg?width=200',
-  rosemary:      'https://commons.wikimedia.org/wiki/Special:FilePath/Rosemary_bush.jpg?width=200',
-  agave:         'https://commons.wikimedia.org/wiki/Special:FilePath/Agave_americana_2.jpg?width=200',
-  snake:         'https://commons.wikimedia.org/wiki/Special:FilePath/Sansevieria_trifasciata_Prain.jpg?width=200',
-  tulsi:         'https://commons.wikimedia.org/wiki/Special:FilePath/Ocimum_tenuiflorum3.jpg?width=200',
-  turmeric:      'https://commons.wikimedia.org/wiki/Special:FilePath/Curcuma_longa_roots.jpg?width=200',
-  fern:          'https://commons.wikimedia.org/wiki/Special:FilePath/Nephrolepis_exaltata_HabitusLeaf_BotGardBln0906.jpg?width=200',
-  bougain:       'https://commons.wikimedia.org/wiki/Special:FilePath/Bougainvillea_Spectabilis.jpg?width=200',
-  geranium:      'https://commons.wikimedia.org/wiki/Special:FilePath/Pelargonium_zonale2.jpg?width=200',
-  // By plant type (for EDIT palette)
-  tree:          'https://commons.wikimedia.org/wiki/Special:FilePath/Murraya_koenigii.jpg?width=200',
-  shrub:         'https://commons.wikimedia.org/wiki/Special:FilePath/Hibiscus_rosa-sinensis.jpg?width=200',
-  ornamental:    'https://commons.wikimedia.org/wiki/Special:FilePath/Tagetes_erecta_flowers.jpg?width=200',
-  herb:          'https://commons.wikimedia.org/wiki/Special:FilePath/Sweet_basil_(Ocimum_basilicum)_2.jpg?width=200',
-  succulent:     'https://commons.wikimedia.org/wiki/Special:FilePath/Aloe_vera_flower_inset.png?width=200',
-  climber:       'https://commons.wikimedia.org/wiki/Special:FilePath/Bougainvillea_Spectabilis.jpg?width=200',
-  vegetable:     'https://commons.wikimedia.org/wiki/Special:FilePath/Tomato_je.jpg?width=200',
-  grass:         'https://commons.wikimedia.org/wiki/Special:FilePath/Chrysopogon_zizanioides.jpg?width=200',
-  foliage:       'https://commons.wikimedia.org/wiki/Special:FilePath/Epipremnum_aureum_31082012.jpg?width=200',
+const PLANT_WIKI = {
+  // species catalog codes
+  tulsi_holy:       'Ocimum tenuiflorum',
+  basil_sweet:      'Basil',
+  mint:             'Mentha',
+  lemongrass:       'Cymbopogon citratus',
+  sedum:            'Sedum',
+  prickly_pear:     'Opuntia',
+  portulaca:        'Portulaca grandiflora',
+  marigold:         'Tagetes',
+  bougainvillea:    'Bougainvillea',
+  pothos:           'Epipremnum aureum',
+  snake_plant:      'Sansevieria trifasciata',
+  areca_palm_dwarf: 'Dypsis lutescens',
+  vetiver:          'Chrysopogon zizanioides',
+  bamboo_dwarf:     'Bamboo',
+  cherry_tomato:    'Cherry tomato',
+  curry_leaf:       'Murraya koenigii',
+  aloe_vera:        'Aloe vera',
+  zinnia:           'Zinnia',
+  // climate-screen plant ids
+  aloe:             'Aloe vera',
+  jasmine:          'Jasmine',
+  lavender:         'Lavender',
+  hibiscus:         'Hibiscus',
+  chrysanth:        'Chrysanthemum',
+  rosemary:         'Rosemary',
+  agave:            'Agave',
+  snake:            'Sansevieria trifasciata',
+  tulsi:            'Ocimum tenuiflorum',
+  turmeric:         'Turmeric',
+  fern:             'Boston fern',
+  bougain:          'Bougainvillea',
+  geranium:         'Pelargonium',
+  // type-level fallbacks for Edit palette
+  tree:             'Ficus benjamina',
+  shrub:            'Hibiscus',
+  ornamental:       'Tagetes',
+  herb:             'Basil',
+  succulent:        'Aloe vera',
+  climber:          'Bougainvillea',
+  vegetable:        'Tomato',
+  grass:            'Chrysopogon zizanioides',
+  foliage:          'Epipremnum aureum',
+  perennial:        'Lavender',
+  cactus:           'Cactus',
+  bamboo:           'Bamboo',
+  palm:             'Dypsis lutescens',
+  creeper:          'Portulaca grandiflora',
 };
 
+// Module-level cache — survives re-renders; each article fetched at most once.
+const _wikiImgCache = new Map(); // title → { status:'loading'|'ok'|'err', src?:string, cbs:[] }
+
 /**
- * Renders a real plant photo; falls back to emoji if the image fails to load.
- * size  — pixel dimensions of the square image
- * round — border-radius value
+ * Shows a real plant photo fetched from Wikipedia's public REST API.
+ * While loading shows a soft green placeholder with a dim emoji.
+ * If fetch fails, gracefully shows the emoji at full size.
  */
 const PlantImg = ({ code, type, emoji, size = 56, round = 10, style = {} }) => {
-  const [err, setErr] = React.useState(false);
-  const src = PLANT_PHOTOS[code] || PLANT_PHOTOS[type];
-  if (!src || err) {
+  const title = PLANT_WIKI[code] || PLANT_WIKI[type];
+
+  const [src, setSrc] = React.useState(() => {
+    const c = _wikiImgCache.get(title);
+    return (c && c.status === 'ok') ? c.src : null;
+  });
+  const [failed, setFailed] = React.useState(!title);
+
+  React.useEffect(() => {
+    if (!title) return;
+    const cached = _wikiImgCache.get(title);
+    if (cached) {
+      if (cached.status === 'ok')  { setSrc(cached.src); return; }
+      if (cached.status === 'err') { setFailed(true);    return; }
+      // still loading — register callback
+      cached.cbs.push((s) => { if (s) setSrc(s); else setFailed(true); });
+      return;
+    }
+    const entry = { status: 'loading', src: null, cbs: [] };
+    _wikiImgCache.set(title, entry);
+    fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`, {
+      headers: { Accept: 'application/json' },
+    })
+      .then(r => r.json())
+      .then(d => {
+        const imgSrc = d?.thumbnail?.source || d?.originalimage?.source || null;
+        entry.status = imgSrc ? 'ok' : 'err';
+        entry.src    = imgSrc;
+        entry.cbs.forEach(cb => cb(imgSrc));
+        entry.cbs = [];
+        if (imgSrc) setSrc(imgSrc); else setFailed(true);
+      })
+      .catch(() => {
+        entry.status = 'err';
+        entry.cbs.forEach(cb => cb(null));
+        entry.cbs = [];
+        setFailed(true);
+      });
+  }, [title]);
+
+  // Emoji fallback
+  if (failed || !title) {
     return (
-      <span style={{ fontSize: size * 0.55, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: size, height: size, ...style }}>
+      <span style={{ fontSize: size * 0.55, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: size, height: size, flexShrink: 0, ...style }}>
         {emoji}
       </span>
     );
   }
+  // Loading skeleton
+  if (!src) {
+    return (
+      <div style={{ width: size, height: size, borderRadius: round, background: 'rgba(82,183,136,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, ...style }}>
+        <span style={{ fontSize: size * 0.45, opacity: 0.25 }}>{emoji}</span>
+      </div>
+    );
+  }
+  // Loaded image
   return (
     <img
       src={src}
       alt={code || type}
-      onError={() => setErr(true)}
+      onError={() => setFailed(true)}
       style={{ width: size, height: size, objectFit: 'cover', borderRadius: round, display: 'block', flexShrink: 0, ...style }}
     />
   );
