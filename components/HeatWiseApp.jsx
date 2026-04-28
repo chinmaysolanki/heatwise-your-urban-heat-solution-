@@ -3636,7 +3636,7 @@ const ResultScreen = ({ navigate, selectedRecommendation, photoSession, setActiv
   // ────────────────────────────────────────────────────────────
 
   return(
-    <div style={{paddingBottom:260,height:'100%',overflowY:'auto',WebkitOverflowScrolling:'touch'}}>
+    <div style={{paddingBottom:260,height:'100%',overflowY:'auto',WebkitOverflowScrolling:'touch',background:'#04091A',position:'relative',zIndex:1}}>
       {/* 3D Garden Hero */}
       <div style={{height:gardenEditMode?520:360,position:'relative',overflow:'hidden',background:`linear-gradient(180deg,${T.greenDark} 0%,${T.green} 100%)`,transition:'height .35s ease'}}>
         <GardenScene3D
