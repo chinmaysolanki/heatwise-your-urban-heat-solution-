@@ -2,8 +2,8 @@
   "buildCommand": "node scripts/patch-prisma-for-prod.js && prisma generate && next build",
   "framework": "nextjs",
   "functions": {
-    "pages/api/**": {
-      "maxDuration": 30
-    }
+    "pages/api/generate-runware-visual": { "maxDuration": 60 },
+    "pages/api/generate-garden-visual":  { "maxDuration": 60 },
+    "pages/api/**":                      { "maxDuration": 30 }
   }
 }

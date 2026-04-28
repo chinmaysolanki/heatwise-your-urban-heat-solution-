@@ -14,6 +14,7 @@ import { Readable } from "stream";
 
 export const config = {
   api: { bodyParser: { sizeLimit: "12mb" } },
+  maxDuration: 60,
 };
 
 // ── Plant visuals ──────────────────────────────────────────────
@@ -247,7 +248,7 @@ export default async function handler(
         prompt:          prompt!,
         n:               1,
         size:            "1024x1024",
-        quality:         "hd",
+        quality:         "standard",
         response_format: "url",
       });
 
