@@ -455,15 +455,17 @@ function drawDimensions(ctx: CanvasRenderingContext2D, corners: ScreenCorner[]) 
 }
 
 function drawAngleBadge(ctx: CanvasRenderingContext2D, W: number, angleMode: AngleMode) {
+  // Drawn below the top bar (≈80px from top)
   const m = ANGLE_META[angleMode];
   const text = `${m.icon} ${m.label}`;
   ctx.save();
   ctx.font = "bold 10px 'DM Sans', sans-serif";
   const tw = ctx.measureText(text).width + 18;
+  const TOP = 84;
   ctx.fillStyle = "rgba(9,22,14,0.82)";
-  ctx.beginPath(); rRect(ctx, W - tw - 10, 10, tw, 26, 6); ctx.fill();
+  ctx.beginPath(); rRect(ctx, W - tw - 10, TOP, tw, 26, 6); ctx.fill();
   ctx.fillStyle = m.color; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillText(text, W - tw / 2 - 10, 23);
+  ctx.fillText(text, W - tw / 2 - 10, TOP + 13);
   ctx.restore();
 }
 
@@ -473,41 +475,47 @@ function drawAxisHint(ctx: CanvasRenderingContext2D, W: number, H: number, corne
   ctx.save();
   ctx.font = "12px 'DM Sans', sans-serif";
   const tw = ctx.measureText(hint).width + 22;
+  const AY = H - 220; // above the bottom bar
   ctx.fillStyle = "rgba(72,202,228,0.14)";
-  ctx.beginPath(); rRect(ctx, W / 2 - tw / 2, H - 160, tw, 28, 6); ctx.fill();
+  ctx.beginPath(); rRect(ctx, W / 2 - tw / 2, AY, tw, 28, 6); ctx.fill();
   ctx.strokeStyle = "rgba(72,202,228,0.5)"; ctx.lineWidth = 1;
-  ctx.beginPath(); rRect(ctx, W / 2 - tw / 2, H - 160, tw, 28, 6); ctx.stroke();
+  ctx.beginPath(); rRect(ctx, W / 2 - tw / 2, AY, tw, 28, 6); ctx.stroke();
   ctx.fillStyle = "rgba(72,202,228,0.95)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillText(hint, W / 2, H - 146);
+  ctx.fillText(hint, W / 2, AY + 14);
   ctx.restore();
 }
 
 function drawNextGuide(ctx: CanvasRenderingContext2D, W: number, H: number, nextIdx: number) {
-  if (nextIdx >= 4) return;
+  // Bottom bar already shows corner progress — only draw a subtle crosshair in centre-screen
+  if (nextIdx >= 4 || nextIdx === 0) return; // skip on first tap (radar handles it) and when done
   const color = CORNER_COLORS[nextIdx]!;
   const label = CORNER_LABELS[nextIdx]!;
-  const msg = `Tap corner ${label}`;
+  const msg = `→ Tap corner ${label}`;
   ctx.save();
-  ctx.font = "13px 'DM Sans', sans-serif";
+  ctx.font = "bold 12px 'DM Sans', sans-serif";
   const tw = ctx.measureText(msg).width + 20;
-  ctx.fillStyle = "rgba(9,22,14,0.80)";
-  ctx.beginPath(); rRect(ctx, W / 2 - tw / 2, H - 122, tw, 30, 7); ctx.fill();
+  // Place in centre of visible camera area (between top bar and bottom bar)
+  const CY = H * 0.62;
+  ctx.fillStyle = "rgba(9,22,14,0.72)";
+  ctx.beginPath(); rRect(ctx, W / 2 - tw / 2, CY - 15, tw, 30, 7); ctx.fill();
   ctx.fillStyle = color; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillText(msg, W / 2, H - 107);
+  ctx.fillText(msg, W / 2, CY);
   ctx.restore();
 }
 
 function drawInstructions(ctx: CanvasRenderingContext2D, W: number, H: number, count: number) {
+  // Drawn below the top bar (≈80px from top) to avoid overlapping the header
   const msg = count === 0 ? "Tap 4 rooftop corners"
             : count < 4   ? `${4 - count} more corner${4 - count > 1 ? "s" : ""} to place`
             : "Confirm or drag corners to adjust";
   ctx.save();
   ctx.font = "13px 'DM Sans', sans-serif";
   const tw = ctx.measureText(msg).width + 24;
+  const TOP = 84;
   ctx.fillStyle = "rgba(9,22,14,0.82)";
-  ctx.beginPath(); rRect(ctx, W / 2 - tw / 2, 22, tw, 30, 7); ctx.fill();
+  ctx.beginPath(); rRect(ctx, W / 2 - tw / 2, TOP, tw, 30, 7); ctx.fill();
   ctx.fillStyle = "rgba(216,243,220,0.9)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillText(msg, W / 2, 37);
+  ctx.fillText(msg, W / 2, TOP + 15);
   ctx.restore();
 }
 
@@ -518,7 +526,7 @@ function drawTipBanner(ctx: CanvasRenderingContext2D, W: number, angleMode: Angl
   ctx.font = "11px 'DM Sans', sans-serif";
   const tw = Math.min(W - 32, ctx.measureText(tip).width + 22);
   const x = W / 2 - tw / 2;
-  const y = 60;
+  const y = 120; // below instructions banner
   ctx.fillStyle = angleMode === "rolled" || angleMode === "horizontal"
     ? "rgba(231,111,81,0.18)" : "rgba(249,199,79,0.14)";
   ctx.beginPath(); rRect(ctx, x, y, tw, 26, 6); ctx.fill();
@@ -1224,56 +1232,50 @@ export function LiveARMeasurementScreen({ projectId, photoSessionId, onApplied, 
 
         {/* ── Top bar ─────────────────────────────────────────────────────── */}
         <div style={S.topBar}>
-          {/* Back */}
+          {/* Back — fixed width so it never collapses */}
           <button
             onClick={onCancel}
-            style={{ ...S.btn, padding: "8px 14px", fontSize: 12, background: "rgba(9,22,14,0.75)", color: "rgba(216,243,220,0.75)", border: "1px solid rgba(82,183,136,0.22)", borderRadius: 12 }}
+            style={{ ...S.btn, padding: "8px 14px", fontSize: 12, background: "rgba(9,22,14,0.75)", color: "rgba(216,243,220,0.75)", border: "1px solid rgba(82,183,136,0.22)", borderRadius: 12, flexShrink: 0 }}
           >
             ← Back
           </button>
 
-          {/* Centre: mode badge + live area */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+          {/* Centre: mode badge + live area — flex:1 so it uses available space only */}
+          <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, overflow: "hidden", padding: "0 8px" }}>
             {/* Mode pill */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, maxWidth: "100%" }}>
               {phase !== "confirmed" && (
                 <span style={{
-                  width: 7, height: 7, borderRadius: "50%",
+                  width: 7, height: 7, borderRadius: "50%", flexShrink: 0,
                   background: captureMode === "gallery" ? C.sky : "#52B788",
                   boxShadow: captureMode === "gallery" ? "0 0 6px rgba(64,145,108,0.8)" : "0 0 6px rgba(82,183,136,0.9)",
                   display: "inline-block",
                 }} />
               )}
-              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "2px", color: phase === "confirmed" ? "#52B788" : capturedLiveFrame ? "#52B788" : captureMode === "gallery" ? C.sky : "rgba(216,243,220,0.95)" }}>
+              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: phase === "confirmed" ? "#52B788" : capturedLiveFrame ? "#52B788" : captureMode === "gallery" ? C.sky : "rgba(216,243,220,0.95)" }}>
                 {phase === "confirmed" ? "✓ CONFIRMED" : capturedLiveFrame ? "FROZEN FRAME" : captureMode === "gallery" ? "GALLERY MODE" : "LIVE SCAN"}
               </span>
             </div>
             {/* ArUco marker detection badge */}
             {arucoDetected && captureMode === "live" && phase === "active" && (
               <div style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(0,255,136,0.15)", border: "1px solid rgba(0,255,136,0.4)", borderRadius: 10, padding: "2px 8px" }}>
-                <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#00FF88", boxShadow: "0 0 5px #00FF88", display: "inline-block" }} />
-                <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: "1.2px", color: "#00FF88" }}>MARKER ✓ SCALE LOCKED</span>
+                <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#00FF88", boxShadow: "0 0 5px #00FF88", display: "inline-block", flexShrink: 0 }} />
+                <span style={{ fontSize: 8, fontWeight: 800, letterSpacing: "1.2px", color: "#00FF88", whiteSpace: "nowrap" }}>SCALE LOCKED</span>
               </div>
             )}
             {/* Live area readout */}
             {corners.length >= 3 && resultRef.current?.polygon && (
               <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                <span style={{ fontSize: 20, fontWeight: 900, color: "#52B788", lineHeight: 1 }}>
+                <span style={{ fontSize: 18, fontWeight: 900, color: "#52B788", lineHeight: 1 }}>
                   {resultRef.current.polygon.areaSqM.toFixed(1)}
                 </span>
-                <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(82,183,136,0.7)", letterSpacing: "1px" }}>m²</span>
+                <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(82,183,136,0.7)", letterSpacing: "1px" }}>m²</span>
               </div>
-            )}
-            {/* Step instruction (no area yet) */}
-            {corners.length < 3 && phase === "active" && (
-              <span style={{ fontSize: 10, color: "rgba(216,243,220,0.55)", letterSpacing: "0.5px" }}>
-                {corners.length === 0 ? "Tap all 4 corners of your roof" : corners.length === 1 ? "Tap next corner →" : "Keep going — almost there"}
-              </span>
             )}
           </div>
 
-          {/* Right: gallery switch + reset + re-shoot */}
-          <div style={{ display: "flex", gap: 6 }}>
+          {/* Right: gallery switch + reset + re-shoot — fixed width */}
+          <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
             {/* Re-shoot: shown when frame is frozen from live capture */}
             {capturedLiveFrame && captureMode === "gallery" && phase === "active" && (
               <button
