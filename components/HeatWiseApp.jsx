@@ -2804,20 +2804,31 @@ const HomeDashboard = ({ navigate, me, resumeProject }) => {
 };
 
 /* ══════════════════════════════════════════════════════════════════
-   PROJECT CREATION (multi-step form)
+   PROJECT CREATION — 4-step wizard
+   Step 1: Name + Location
+   Step 2: Surface Type
+   Step 3: Primary Goal
+   Step 4: Safety Filters → Create
 ══════════════════════════════════════════════════════════════════ */
+const PC_STEPS = ['Name', 'Surface', 'Goal', 'Safety'];
+
 const ProjectCreation = ({ navigate, setPhotoSession }) => {
-  const [name,setName]=useState('');const [surf,setSurf]=useState('');const [goal,setGoal]=useState('');
-  const [petSafe,setPetSafe]=useState(false);const [childSafe,setChildSafe]=useState(false);
-  const [creating,setCreating]=useState(false);
-  const [createErr,setCreateErr]=useState(null);
-  const surfs=[
+  const [step, setStep]             = useState(0);
+  const [name, setName]             = useState('');
+  const [surf, setSurf]             = useState('');
+  const [goal, setGoal]             = useState('');
+  const [petSafe, setPetSafe]       = useState(false);
+  const [childSafe, setChildSafe]   = useState(false);
+  const [creating, setCreating]     = useState(false);
+  const [createErr, setCreateErr]   = useState(null);
+
+  const surfs = [
     {id:'rooftop', e:'🏢', l:'ROOFTOP',  s:'Flat or pitched building roof',        img:'https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?w=800&q=80'},
     {id:'balcony', e:'🌇', l:'BALCONY',  s:'Apartment or building balcony',         img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80'},
     {id:'terrace', e:'🏡', l:'TERRACE',  s:'Ground or podium level terrace',        img:'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80'},
     {id:'indoor',  e:'🪴', l:'INDOOR',   s:'Sunlit indoor space or windowsill',     img:'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?w=800&q=80'},
   ];
-  const goals=[
+  const goals = [
     {id:'cooling',     e:'❄️', l:'COOLING',      s:'Reduce surface & ambient temperature', img:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80'},
     {id:'food',        e:'🥗', l:'FOOD GARDEN',  s:'Grow edibles, herbs & vegetables',     img:'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=800&q=80'},
     {id:'aesthetic',   e:'🌸', l:'AESTHETIC',    s:'Visual beauty & seasonal blooms',      img:'https://images.unsplash.com/photo-1490750967868-88df5691cc34?w=800&q=80'},
@@ -2825,204 +2836,237 @@ const ProjectCreation = ({ navigate, setPhotoSession }) => {
     {id:'privacy',     e:'🛡️', l:'PRIVACY',      s:'Screening, windbreak & natural shade', img:'https://images.unsplash.com/photo-1558905586-b025a657ed0b?w=800&q=80'},
     {id:'energy',      e:'⚡', l:'ENERGY',        s:'Lower AC load and energy costs',       img:'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&q=80'},
   ];
-  return(
-    <div style={{paddingBottom:100,height:'100%',overflowY:'auto'}}>
-      <div className="navbar">
-        <button onClick={()=>navigate('home')} style={{background:'none',border:'none',cursor:'pointer',display:'flex'}}><Ic n="back" s={22} c={T.green}/></button>
+
+  const canNext = [
+    !!name.trim(),   // step 0
+    !!surf,          // step 1
+    !!goal,          // step 2
+    true,            // step 3 — safety filters optional
+  ];
+
+  /* ── Shared header ── */
+  const Header = () => (
+    <>
+      <div className="navbar" style={{borderBottom:'1px solid rgba(56,189,248,.08)'}}>
+        <button onClick={()=>{ if(step===0) navigate('home'); else setStep(s=>s-1); }}
+          style={{background:'none',border:'none',cursor:'pointer',display:'flex',padding:8}}>
+          <Ic n="back" s={22} c={T.green}/>
+        </button>
         <div style={{position:'absolute',left:'50%',transform:'translateX(-50%)',textAlign:'center'}}>
           <div className="mono" style={{fontSize:13,fontWeight:700,color:T.textBright,letterSpacing:'2px'}}>NEW SCAN</div>
-          <div className="mono" style={{fontSize:9,color:'rgba(56,189,248,.4)',letterSpacing:'1px'}}>01 / 04</div>
+          <div className="mono" style={{fontSize:9,color:'rgba(56,189,248,.4)',letterSpacing:'1px'}}>{String(step+1).padStart(2,'0')} / 04</div>
         </div>
       </div>
-      <div className="hprog"><div className="hprog-fill" style={{width:'25%'}}/></div>
-      <div style={{padding:'0 20px'}}>
-        <div className="a1" style={{marginBottom:20}}>
-          <div className="slabel">PROJECT DESIGNATION</div>
-          <input className="hinp mono" placeholder="e.g. HOME-ROOF-001" value={name} onChange={e=>setName(e.target.value)}/>
+      {/* Step-dot progress */}
+      <div style={{display:'flex',gap:6,padding:'12px 20px 0'}}>
+        {PC_STEPS.map((label,i)=>(
+          <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+            <div style={{height:3,width:'100%',borderRadius:2,background:i<=step?T.green:'rgba(56,189,248,.15)',boxShadow:i===step?`0 0 8px ${T.green}`:'',transition:'all .3s'}}/>
+            <div className="mono" style={{fontSize:8,letterSpacing:'1px',color:i<=step?T.green:'rgba(56,189,248,.3)',fontWeight:i===step?700:400}}>{label.toUpperCase()}</div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+
+  /* ── Bottom CTA ── */
+  const NextBtn = ({ label='Next →', disabled=false, onClick }) => (
+    <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(4,9,26,.97)',padding:'16px 20px 32px',borderTop:'1px solid rgba(56,189,248,.1)',maxWidth:430,margin:'0 auto',zIndex:50}}>
+      <button className={`gbtn${!disabled?' fill':''}`} disabled={disabled} onClick={onClick}
+        style={{width:'100%',padding:'16px',borderRadius:14,fontSize:14,fontWeight:700,letterSpacing:'.5px'}}>
+        {label}
+      </button>
+    </div>
+  );
+
+  /* ══ STEP 0 — Name + Location ══ */
+  if (step === 0) return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto'}}>
+      <Header/>
+      <div style={{padding:'28px 20px 120px',flex:1}}>
+        {/* Hero hint */}
+        <div style={{marginBottom:28,textAlign:'center'}}>
+          <div style={{fontSize:32,marginBottom:8}}>🌿</div>
+          <div style={{fontSize:20,fontWeight:700,color:T.textBright,letterSpacing:'.5px'}}>Name your project</div>
+          <div style={{fontSize:13,color:T.textDim,marginTop:6,lineHeight:1.5}}>Give it a unique label so you can find it later</div>
         </div>
-        <div className="a2" style={{marginBottom:20}}>
-          <div className="slabel">COORDINATES</div>
+        <div style={{marginBottom:20}}>
+          <div className="slabel">PROJECT DESIGNATION</div>
+          <input className="hinp mono" placeholder="e.g. HOME-ROOF-001" value={name} onChange={e=>setName(e.target.value)}
+            style={{fontSize:15}} autoFocus/>
+        </div>
+        <div style={{marginBottom:20}}>
+          <div className="slabel">LOCATION</div>
           <div style={{position:'relative'}}>
             <input className="hinp mono" defaultValue="Patiāla, Punjab · 30.3398° N" style={{paddingLeft:42}}/>
             <div style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)'}}><Ic n="map" s={16} c="rgba(56,189,248,.5)"/></div>
           </div>
-          {/* Mini map */}
-          <div style={{height:80,marginTop:8,background:'rgba(56,189,248,.04)',border:'1px solid rgba(56,189,248,.14)',position:'relative',overflow:'hidden'}}>
+          <div style={{height:80,marginTop:8,background:'rgba(56,189,248,.04)',border:'1px solid rgba(56,189,248,.14)',borderRadius:10,position:'relative',overflow:'hidden'}}>
             <div style={{position:'absolute',inset:0,backgroundImage:'repeating-linear-gradient(0deg,transparent,transparent 14px,rgba(56,189,248,.06) 14px,rgba(56,189,248,.06) 15px),repeating-linear-gradient(90deg,transparent,transparent 14px,rgba(56,189,248,.06) 14px,rgba(56,189,248,.06) 15px)'}}/>
             <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',width:10,height:10,background:T.green,boxShadow:`0 0 12px ${T.green}`}}/>
             <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',width:24,height:24,border:`1px solid ${T.green}`,animation:'ping 1.5s ease-out infinite'}}/>
           </div>
         </div>
-        <div className="a3" style={{marginBottom:20}}>
-          <div className="slabel">SURFACE TYPE</div>
-          {surfs.map((s,i)=>{
-            const sel=surf===s.id;
-            return(
-              <div key={s.id} onClick={()=>setSurf(s.id)} style={{
-                position:'relative',height:72,borderRadius:18,overflow:'hidden',
-                marginBottom:10,cursor:'pointer',
-                border:`2px solid ${sel?T.green:'transparent'}`,
-                boxShadow:sel?`0 0 0 1px ${T.green},0 4px 20px rgba(45,106,79,.20)`:'0 2px 10px rgba(0,0,0,.10)',
-                transition:'all .22s ease',
-                animation:`growUp .4s ${i*.07}s ease both`,
-              }}>
-                {/* background image */}
-                <img src={s.img} alt={s.l} style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}
-                  onError={e=>{e.target.style.display='none';}}/>
-                {/* gradient overlay */}
-                <div style={{position:'absolute',inset:0,background:sel
-                  ?'linear-gradient(90deg,rgba(27,67,50,.82) 0%,rgba(45,106,79,.55) 60%,rgba(45,106,79,.30) 100%)'
-                  :'linear-gradient(90deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.42) 60%,rgba(0,0,0,.18) 100%)'
-                }}/>
-                {/* content row */}
-                <div style={{position:'relative',zIndex:2,display:'flex',alignItems:'center',gap:14,height:'100%',padding:'0 18px'}}>
-                  <div style={{
-                    width:40,height:40,borderRadius:12,
-                    background:sel?'rgba(255,255,255,.22)':'rgba(255,255,255,.14)',
-                    display:'flex',alignItems:'center',justifyContent:'center',
-                    fontSize:20,flexShrink:0,
-                    border:`1px solid ${sel?'rgba(255,255,255,.40)':'rgba(255,255,255,.18)'}`,
-                  }}>{s.e}</div>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:13,fontWeight:800,color:'#fff',letterSpacing:'2px',fontFamily:"'Space Grotesk',sans-serif"}}>{s.l}</div>
-                    <div style={{fontSize:11,color:'rgba(255,255,255,.72)',marginTop:2,fontFamily:"'DM Sans',sans-serif"}}>{s.s}</div>
-                  </div>
-                  {/* check */}
-                  <div style={{
-                    width:22,height:22,borderRadius:6,flexShrink:0,
-                    border:`2px solid ${sel?T.greenLight:'rgba(255,255,255,.40)'}`,
-                    background:sel?T.green:'transparent',
-                    display:'flex',alignItems:'center',justifyContent:'center',
-                    transition:'all .2s',
-                  }}>
-                    {sel&&<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                  </div>
+      </div>
+      <NextBtn disabled={!name.trim()} onClick={()=>setStep(1)}/>
+    </div>
+  );
+
+  /* ══ STEP 1 — Surface Type ══ */
+  if (step === 1) return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto'}}>
+      <Header/>
+      <div style={{padding:'28px 20px 120px',flex:1}}>
+        <div style={{marginBottom:24,textAlign:'center'}}>
+          <div style={{fontSize:32,marginBottom:8}}>🏗️</div>
+          <div style={{fontSize:20,fontWeight:700,color:T.textBright}}>Select surface type</div>
+          <div style={{fontSize:13,color:T.textDim,marginTop:6}}>Where will the garden be installed?</div>
+        </div>
+        {surfs.map((s,i)=>{
+          const sel=surf===s.id;
+          return(
+            <div key={s.id} onClick={()=>setSurf(s.id)} style={{
+              position:'relative',height:76,borderRadius:18,overflow:'hidden',marginBottom:12,cursor:'pointer',
+              border:`2px solid ${sel?T.green:'transparent'}`,
+              boxShadow:sel?`0 0 0 1px ${T.green},0 4px 20px rgba(45,106,79,.22)`:'0 2px 10px rgba(0,0,0,.10)',
+              transition:'all .22s ease',animation:`growUp .4s ${i*.07}s ease both`,
+            }}>
+              <img src={s.img} alt={s.l} style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.style.display='none';}}/>
+              <div style={{position:'absolute',inset:0,background:sel?'linear-gradient(90deg,rgba(27,67,50,.85) 0%,rgba(45,106,79,.55) 60%,rgba(45,106,79,.28) 100%)':'linear-gradient(90deg,rgba(0,0,0,.74) 0%,rgba(0,0,0,.42) 60%,rgba(0,0,0,.16) 100%)'}}/>
+              <div style={{position:'relative',zIndex:2,display:'flex',alignItems:'center',gap:14,height:'100%',padding:'0 18px'}}>
+                <div style={{width:42,height:42,borderRadius:12,background:sel?'rgba(255,255,255,.22)':'rgba(255,255,255,.14)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0,border:`1px solid ${sel?'rgba(255,255,255,.40)':'rgba(255,255,255,.18)'}`}}>{s.e}</div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:13,fontWeight:800,color:'#fff',letterSpacing:'2px',fontFamily:"'Space Grotesk',sans-serif"}}>{s.l}</div>
+                  <div style={{fontSize:11,color:'rgba(255,255,255,.72)',marginTop:2}}>{s.s}</div>
+                </div>
+                <div style={{width:22,height:22,borderRadius:6,flexShrink:0,border:`2px solid ${sel?T.greenLight:'rgba(255,255,255,.40)'}`,background:sel?T.green:'transparent',display:'flex',alignItems:'center',justifyContent:'center',transition:'all .2s'}}>
+                  {sel&&<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                 </div>
               </div>
-            );
-          })}
+            </div>
+          );
+        })}
+      </div>
+      <NextBtn disabled={!surf} onClick={()=>setStep(2)}/>
+    </div>
+  );
+
+  /* ══ STEP 2 — Primary Goal ══ */
+  if (step === 2) return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto'}}>
+      <Header/>
+      <div style={{padding:'28px 20px 120px',flex:1}}>
+        <div style={{marginBottom:24,textAlign:'center'}}>
+          <div style={{fontSize:32,marginBottom:8}}>🎯</div>
+          <div style={{fontSize:20,fontWeight:700,color:T.textBright}}>What's your main goal?</div>
+          <div style={{fontSize:13,color:T.textDim,marginTop:6}}>We'll tailor species and layouts to match</div>
         </div>
-        <div className="a4" style={{marginBottom:20}}>
-          <div className="slabel">PRIMARY OBJECTIVE</div>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
           {goals.map((g,i)=>{
             const sel=goal===g.id;
             return(
               <div key={g.id} onClick={()=>setGoal(g.id)} style={{
-                position:'relative',height:80,borderRadius:16,overflow:'hidden',
-                cursor:'pointer',
+                position:'relative',height:90,borderRadius:16,overflow:'hidden',cursor:'pointer',
                 border:`2px solid ${sel?T.green:'transparent'}`,
                 boxShadow:sel?`0 0 0 1px ${T.green},0 4px 18px rgba(45,106,79,.22)`:'0 2px 8px rgba(0,0,0,.10)',
-                transition:'all .22s ease',
-                animation:`growUp .4s ${i*.06}s ease both`,
+                transition:'all .22s ease',animation:`growUp .4s ${i*.06}s ease both`,
               }}>
-                {/* background image */}
-                <img src={g.img} alt={g.l} style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}
-                  onError={e=>{e.target.style.display='none';}}/>
-                {/* overlay */}
-                <div style={{position:'absolute',inset:0,background:sel
-                  ?'linear-gradient(160deg,rgba(27,67,50,.80),rgba(45,106,79,.50))'
-                  :'linear-gradient(160deg,rgba(0,0,0,.68),rgba(0,0,0,.35))'
-                }}/>
-                {/* content */}
+                <img src={g.img} alt={g.l} style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}} onError={e=>{e.target.style.display='none';}}/>
+                <div style={{position:'absolute',inset:0,background:sel?'linear-gradient(160deg,rgba(27,67,50,.82),rgba(45,106,79,.52))':'linear-gradient(160deg,rgba(0,0,0,.70),rgba(0,0,0,.36))'}}/>
                 <div style={{position:'relative',zIndex:2,display:'flex',flexDirection:'column',justifyContent:'flex-end',height:'100%',padding:'0 12px 10px'}}>
-                  <div style={{fontSize:16,marginBottom:3}}>{g.e}</div>
+                  <div style={{fontSize:17,marginBottom:3}}>{g.e}</div>
                   <div style={{fontSize:11,fontWeight:800,color:'#fff',letterSpacing:'1.5px',fontFamily:"'Space Grotesk',sans-serif"}}>{g.l}</div>
-                  <div style={{fontSize:9.5,color:'rgba(255,255,255,.65)',marginTop:1,lineHeight:1.3,fontFamily:"'DM Sans',sans-serif"}}>{g.s}</div>
+                  <div style={{fontSize:9,color:'rgba(255,255,255,.62)',marginTop:1,lineHeight:1.3}}>{g.s}</div>
                 </div>
-                {/* selected tick */}
-                {sel&&<div style={{
-                  position:'absolute',top:10,right:10,
-                  width:18,height:18,borderRadius:5,
-                  background:T.green,
-                  display:'flex',alignItems:'center',justifyContent:'center',
-                }}>
+                {sel&&<div style={{position:'absolute',top:8,right:8,width:18,height:18,borderRadius:5,background:T.green,display:'flex',alignItems:'center',justifyContent:'center'}}>
                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>}
               </div>
             );
           })}
-          </div>
         </div>
+      </div>
+      <NextBtn disabled={!goal} onClick={()=>setStep(3)}/>
+    </div>
+  );
 
-        {/* ── Safety Filters ── */}
-        <div className="a5" style={{marginBottom:20}}>
-          <div className="slabel">SAFETY FILTERS</div>
-          <div style={{display:'flex',gap:10}}>
-            {[
-              {key:'pet',  label:'Pet Safe',   icon:'\ud83d\udc3e', desc:'Non-toxic to dogs & cats',      active:petSafe,  set:setPetSafe},
-              {key:'child',label:'Child Safe',  icon:'\ud83d\udc76', desc:'Safe for children & toddlers',  active:childSafe,set:setChildSafe},
-            ].map(({key,label,icon,desc,active,set})=>(
-              <div key={key} onClick={()=>set(v=>!v)}
-                style={{
-                  flex:1,padding:'12px 10px',borderRadius:14,cursor:'pointer',
-                  border:`1.5px solid ${active?'rgba(56,189,248,.6)':'rgba(56,189,248,.15)'}`,
-                  background:active?'rgba(56,189,248,.12)':'rgba(6,14,34,.6)',
-                  transition:'all .2s',display:'flex',flexDirection:'column',alignItems:'center',gap:6,
-                }}
-              >
-                <div style={{fontSize:26}}>{icon}</div>
-                <div style={{fontSize:11,fontWeight:700,color:active?T.green:T.textBright,letterSpacing:'.5px',textAlign:'center'}}>{label}</div>
-                <div style={{fontSize:9,color:T.textDim,textAlign:'center',lineHeight:1.4}}>{desc}</div>
-                <div style={{
-                  marginTop:4,width:20,height:20,borderRadius:'50%',
-                  border:`1.5px solid ${active?T.green:'rgba(56,189,248,.3)'}`,
-                  background:active?T.green:'transparent',
-                  display:'flex',alignItems:'center',justifyContent:'center',
-                }}>
-                  {active&&<Ic n="check" s={10} c="#04091A"/>}
-                </div>
-              </div>
-            ))}
-          </div>
-          {(petSafe||childSafe)&&(
-            <div style={{marginTop:8,padding:'8px 12px',borderRadius:10,background:'rgba(56,189,248,.06)',border:'1px solid rgba(56,189,248,.12)'}}>
-              <div style={{fontSize:10,color:T.green,fontWeight:700,marginBottom:2}}>Filter active</div>
-              <div style={{fontSize:10,color:T.textDim,lineHeight:1.5}}>
-                {petSafe&&childSafe?'Plants will be filtered to only show species safe for both pets and children.'
-                  :petSafe?'Plants will exclude species toxic to dogs and cats (ASPCA-verified).'
-                  :'Plants will exclude species unsafe for children and toddlers.'}
+  /* ══ STEP 3 — Safety Filters + Create ══ */
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto'}}>
+      <Header/>
+      <div style={{padding:'28px 20px 120px',flex:1}}>
+        <div style={{marginBottom:28,textAlign:'center'}}>
+          <div style={{fontSize:32,marginBottom:8}}>🛡️</div>
+          <div style={{fontSize:20,fontWeight:700,color:T.textBright}}>Safety preferences</div>
+          <div style={{fontSize:13,color:T.textDim,marginTop:6,lineHeight:1.5}}>Optional — we'll filter species to match</div>
+        </div>
+        <div style={{display:'flex',gap:12,marginBottom:20}}>
+          {[
+            {key:'pet',  label:'Pet Safe',  icon:'🐾', desc:'Non-toxic to dogs & cats',     active:petSafe,  set:setPetSafe},
+            {key:'child',label:'Child Safe', icon:'👶', desc:'Safe for children & toddlers', active:childSafe,set:setChildSafe},
+          ].map(({key,label,icon,desc,active,set})=>(
+            <div key={key} onClick={()=>set(v=>!v)} style={{
+              flex:1,padding:'20px 14px',borderRadius:18,cursor:'pointer',
+              border:`2px solid ${active?T.green:'rgba(56,189,248,.15)'}`,
+              background:active?'rgba(45,106,79,.12)':'rgba(6,14,34,.6)',
+              transition:'all .2s',display:'flex',flexDirection:'column',alignItems:'center',gap:8,
+              boxShadow:active?`0 0 0 1px ${T.green},0 4px 18px rgba(45,106,79,.18)`:'none',
+            }}>
+              <div style={{fontSize:34}}>{icon}</div>
+              <div style={{fontSize:13,fontWeight:700,color:active?T.green:T.textBright,letterSpacing:'.3px',textAlign:'center'}}>{label}</div>
+              <div style={{fontSize:10,color:T.textDim,textAlign:'center',lineHeight:1.4}}>{desc}</div>
+              <div style={{width:24,height:24,borderRadius:'50%',border:`2px solid ${active?T.green:'rgba(56,189,248,.3)'}`,background:active?T.green:'transparent',display:'flex',alignItems:'center',justifyContent:'center',transition:'all .2s'}}>
+                {active&&<Ic n="check" s={12} c="#fff"/>}
               </div>
             </div>
-          )}
+          ))}
         </div>
-        {createErr && (
-          <div className="mono" style={{fontSize:10,color:T.orange,marginTop:12,letterSpacing:"1px"}}>{createErr}</div>
-        )}
+
+        {/* Summary card */}
+        <div style={{padding:'16px',borderRadius:16,background:'rgba(56,189,248,.05)',border:'1px solid rgba(56,189,248,.12)',marginBottom:16}}>
+          <div className="mono" style={{fontSize:10,color:T.textDim,letterSpacing:'1px',marginBottom:10}}>SUMMARY</div>
+          {[
+            {label:'Project', value:name},
+            {label:'Surface', value:surfs.find(s=>s.id===surf)?.l || surf},
+            {label:'Goal',    value:goals.find(g=>g.id===goal)?.l || goal},
+            {label:'Safety',  value:[petSafe&&'Pet Safe',childSafe&&'Child Safe'].filter(Boolean).join(', ')||'None'},
+          ].map(({label,value})=>(
+            <div key={label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
+              <span className="mono" style={{fontSize:10,color:T.textDim,letterSpacing:'.5px'}}>{label.toUpperCase()}</span>
+              <span style={{fontSize:12,fontWeight:600,color:T.textBright}}>{value}</span>
+            </div>
+          ))}
+        </div>
+        {createErr && <div className="mono" style={{fontSize:10,color:T.orange,letterSpacing:'1px',marginBottom:8}}>{createErr}</div>}
       </div>
-      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(4,9,26,.97)',padding:'16px 20px 32px',borderTop:'1px solid rgba(56,189,248,.1)',maxWidth:430,margin:'0 auto'}}>
-        <button
-          className={`gbtn${name&&surf&&goal&&!creating?' fill':''}`}
-          disabled={!name||!surf||!goal||creating}
-          onClick={async ()=>{
-            setCreateErr(null);
-            setCreating(true);
-            const goalMap={cooling:'cooling',food:'food',aesthetic:'aesthetic',biodiversity:'biodiversity',privacy:'privacy',energy:'cooling'};
-            const primaryGoal=goalMap[goal]||'mixed';
-            const meta={name,location:"Patiāla, Punjab",surfaceType:surf,primaryGoal:goal,petSafe,childSafe};
-            try{
-              const res=await fetch("/api/projects",{
-                method:"POST",
-                headers:{"Content-Type":"application/json"},
-                body:JSON.stringify({name,location:"Patiāla, Punjab",surfaceType:surf,primaryGoal,area:0,obstacles:"Unknown"}),
-              });
-              const data=await res.json().catch(()=>({}));
-              const projectId=res.ok&&data?.id ? data.id : ('local-'+Math.random().toString(36).slice(2,9));
-              setPhotoSession(prev=>({...prev,projectId,projectMeta:meta}));
-              navigate('measure');
-            }catch{
-              // Network error — proceed with local-only session
-              const projectId='local-'+Math.random().toString(36).slice(2,9);
-              setPhotoSession(prev=>({...prev,projectId,projectMeta:meta}));
-              navigate('measure');
-            }finally{
-              setCreating(false);
-            }
-          }}
-        >
-          {creating?"Creating project…":"Proceed to Measurements →"}
-        </button>
-      </div>
+      <NextBtn
+        label={creating ? 'Creating project…' : 'Create Project →'}
+        disabled={creating}
+        onClick={async ()=>{
+          setCreateErr(null);
+          setCreating(true);
+          const goalMap={cooling:'cooling',food:'food',aesthetic:'aesthetic',biodiversity:'biodiversity',privacy:'privacy',energy:'cooling'};
+          const primaryGoal=goalMap[goal]||'mixed';
+          const meta={name,location:"Patiāla, Punjab",surfaceType:surf,primaryGoal:goal,petSafe,childSafe};
+          try{
+            const res=await fetch("/api/projects",{
+              method:"POST",
+              headers:{"Content-Type":"application/json"},
+              body:JSON.stringify({name,location:"Patiāla, Punjab",surfaceType:surf,primaryGoal,area:0,obstacles:"Unknown"}),
+            });
+            const data=await res.json().catch(()=>({}));
+            const projectId=res.ok&&data?.id ? data.id : ('local-'+Math.random().toString(36).slice(2,9));
+            setPhotoSession(prev=>({...prev,projectId,projectMeta:meta}));
+            navigate('measure');
+          }catch{
+            const projectId='local-'+Math.random().toString(36).slice(2,9);
+            setPhotoSession(prev=>({...prev,projectId,projectMeta:meta}));
+            navigate('measure');
+          }finally{
+            setCreating(false);
+          }
+        }}
+      />
     </div>
   );
 };
