@@ -6891,8 +6891,7 @@ const PLANT_PHOTOS = {
  */
 const PlantImg = ({ code, type, emoji, size = 56, round = 10, style = {} }) => {
   const src = PLANT_PHOTOS[code] || PLANT_PHOTOS[type];
-  const [err, setErr] = useState(false);
-  if (!src || err) {
+  if (!src) {
     return (
       <span style={{ fontSize: size * 0.55, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', width: size, height: size, flexShrink: 0, ...style }}>
         {emoji}
@@ -6900,12 +6899,21 @@ const PlantImg = ({ code, type, emoji, size = 56, round = 10, style = {} }) => {
     );
   }
   return (
-    <img
-      src={src}
-      alt={code || type}
-      onError={() => setErr(true)}
-      style={{ width: size, height: size, objectFit: 'cover', borderRadius: round, display: 'block', flexShrink: 0, ...style }}
-    />
+    <span style={{ position: 'relative', display: 'inline-flex', width: size, height: size, flexShrink: 0, borderRadius: round, overflow: 'hidden', ...style }}>
+      <img
+        src={src}
+        alt={code || type}
+        onError={e => {
+          e.currentTarget.style.display = 'none';
+          const fb = e.currentTarget.nextSibling;
+          if (fb) fb.style.display = 'flex';
+        }}
+        style={{ width: size, height: size, objectFit: 'cover', display: 'block', flexShrink: 0 }}
+      />
+      <span style={{ fontSize: size * 0.55, lineHeight: 1, display: 'none', alignItems: 'center', justifyContent: 'center', position: 'absolute', inset: 0 }}>
+        {emoji}
+      </span>
+    </span>
   );
 };
 
