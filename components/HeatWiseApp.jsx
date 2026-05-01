@@ -10,9 +10,7 @@ import { BottomNav } from "@/components/heatwise/ui/BottomNav";
 import { buildInstallerExport } from "@/lib/installerExport";
 import { LiveARMeasurementScreen } from "@/live-ar/screens/LiveARMeasurementScreen";
 import { useSession } from "next-auth/react";
-import { PhoneLoginScreen } from "@/components/heatwise/auth/PhoneLoginScreen";
-import { CompleteProfileScreen } from "@/components/heatwise/auth/CompleteProfileScreen";
-import { OTPVerificationScreen } from "@/components/heatwise/auth/OTPVerificationScreen";
+import { IntroSlides } from "@/components/heatwise/IntroSlides";
 import {
   buildRecommendationGenerateRequestFromPhotoSession,
   buildGenerateLayoutRequestBody,
@@ -2815,6 +2813,7 @@ const PC_STEPS = ['Name', 'Surface', 'Goal', 'Safety'];
 const ProjectCreation = ({ navigate, setPhotoSession }) => {
   const [step, setStep]             = useState(0);
   const [name, setName]             = useState('');
+  const [location, setLocation]     = useState('');
   const [surf, setSurf]             = useState('');
   const [goal, setGoal]             = useState('');
   const [petSafe, setPetSafe]       = useState(false);
@@ -2898,7 +2897,7 @@ const ProjectCreation = ({ navigate, setPhotoSession }) => {
         <div style={{marginBottom:20}}>
           <div className="slabel">LOCATION</div>
           <div style={{position:'relative'}}>
-            <input className="hinp mono" defaultValue="Patiāla, Punjab · 30.3398° N" style={{paddingLeft:42}}/>
+            <input className="hinp mono" value={location} onChange={e=>setLocation(e.target.value)} placeholder="e.g. Mumbai, Maharashtra" style={{paddingLeft:42}}/>
             <div style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)'}}><Ic n="map" s={16} c="rgba(56,189,248,.5)"/></div>
           </div>
           <div style={{height:80,marginTop:8,background:'rgba(56,189,248,.04)',border:'1px solid rgba(56,189,248,.14)',borderRadius:10,position:'relative',overflow:'hidden'}}>
@@ -3047,21 +3046,20 @@ const ProjectCreation = ({ navigate, setPhotoSession }) => {
           setCreating(true);
           const goalMap={cooling:'cooling',food:'food',aesthetic:'aesthetic',biodiversity:'biodiversity',privacy:'privacy',energy:'cooling'};
           const primaryGoal=goalMap[goal]||'mixed';
-          const meta={name,location:"Patiāla, Punjab",surfaceType:surf,primaryGoal:goal,petSafe,childSafe};
+          const loc=location.trim()||'Unknown location';
+          const meta={name,location:loc,surfaceType:surf,primaryGoal:goal,petSafe,childSafe};
           try{
             const res=await fetch("/api/projects",{
               method:"POST",
               headers:{"Content-Type":"application/json"},
-              body:JSON.stringify({name,location:"Patiāla, Punjab",surfaceType:surf,primaryGoal,area:0,obstacles:"Unknown"}),
+              body:JSON.stringify({name,location:loc,surfaceType:surf,primaryGoal,area:0,obstacles:"Unknown"}),
             });
             const data=await res.json().catch(()=>({}));
-            const projectId=res.ok&&data?.id ? data.id : ('local-'+Math.random().toString(36).slice(2,9));
-            setPhotoSession(prev=>({...prev,projectId,projectMeta:meta}));
+            if(!res.ok) throw new Error(data?.message||'Failed to create project. Please try again.');
+            setPhotoSession(prev=>({...prev,projectId:data.id,projectMeta:meta}));
             navigate('measure');
-          }catch{
-            const projectId='local-'+Math.random().toString(36).slice(2,9);
-            setPhotoSession(prev=>({...prev,projectId,projectMeta:meta}));
-            navigate('measure');
+          }catch(e){
+            setCreateErr(e instanceof Error ? e.message : 'Failed to create project. Please try again.');
           }finally{
             setCreating(false);
           }
@@ -3843,8 +3841,9 @@ const ResultScreen = ({ navigate, selectedRecommendation, photoSession, setActiv
           onConfirm={(cropFrac, maskDataUrl, userPrompt) => {
             setShowFrameSelect(false);
             setRunwareLoading(true);
+            const timeout=setTimeout(()=>setRunwareLoading(false),45000);
             generateRunwareVisualization?.({ frameCrop: cropFrac, frameMask: maskDataUrl, userPrompt: userPrompt || undefined })
-              .finally(() => setRunwareLoading(false));
+              .finally(()=>{clearTimeout(timeout);setRunwareLoading(false);});
           }}
         />
       )}
@@ -3867,7 +3866,7 @@ const ResultScreen = ({ navigate, selectedRecommendation, photoSession, setActiv
             </div>
             <div style={{display:'flex',gap:6,alignItems:'center'}}>
               {photoSession?.runwareVisualization?.imageUrl && (
-                <button onClick={async()=>{setRunwareLoading(true);await generateRunwareVisualization?.({});setRunwareLoading(false);}}
+                <button onClick={async()=>{setRunwareLoading(true);const to=setTimeout(()=>setRunwareLoading(false),45000);await generateRunwareVisualization?.({}).catch(()=>{});clearTimeout(to);setRunwareLoading(false);}}
                   style={{background:'rgba(212,175,55,0.10)',border:'1px solid rgba(212,175,55,0.30)',borderRadius:7,padding:'3px 8px',cursor:'pointer',fontSize:9,color:'#e8c14e',fontFamily:"'DM Sans',sans-serif",fontWeight:700}}>
                   ↺ Regen
                 </button>
@@ -3917,7 +3916,7 @@ const ResultScreen = ({ navigate, selectedRecommendation, photoSession, setActiv
               </div>
               <div style={{position:'absolute',bottom:0,left:0,right:0,padding:'10px 14px',background:'linear-gradient(transparent,rgba(4,9,26,0.92))',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                 <span style={{fontSize:9,letterSpacing:'1.5px',color:'rgba(186,230,253,0.55)',fontFamily:"'JetBrains Mono',monospace"}}>PHOTOREALISTIC · RUNWARE AI</span>
-                <button onClick={async()=>{setRunwareLoading(true);await generateRunwareVisualization?.({});setRunwareLoading(false);}}
+                <button onClick={async()=>{setRunwareLoading(true);const to=setTimeout(()=>setRunwareLoading(false),45000);await generateRunwareVisualization?.({}).catch(()=>{});clearTimeout(to);setRunwareLoading(false);}}
                   style={{background:'rgba(212,175,55,0.12)',border:'1px solid rgba(212,175,55,0.35)',borderRadius:8,padding:'4px 10px',cursor:'pointer',fontSize:10,color:'#e8c14e',fontFamily:"'DM Sans',sans-serif",fontWeight:700}}>
                   ↺ Regenerate
                 </button>
@@ -4040,7 +4039,6 @@ const ResultScreen = ({ navigate, selectedRecommendation, photoSession, setActiv
           onClick={async () => {
             setRunwareError(null);
             setRunwareLoading(true);
-            // If no selectedRecommendation, pass allPlants directly so generation still works
             const opts = selectedRecommendation ? {} : {
               scoredPlants: allPlants.map((p, i) => ({
                 plant: { name: p.name, type: p.type ?? 'herb', heightM: p.heightM ?? 0.5 },
@@ -4049,7 +4047,9 @@ const ResultScreen = ({ navigate, selectedRecommendation, photoSession, setActiv
                 relevanceScore: p.coolingScore ?? 50,
               })),
             };
-            const result = await generateRunwareVisualization?.(opts);
+            const to=setTimeout(()=>{setRunwareLoading(false);setRunwareError('Visualisation timed out. Please try again.');},45000);
+            const result = await generateRunwareVisualization?.(opts).catch(()=>({error:'Generation failed'}));
+            clearTimeout(to);
             setRunwareLoading(false);
             if (result?.error) setRunwareError(result.error);
           }}
@@ -4765,14 +4765,7 @@ async function fetchLayoutRecommendationsForSession(photoSession, userId) {
     return { recommendations: recs, telemetryMeta, generateLatencyMs, layoutSource: "canonical" };
   }
 
-  if (typeof console !== "undefined" && console.warn) {
-    const ls = data?.layoutSlate;
-    console.warn(
-      "[HeatWise] No layout recommendations from /api/recommendations/generate",
-      ls ? { layoutSlate: ls } : {},
-      "— falling back to /api/generate-layout if applicable",
-    );
-  }
+  // No layout recommendations from primary endpoint — falling back to legacy endpoint
   const legacyBody = buildGenerateLayoutRequestBody(photoSession ?? {});
   res = await fetch("/api/generate-layout", {
     method: "POST",
@@ -4865,8 +4858,8 @@ const ReportScreen = ({ navigate, selectedRecommendation, photoSession, me, setP
   const heatSummary = selectedRecommendation?.heatReductionSummary || null;
   const tabs=['THERMAL','SPECIES','IMPACT'];
   const repTitle=photoSession?.projectMeta?.name
-    ? `${photoSession.projectMeta.name} · ${photoSession.projectMeta.location || "Patiāla"}`
-    : "Home Rooftop · Patiāla, Punjab";
+    ? `${photoSession.projectMeta.name} · ${photoSession.projectMeta.location || "Unknown location"}`
+    : "My Garden Project";
   return(
     <div style={{paddingBottom:20}}>
       <div className="navbar">
@@ -5354,6 +5347,8 @@ const InstallScreen = ({ navigate, selectedRecommendation, photoSession, me, set
 ══════════════════════════════════════════════════════════════════ */
 const SavedScreen = ({ navigate, setPhotoSession, setActivePhotoRecommendation }) => {
   const [f,setF]=useState('ALL');
+  const [q,setQ]=useState('');
+  const [showSearch,setShowSearch]=useState(false);
   const [sessions,setSessions]=useState([]);
   const [loading,setLoading]=useState(false);
   const filters=['ALL','ROOFTOP','BALCONY','ANALYZED','DRAFT'];
@@ -5374,16 +5369,17 @@ const SavedScreen = ({ navigate, setPhotoSession, setActivePhotoRecommendation }
 
   const projects=sessions.map(s=>({
     id:s.id,
-    n:`Session ${s.id.slice(0,6)}`,
-    a:s.widthM && s.lengthM ? `${s.widthM}m x ${s.lengthM}m` : "Unknown size",
-    type:'ROOFTOP',
+    n:s.projectMeta?.name || s.name || `Scan ${new Date(s.createdAt??s.capturedAt??Date.now()).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}`,
+    a:s.widthM && s.lengthM ? `${s.widthM}m × ${s.lengthM}m` : "Area not measured",
+    type:(s.projectMeta?.surfaceType||s.surfaceType||'ROOFTOP').toUpperCase(),
     score:Math.min(100,Math.round((s.widthM ?? 6)*(s.lengthM ?? 7))),
     s:s.measurementStatus === "ar_complete" ? "ANALYZED" : "DRAFT",
-    d:new Date(s.createdAt ?? s.capturedAt ?? Date.now()).toLocaleDateString(),
+    d:new Date(s.createdAt ?? s.capturedAt ?? Date.now()).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
     c:s.measurementStatus === "ar_complete" ? T.green : T.textDim,
   }));
 
-  const filtered=f==='ALL'?projects:projects.filter(p=>p.type===f||p.s===f);
+  const filtered=(f==='ALL'?projects:projects.filter(p=>p.type===f||p.s===f))
+    .filter(p=>!q.trim()||(p.n+p.a+p.type).toLowerCase().includes(q.toLowerCase()));
   return(
     <div style={{paddingBottom:80,position:'relative',overflow:'hidden',background:'rgba(5,8,18,0.88)'}}>
       <div style={{position:'absolute',top:0,left:0,right:0,height:300,pointerEvents:'none',opacity:.4}}><DataOrb/></div>
@@ -5392,9 +5388,14 @@ const SavedScreen = ({ navigate, setPhotoSession, setActivePhotoRecommendation }
           <div className="mono" style={{fontSize:9,letterSpacing:'2px',color:'rgba(56,189,248,.5)'}}>// SYSTEM</div>
           <div style={{fontSize:20,fontWeight:800,color:T.textBright,letterSpacing:'1px'}}>MY SCANS</div>
         </div>
-        <button style={{background:'none',border:'none',cursor:'pointer',marginLeft:'auto',display:'flex'}}><Ic n="search" s={18} c="rgba(56,189,248,.5)"/></button>
+        <button onClick={()=>setShowSearch(s=>!s)} style={{background:'none',border:'none',cursor:'pointer',marginLeft:'auto',display:'flex'}}><Ic n="search" s={18} c={showSearch?"rgba(56,189,248,.9)":"rgba(56,189,248,.5)"}/></button>
       </div>
         <div style={{padding:'14px 20px 0',position:'relative',zIndex:2}}>
+        {showSearch&&(
+          <input autoFocus value={q} onChange={e=>setQ(e.target.value)} placeholder="Search by name or type…"
+            className="hinp mono" style={{marginBottom:12,fontSize:13}}
+            onKeyDown={e=>e.key==='Escape'&&(setShowSearch(false),setQ(''))}/>
+        )}
         <div className="slabel" style={{marginBottom:8}}>Filter scans</div>
         <div className="scan-pill-row">
           {filters.map(fi=>(
@@ -5409,6 +5410,15 @@ const SavedScreen = ({ navigate, setPhotoSession, setActivePhotoRecommendation }
           ))}
         </div>
         <div className="mono" style={{fontSize:10,letterSpacing:'1.5px',color:T.textDim,marginBottom:14}}>{filtered.length} RECORDS FOUND</div>
+        {loading&&<div style={{display:'flex',justifyContent:'center',padding:'40px 0'}}><div style={{width:32,height:32,borderRadius:'50%',border:`2px solid ${T.green}`,borderTopColor:'transparent',animation:'rotateSlow .7s linear infinite'}}/></div>}
+        {!loading&&filtered.length===0&&(
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'60px 20px',textAlign:'center'}}>
+            <div style={{fontSize:44,marginBottom:14}}>📂</div>
+            <div style={{fontSize:15,fontWeight:700,color:T.textBright,marginBottom:8}}>{q?'No matching scans':'No scans yet'}</div>
+            <div style={{fontSize:12,color:T.textDim,lineHeight:1.6,maxWidth:240,marginBottom:20}}>{q?'Try a different search term.':'Start your first garden scan to see it here.'}</div>
+            {!q&&<button onClick={()=>navigate('create')} className="gbtn fill" style={{borderRadius:12,padding:'11px 24px',fontSize:13}}>Start a Scan →</button>}
+          </div>
+        )}
         {filtered.map((p,i)=>(
           <div
             key={p.id ?? p.n}
@@ -5501,7 +5511,13 @@ const SavedScreen = ({ navigate, setPhotoSession, setActivePhotoRecommendation }
    SETTINGS
 ══════════════════════════════════════════════════════════════════ */
 const SettingsScreen = () => {
-  const [dark,setDark]=useState(true);const [notif,setNotif]=useState(true);const [ds,setDs]=useState(true);
+  const ls=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v==='true';}catch{return d;}};
+  const [dark,setDark]=useState(()=>ls('hw_dark',true));
+  const [notif,setNotif]=useState(()=>ls('hw_notif',true));
+  const [ds,setDs]=useState(()=>ls('hw_ds',true));
+  const togDark=v=>{setDark(v);try{localStorage.setItem('hw_dark',v);}catch{}};
+  const togNotif=v=>{setNotif(v);try{localStorage.setItem('hw_notif',v);}catch{}};
+  const togDs=v=>{setDs(v);try{localStorage.setItem('hw_ds',v);}catch{}};
   const [profile, setProfile] = useState(null);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileError, setProfileError] = useState(null);
@@ -5719,13 +5735,13 @@ const SettingsScreen = () => {
 
         <Sec t="PREFERENCES">
           <Row ic="globe" l="Units" sub="Measurement system" v="METRIC"/>
-          <Row ic="bell" l="Notifications" sub="Analysis alerts & tips" tog={notif} onT={()=>setNotif(!notif)}/>
-          <Row ic="moon" l="Dark Mode" tog={dark} onT={()=>setDark(!dark)}/>
+          <Row ic="bell" l="Notifications" sub="Analysis alerts & tips" tog={notif} onT={()=>togNotif(!notif)}/>
+          <Row ic="moon" l="Dark Mode" tog={dark} onT={()=>togDark(!dark)}/>
         </Sec>
         <Sec t="ANALYSIS ENGINE">
           <Row ic="map" l="Default Location" v="PATIĀLA"/>
           <Row ic="target" l="AI Model" sub="Processing preset" v="BALANCED"/>
-          <Row ic="chart" l="Data Sharing" sub="Improves model accuracy" tog={ds} onT={()=>setDs(!ds)}/>
+          <Row ic="chart" l="Data Sharing" sub="Improves model accuracy" tog={ds} onT={()=>togDs(!ds)}/>
         </Sec>
         <Sec t="ACCOUNT">
           <Row ic="lock" l="Privacy Policy"/>
@@ -8212,117 +8228,64 @@ const CarbonDashboardScreen = ({ navigate }) => {
    SCREEN 23 — IMPACT DASHBOARD
 ══════════════════════════════════════════════════════════════════ */
 const ImpactDashboardScreen=({navigate})=>{
-  const [pulse,setPulse]=useState(false);
-  useEffect(()=>{const t=setInterval(()=>setPulse(p=>!p),1800);return()=>clearInterval(t);},[]);
-  const COMING_FEATURES=[
-    {icon:'🌱',label:'CO₂ Offset Tracker',desc:'Monthly carbon offset from your gardens',  bg:'rgba(34,197,94,0.18)',  border:'rgba(34,197,94,0.35)'},
-    {icon:'🌡️',label:'Cooling Analytics',  desc:'Surface temperature reduction data',       bg:'rgba(56,189,248,0.18)', border:'rgba(56,189,248,0.35)'},
-    {icon:'💧',label:'Water Conservation', desc:'Savings vs concrete/paved surfaces',        bg:'rgba(34,211,238,0.18)', border:'rgba(34,211,238,0.35)'},
-    {icon:'🌍',label:'City Contribution',  desc:"Your share of the city-wide green goal",   bg:'rgba(52,211,153,0.18)', border:'rgba(52,211,153,0.35)'},
-    {icon:'📈',label:'6-Month Trends',     desc:'Visual progress charts & milestones',       bg:'rgba(251,191,36,0.18)', border:'rgba(251,191,36,0.35)'},
-    {icon:'🏆',label:'Impact Score',       desc:'Ranked vs other gardeners in your city',    bg:'rgba(249,115,22,0.18)', border:'rgba(249,115,22,0.35)'},
+  const STATS=[
+    {icon:'🌱',label:'CO₂ Offset',value:'—',unit:'kg/yr',color:'rgba(34,197,94,0.9)',bg:'rgba(34,197,94,0.1)',border:'rgba(34,197,94,0.25)'},
+    {icon:'🌡️',label:'Cooling Effect',value:'—',unit:'°C avg',color:'rgba(56,189,248,0.9)',bg:'rgba(56,189,248,0.1)',border:'rgba(56,189,248,0.25)'},
+    {icon:'💧',label:'Water Saved',value:'—',unit:'L/mo',color:'rgba(34,211,238,0.9)',bg:'rgba(34,211,238,0.1)',border:'rgba(34,211,238,0.25)'},
+    {icon:'🏆',label:'Impact Score',value:'—',unit:'pts',color:'rgba(251,191,36,0.9)',bg:'rgba(251,191,36,0.1)',border:'rgba(251,191,36,0.25)'},
   ];
   return(
-    <div style={{minHeight:'100%',background:'rgba(0,0,0,0.04)',paddingBottom:90}}>
-      {/* Navbar */}
-      <div className="navbar" style={{background:'rgba(10,45,18,0.72)',backdropFilter:'blur(24px)',borderBottom:'1px solid rgba(120,200,140,0.25)'}}>
-        <button onClick={()=>navigate('home')} style={{background:'none',border:'none',cursor:'pointer',display:'flex'}}><Ic n="back" s={22} c="#FFFFFF"/></button>
+    <div style={{minHeight:'100%',background:'linear-gradient(180deg,#04091A 0%,#071524 100%)',paddingBottom:90}}>
+      <div className="navbar" style={{borderBottom:'1px solid rgba(56,189,248,0.08)'}}>
+        <button onClick={()=>navigate('home')} style={{background:'none',border:'none',cursor:'pointer',display:'flex'}}><Ic n="back" s={22} c={T.sky}/></button>
         <div style={{position:'absolute',left:'50%',transform:'translateX(-50%)',textAlign:'center'}}>
-          <div style={{fontSize:14,fontWeight:700,color:'#FFFFFF',fontFamily:"'Space Grotesk',sans-serif"}}>Your Impact</div>
+          <div className="mono" style={{fontSize:11,letterSpacing:'3px',color:T.green,fontWeight:700}}>IMPACT</div>
         </div>
         <div style={{width:32}}/>
       </div>
 
       {/* Hero */}
-      <div style={{display:'flex',flexDirection:'column',alignItems:'center',padding:'48px 28px 32px',textAlign:'center'}}>
-        {/* Animated globe */}
-        <div style={{position:'relative',width:120,height:120,marginBottom:24}}>
-          {[0,1,2].map(i=>(
-            <div key={i} style={{
-              position:'absolute',
-              inset: -i*14,
-              borderRadius:'50%',
-              border:`1.5px solid rgba(82,183,136,${0.5-i*0.14})`,
-              animation:`breathe ${2.5+i*.6}s ease-in-out infinite`,
-              animationDelay:`${i*0.4}s`,
-            }}/>
-          ))}
-          <div style={{
-            position:'absolute',inset:0,borderRadius:'50%',
-            background:'linear-gradient(135deg,#1B4332,#40916C)',
-            display:'flex',alignItems:'center',justifyContent:'center',
-            boxShadow:'0 8px 32px rgba(45,106,79,0.5)',
-            fontSize:52,
-          }}>🌍</div>
-        </div>
-
-        {/* Coming Soon badge */}
-        <div style={{
-          background:'linear-gradient(135deg,rgba(251,191,36,0.22),rgba(249,115,22,0.18))',
-          border:'1.5px solid rgba(251,191,36,0.55)',
-          borderRadius:30,padding:'6px 20px',marginBottom:18,
-          boxShadow:'0 2px 12px rgba(251,191,36,0.2)',
-        }}>
-          <span style={{fontSize:11,fontWeight:800,letterSpacing:'2.5px',color:'#F59E0B'}}>COMING SOON</span>
-        </div>
-
-        <div style={{fontSize:26,fontWeight:800,color:'#FFFFFF',fontFamily:"'Space Grotesk',sans-serif",marginBottom:10,textShadow:'0 2px 8px rgba(0,0,0,0.4)'}}>
-          Track Your Green Impact
-        </div>
-        <div style={{fontSize:14,color:'rgba(255,255,255,0.75)',lineHeight:1.6,maxWidth:300,textShadow:'0 1px 4px rgba(0,0,0,0.4)'}}>
-          Complete your first garden project to unlock detailed environmental impact analytics.
+      <div style={{display:'flex',flexDirection:'column',alignItems:'center',padding:'40px 28px 28px',textAlign:'center'}}>
+        <div style={{fontSize:64,marginBottom:16,lineHeight:1}}>🌍</div>
+        <div style={{fontSize:22,fontWeight:800,color:T.textBright,marginBottom:10,letterSpacing:'.3px'}}>Your Environmental Impact</div>
+        <div style={{fontSize:13,color:T.textDim,lineHeight:1.6,maxWidth:300}}>
+          Complete your first garden scan to start tracking your real-world impact on city heat and carbon.
         </div>
       </div>
 
-      {/* Feature preview cards */}
+      {/* Stat cards — empty state */}
+      <div style={{padding:'0 16px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:28}}>
+        {STATS.map((s,i)=>(
+          <div key={i} style={{background:s.bg,border:`1.5px solid ${s.border}`,borderRadius:18,padding:'18px 14px',display:'flex',flexDirection:'column',gap:6}}>
+            <div style={{fontSize:26}}>{s.icon}</div>
+            <div style={{fontSize:22,fontWeight:800,color:s.color,letterSpacing:'.5px'}}>{s.value}</div>
+            <div style={{fontSize:10,color:T.textDim,fontWeight:600,letterSpacing:'1px'}}>{s.label.toUpperCase()}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* How it works */}
       <div style={{padding:'0 16px',marginBottom:24}}>
-        <div style={{fontSize:10,fontWeight:700,letterSpacing:'2px',color:'rgba(255,255,255,0.6)',marginBottom:12,textAlign:'center',textShadow:'0 1px 4px rgba(0,0,0,0.4)'}}>WHAT YOU'LL UNLOCK</div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-          {COMING_FEATURES.map((f,i)=>(
-            <div key={i} style={{
-              background:'rgba(255,255,255,0.55)',
-              backdropFilter:'blur(20px)',
-              WebkitBackdropFilter:'blur(20px)',
-              border:'1.5px solid rgba(255,255,255,0.75)',
-              borderRadius:18,padding:'16px 14px 14px',
-              boxShadow:'0 6px 20px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.8)',
-              position:'relative',overflow:'hidden',
-            }}>
-              {/* lock badge */}
-              <div style={{position:'absolute',top:8,right:8,background:'rgba(0,0,0,0.08)',borderRadius:8,padding:'2px 5px',fontSize:9,color:'rgba(0,0,0,0.35)',fontWeight:700}}>🔒</div>
-              {/* Icon circle */}
-              <div style={{
-                width:44,height:44,borderRadius:14,
-                background:f.bg,
-                border:`1.5px solid ${f.border}`,
-                display:'flex',alignItems:'center',justifyContent:'center',
-                fontSize:22,marginBottom:10,
-                boxShadow:`0 3px 10px ${f.bg}`,
-              }}>{f.icon}</div>
-              <div style={{fontSize:12,fontWeight:800,color:'#1B4332',marginBottom:4,lineHeight:1.2}}>{f.label}</div>
-              <div style={{fontSize:10.5,color:'#40916C',lineHeight:1.45}}>{f.desc}</div>
+        <div className="mono" style={{fontSize:10,letterSpacing:'2px',color:T.textDim,marginBottom:12}}>HOW IT WORKS</div>
+        {[
+          ['1','Scan your rooftop or terrace','Measure area with the AR tool'],
+          ['2','Get plant recommendations','AI matches species to your space'],
+          ['3','Track your real impact','CO₂, cooling & water data auto-calculated'],
+        ].map(([n,t,s])=>(
+          <div key={n} style={{display:'flex',gap:12,marginBottom:14,alignItems:'flex-start'}}>
+            <div style={{width:28,height:28,borderRadius:'50%',background:'rgba(56,189,248,0.1)',border:'1px solid rgba(56,189,248,0.25)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800,color:T.sky,flexShrink:0}}>{n}</div>
+            <div>
+              <div style={{fontSize:13,fontWeight:700,color:T.textBright,marginBottom:2}}>{t}</div>
+              <div style={{fontSize:11,color:T.textDim,lineHeight:1.5}}>{s}</div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
 
-      {/* CTA */}
       <div style={{padding:'0 16px'}}>
-        <button
-          onClick={()=>navigate('create')}
-          style={{
-            width:'100%',padding:'15px',borderRadius:14,border:'none',cursor:'pointer',
-            background:'linear-gradient(135deg,#2D6A4F,#52B788)',
-            color:'#FFFFFF',fontSize:15,fontWeight:700,
-            boxShadow:'0 6px 24px rgba(45,106,79,0.45)',
-            letterSpacing:'0.3px',
-          }}
-        >
-          Start Your First Garden →
+        <button onClick={()=>navigate('create')} className="gbtn fill" style={{width:'100%',padding:'15px',borderRadius:14,fontSize:14,fontWeight:700}}>
+          Start Your First Scan →
         </button>
-        <div style={{textAlign:'center',marginTop:12,fontSize:11,color:'rgba(255,255,255,0.55)',textShadow:'0 1px 4px rgba(0,0,0,0.4)'}}>
-          Impact unlocks after your first completed project
-        </div>
       </div>
     </div>
   );
@@ -8331,58 +8294,22 @@ const ImpactDashboardScreen=({navigate})=>{
 /* ══════════════════════════════════════════════════════════════════
    SCREEN 24 — NOTIFICATIONS
 ══════════════════════════════════════════════════════════════════ */
-const MOCK_NOTIFS=[
-  {id:1,icon:'🤖',title:'AI Analysis Complete',body:'Your rooftop scan at Sector 12 is ready. 3 species recommended.',time:'2h ago',type:'scan',read:false},
-  {id:2,icon:'🔧',title:'Installer Reply',body:'GreenBuild Solutions has sent a quote for your project.',time:'5h ago',type:'installer',read:false},
-  {id:3,icon:'🌡',title:'Heat Alert',body:'Patiāla is experiencing extreme heat (46°C). Green cover is critical.',time:'1d ago',type:'alert',read:true},
-  {id:4,icon:'🌿',title:'Tip of the Day',body:'Vetiver grass can reduce surface temperature by up to 4°C. Learn more.',time:'1d ago',type:'tip',read:true},
-  {id:5,icon:'📊',title:'Monthly Report Ready',body:'Your February impact report is available to download.',time:'2d ago',type:'report',read:true},
-  {id:6,icon:'🏆',title:'Impact Milestone',body:"Congratulations! You've offset 100kg CO₂ this year.",time:'3d ago',type:'achievement',read:true},
-];
 const NotificationsScreen=({navigate})=>{
-  const [notifs,setNotifs]=useState(MOCK_NOTIFS);
-  const [read,setRead]=useState(false);
-  const typeColor={scan:T.green,installer:T.sky,alert:T.heat,tip:T.earth,report:T.sun,achievement:T.green};
-  const unread=notifs.filter(n=>!n.read).length;
   return(
     <div style={{background:'rgba(242,243,247,0.92)',minHeight:'100%'}}>
       <div className="navbar">
         <button onClick={()=>navigate('home')} style={{background:'none',border:'none',cursor:'pointer',display:'flex'}}><Ic n="back" s={22} c={T.green}/></button>
         <div style={{position:'absolute',left:'50%',transform:'translateX(-50%)',textAlign:'center'}}>
           <div style={{fontSize:14,fontWeight:700,color:T.textBright,fontFamily:"'Space Grotesk',sans-serif"}}>Notifications</div>
-          {unread>0&&!read&&<div style={{fontSize:10,color:T.heat,fontFamily:"'DM Sans',sans-serif",fontWeight:600}}>{unread} new</div>}
         </div>
-        {(unread>0||!read)?
-          <button onClick={()=>{setNotifs(n=>n.map(x=>({...x,read:true})));setRead(true);}} style={{background:'none',border:'none',cursor:'pointer',fontSize:11,color:T.green,fontFamily:"'DM Sans',sans-serif",fontWeight:600}}>
-            Clear
-          </button>
-        :<div style={{width:40}}/>}
+        <div style={{width:40}}/>
       </div>
-      <div style={{paddingBottom:90}}>
-        {notifs.length===0?(
-          <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 32px',textAlign:'center'}}>
-            <div style={{fontSize:52,marginBottom:16,animation:'leafFloat 3s ease-in-out infinite'}}>🌿</div>
-            <div style={{fontSize:16,fontWeight:700,color:T.textBright,fontFamily:"'Space Grotesk',sans-serif",marginBottom:8}}>All caught up!</div>
-            <div style={{fontSize:13,color:T.textDim,fontFamily:"'DM Sans',sans-serif"}}>No new notifications</div>
-          </div>
-        ):(
-          notifs.map((n,i)=>(
-            <div key={n.id} className="notif-item" style={{animationDelay:`${i*.05}s`,background:n.read?'transparent':'rgba(56,189,248,.03)'}}
-              onClick={()=>setNotifs(prev=>prev.map(x=>x.id===n.id?{...x,read:true}:x))}>
-              <div style={{width:40,height:40,borderRadius:12,background:`${typeColor[n.type]||T.green}14`,border:`1px solid ${typeColor[n.type]||T.green}25`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0,position:'relative'}}>
-                {n.emoji||n.icon}
-                {!n.read&&<div style={{position:'absolute',top:-2,right:-2,width:7,height:7,borderRadius:'50%',background:T.heat,border:`1.5px solid ${T.bg}`}}/>}
-              </div>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:3}}>
-                  <span style={{fontSize:13,fontWeight:n.read?500:700,color:n.read?T.text:T.textBright,fontFamily:"'DM Sans',sans-serif"}}>{n.title}</span>
-                  <span style={{fontSize:9,color:T.textDim,fontFamily:"'DM Sans',sans-serif",flexShrink:0,marginLeft:8}}>{n.time}</span>
-                </div>
-                <div style={{fontSize:11,color:T.textDim,fontFamily:"'DM Sans',sans-serif",lineHeight:1.4}}>{n.body}</div>
-              </div>
-            </div>
-          ))
-        )}
+      <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 32px',textAlign:'center'}}>
+        <div style={{fontSize:52,marginBottom:16}}>🌿</div>
+        <div style={{fontSize:16,fontWeight:700,color:T.textBright,fontFamily:"'Space Grotesk',sans-serif",marginBottom:8}}>All caught up!</div>
+        <div style={{fontSize:13,color:T.textDim,fontFamily:"'DM Sans',sans-serif",lineHeight:1.6,maxWidth:260}}>
+          You'll get notified when your scan results are ready, or when installers reply to your quotes.
+        </div>
       </div>
     </div>
   );
@@ -9935,7 +9862,7 @@ const PhotoARMeasurementScreen = ({ navigate, photoSession, setPhotoSession }) =
       floorLevel: prev?.floorLevel ?? 1,
       measurementCompletedAt: new Date().toISOString(),
     }));
-    navigate("environment");
+    navigate("locationSpecies");
   };
 
   const handleCancel = () => {
@@ -10030,6 +9957,385 @@ const WIND_META={
   moderate: {label:'MODERATE',   color:'#F9C74F', icon:'💨'},
   windy:    {label:'WINDY',      color:'#F4845F', icon:'🌪'},
   severe:   {label:'SEVERE',     color:'#E63946', icon:'⛈'},
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   LOCATION & SPECIES SCREEN (Step 2 in new flow)
+   Auto-detects location → climate data → recommended species
+══════════════════════════════════════════════════════════════════ */
+const LocationSpeciesScreen = ({ navigate, photoSession, setPhotoSession }) => {
+  const [phase, setPhase] = useState('detecting'); // detecting|loaded|error|search
+  const [envData, setEnvData] = useState(null);
+  const [cityQ, setCityQ] = useState('');
+  const [cityResults, setCityResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [err, setErr] = useState('');
+
+  const heatColor = h => ({ low:'#38BDF8', medium:'#F9C74F', high:'#F4845F', extreme:'#E63946' }[h] ?? T.green);
+  const heatLabel = h => ({ low:'Cool Climate', medium:'Moderate Heat', high:'Hot Climate', extreme:'Extreme Heat' }[h] ?? 'Detecting…');
+  const heatEmoji = h => ({ low:'🌤', medium:'☀️', high:'🔆', extreme:'🌡️' }[h] ?? '📍');
+
+  const loadEnv = async (lat, lon) => {
+    try {
+      const res = await fetch('/api/env/detect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat, lon }),
+      });
+      if (!res.ok) throw new Error('Could not load location data');
+      const data = await res.json();
+      setEnvData(data);
+      setPhotoSession(prev => ({ ...prev, environment: { ...data, environmentSource: 'auto' } }));
+      setPhase('loaded');
+    } catch (e) {
+      setErr('Could not detect location. Search your city below.');
+      setPhase('search');
+    }
+  };
+
+  useEffect(() => {
+    navigator.geolocation?.getCurrentPosition(
+      pos => loadEnv(pos.coords.latitude, pos.coords.longitude),
+      () => { setPhase('search'); setErr('Location access denied. Search your city below.'); },
+      { timeout: 8000 }
+    );
+  }, []);
+
+  const searchCity = async q => {
+    if (!q.trim()) { setCityResults([]); return; }
+    setSearching(true);
+    try {
+      const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en&format=json`);
+      const d = await r.json();
+      setCityResults(d.results ?? []);
+    } catch { setCityResults([]); }
+    finally { setSearching(false); }
+  };
+
+  // Filter species by climate suitability
+  const recommendedSpecies = SPECIES_CATALOG.filter(s => {
+    if (!envData) return s.cooling >= 6;
+    const heat = envData.heatExposure;
+    if (heat === 'extreme' || heat === 'high') return s.drought || s.cooling >= 6;
+    if (heat === 'low') return s.sun !== 'full' || s.type === 'herb';
+    return s.cooling >= 5;
+  }).slice(0, 8);
+
+  const onNext = () => {
+    if (envData) setPhotoSession(prev => ({ ...prev, environment: { ...envData, environmentSource: 'auto' } }));
+    navigate('spaceDetails');
+  };
+
+  return (
+    <div style={{ minHeight: '100%', background: 'linear-gradient(180deg,#04091A 0%,#071524 100%)', paddingBottom: 100 }}>
+      {/* Navbar */}
+      <div className="navbar">
+        <button onClick={() => navigate('measure')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
+          <Ic n="back" s={22} c={T.green} />
+        </button>
+        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
+          <div className="mono" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: T.textBright }}>LOCATION & SPECIES</div>
+          <div className="mono" style={{ fontSize: 9, color: 'rgba(56,189,248,.4)', letterSpacing: '1px' }}>02 / 03</div>
+        </div>
+        <div style={{ width: 32 }} />
+      </div>
+      <div className="hprog"><div className="hprog-fill" style={{ width: '55%' }} /></div>
+
+      <div style={{ padding: '16px 16px 0' }}>
+
+        {/* ── Detecting ── */}
+        {phase === 'detecting' && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px', gap: 16 }}>
+            <div style={{ width: 48, height: 48, borderRadius: '50%', border: `3px solid rgba(56,189,248,.2)`, borderTop: `3px solid ${T.sky}`, animation: 'rotateSlow .8s linear infinite' }} />
+            <div style={{ fontSize: 14, color: T.textDim, fontFamily: "'DM Sans',sans-serif" }}>Detecting your location…</div>
+          </div>
+        )}
+
+        {/* ── City search fallback ── */}
+        {(phase === 'search' || phase === 'loaded') && (
+          <div style={{ marginBottom: 14 }}>
+            {err && <div style={{ fontSize: 12, color: T.orange, marginBottom: 8, fontFamily: "'DM Sans',sans-serif" }}>{err}</div>}
+            <div style={{ position: 'relative' }}>
+              <input className="hinp mono" value={cityQ} onChange={e => { setCityQ(e.target.value); searchCity(e.target.value); }}
+                placeholder="Search city or zip code…" style={{ paddingLeft: 38, fontSize: 13 }} />
+              <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }}>
+                {searching ? <div style={{ width: 14, height: 14, borderRadius: '50%', border: `2px solid ${T.green}`, borderTopColor: 'transparent', animation: 'rotateSlow .7s linear infinite' }} /> : <Ic n="search" s={14} c="rgba(56,189,248,.5)" />}
+              </div>
+            </div>
+            {cityResults.length > 0 && (
+              <div style={{ background: 'rgba(6,14,34,.98)', border: `1px solid rgba(56,189,248,.15)`, borderRadius: 12, overflow: 'hidden', marginTop: 4 }}>
+                {cityResults.map((r, i) => (
+                  <div key={r.id ?? i} onClick={() => { setCityResults([]); setCityQ(''); setPhase('detecting'); loadEnv(r.latitude, r.longitude); }}
+                    style={{ padding: '11px 14px', borderBottom: i < cityResults.length - 1 ? `1px solid rgba(56,189,248,.08)` : 'none', cursor: 'pointer', fontSize: 13, color: T.textBright, fontFamily: "'DM Sans',sans-serif" }}>
+                    📍 {r.name}{r.admin1 ? `, ${r.admin1}` : ''}{r.country ? `, ${r.country}` : ''}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Location + Climate Card ── */}
+        {phase === 'loaded' && envData && (
+          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1.5px solid rgba(56,189,248,0.15)', borderRadius: 18, padding: '18px 16px', marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+              <div style={{ fontSize: 28 }}>{heatEmoji(envData.heatExposure)}</div>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: T.textBright }}>{envData.locationLabel || 'Your Location'}</div>
+                <div style={{ fontSize: 11, color: heatColor(envData.heatExposure), fontWeight: 700, letterSpacing: '1px', marginTop: 2 }}>{heatLabel(envData.heatExposure)}</div>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+              {[
+                ['🌡️', `${Math.round(envData.dailyMaxTempC ?? envData.currentTempC ?? 32)}°C`, 'Daily Max'],
+                ['💨', `${Math.round(envData.windSpeedKmh ?? 0)} km/h`, 'Wind'],
+                ['☀️', envData.uvIndex != null ? `UV ${Math.round(envData.uvIndex)}` : 'UV —', 'UV Index'],
+              ].map(([ic, val, lbl]) => (
+                <div key={lbl} style={{ background: 'rgba(56,189,248,0.06)', borderRadius: 12, padding: '10px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 18, marginBottom: 4 }}>{ic}</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: T.textBright }}>{val}</div>
+                  <div style={{ fontSize: 9, color: T.textDim, letterSpacing: '1px', marginTop: 2 }}>{lbl.toUpperCase()}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Species Recommendations ── */}
+        {phase === 'loaded' && (
+          <>
+            <div className="mono" style={{ fontSize: 10, letterSpacing: '2px', color: T.textDim, marginBottom: 12 }}>
+              RECOMMENDED FOR YOUR CLIMATE
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+              {recommendedSpecies.map(s => (
+                <div key={s.code} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(56,189,248,0.12)', borderRadius: 16, padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 24 }}>{s.emoji}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: T.textBright, lineHeight: 1.2 }}>{s.name}</div>
+                      <div style={{ fontSize: 10, color: T.textDim, fontStyle: 'italic', lineHeight: 1.2 }}>{s.sci}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 9, background: 'rgba(34,197,94,0.12)', color: T.green, padding: '2px 6px', borderRadius: 6, fontWeight: 700 }}>Cool {s.cooling}/10</span>
+                    {s.drought && <span style={{ fontSize: 9, background: 'rgba(251,191,36,0.12)', color: T.gold, padding: '2px 6px', borderRadius: 6, fontWeight: 700 }}>Drought OK</span>}
+                    {s.petSafe && <span style={{ fontSize: 9, background: 'rgba(56,189,248,0.10)', color: T.sky, padding: '2px 6px', borderRadius: 6, fontWeight: 700 }}>Pet Safe</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ fontSize: 11, color: T.textDim, textAlign: 'center', marginBottom: 8, fontFamily: "'DM Sans',sans-serif" }}>
+              These species will be fine-tuned after you enter your space details.
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Bottom CTA */}
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(4,9,26,.97)', padding: '16px 20px 32px', borderTop: '1px solid rgba(56,189,248,.1)', maxWidth: 430, margin: '0 auto', zIndex: 50 }}>
+        <button className="gbtn fill" onClick={onNext}
+          disabled={phase === 'detecting'}
+          style={{ width: '100%', padding: '16px', borderRadius: 14, fontSize: 14, fontWeight: 700, letterSpacing: '.5px', opacity: phase === 'detecting' ? 0.5 : 1 }}>
+          {phase === 'detecting' ? 'Detecting location…' : 'Next: Space Details →'}
+        </button>
+        {phase !== 'loaded' && phase !== 'detecting' && (
+          <button onClick={onNext} style={{ background: 'none', border: 'none', color: T.textDim, fontSize: 12, cursor: 'pointer', marginTop: 10, width: '100%', textAlign: 'center' }}>
+            Skip location step →
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   SPACE DETAILS SCREEN (Step 3 in new flow)
+   User fills in space info → triggers AI generation
+══════════════════════════════════════════════════════════════════ */
+const SpaceDetailsScreen = ({ navigate, photoSession, setPhotoSession, ensureRecommendation, generatePhotoRecommendations, generateRunwareVisualization, persistPhotoSession }) => {
+  const env = photoSession?.environment ?? {};
+  const [name, setName] = useState(photoSession?.projectMeta?.name ?? '');
+  const [surf, setSurf] = useState(photoSession?.projectMeta?.surfaceType ?? '');
+  const [goal, setGoal] = useState(photoSession?.projectMeta?.primaryGoal ?? '');
+  const [sun, setSun] = useState(env.sunExposure ?? 'full');
+  const [wind, setWind] = useState(env.windLevel ?? 'medium');
+  const [budget, setBudget] = useState('medium');
+  const [petSafe, setPetSafe] = useState(photoSession?.projectMeta?.petSafe ?? false);
+  const [childSafe, setChildSafe] = useState(photoSession?.projectMeta?.childSafe ?? false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+
+  const surfs = [
+    { id: 'rooftop',  e: '🏢', l: 'ROOFTOP',  s: 'Flat or pitched roof' },
+    { id: 'balcony',  e: '🌇', l: 'BALCONY',  s: 'Apartment balcony' },
+    { id: 'terrace',  e: '🏡', l: 'TERRACE',  s: 'Ground level terrace' },
+    { id: 'indoor',   e: '🪴', l: 'INDOOR',   s: 'Sunlit indoor space' },
+  ];
+  const goals = [
+    { id: 'cooling',      e: '❄️', l: 'Cooling',      s: 'Reduce heat' },
+    { id: 'food',         e: '🥗', l: 'Food Garden',  s: 'Grow edibles' },
+    { id: 'aesthetic',    e: '🌸', l: 'Aesthetic',    s: 'Visual beauty' },
+    { id: 'biodiversity', e: '🌱', l: 'Biodiversity', s: 'Support wildlife' },
+    { id: 'privacy',      e: '🛡️', l: 'Privacy',      s: 'Natural screening' },
+    { id: 'energy',       e: '⚡', l: 'Energy',        s: 'Lower AC costs' },
+  ];
+
+  const valid = name.trim() && surf && goal;
+
+  const onGenerate = async () => {
+    if (!valid) { setErr('Please complete all fields above.'); return; }
+    setBusy(true);
+    setErr('');
+    try {
+      const goalMap = { cooling:'cooling', food:'food', aesthetic:'aesthetic', biodiversity:'biodiversity', privacy:'privacy', energy:'cooling' };
+      const primaryGoal = goalMap[goal] ?? 'mixed';
+      const loc = env.locationLabel ?? photoSession?.projectMeta?.location ?? 'Unknown location';
+      const meta = { name: name.trim(), location: loc, surfaceType: surf, primaryGoal: goal, petSafe, childSafe };
+
+      // Create project
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), location: loc, surfaceType: surf, primaryGoal, area: (photoSession?.widthM ?? 0) * (photoSession?.lengthM ?? 0), obstacles: 'Unknown' }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.message ?? 'Could not create project');
+
+      // Merge everything into photoSession
+      const spaceType = { rooftop: 'outdoor_rooftop', balcony: 'outdoor_balcony', terrace: 'outdoor_terrace', indoor: 'indoor' }[surf] ?? 'outdoor_rooftop';
+      setPhotoSession(prev => ({
+        ...prev,
+        projectId: data.id,
+        projectMeta: meta,
+        environment: {
+          ...(prev.environment ?? {}),
+          sunExposure: sun,
+          windLevel: wind,
+          spaceType,
+          budgetRange: budget,
+          environmentSource: prev.environment?.environmentSource ?? 'manual',
+        },
+      }));
+
+      navigate('analysis');
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const Card = ({ id, e, l, s, selected, onSelect }) => (
+    <button type="button" onClick={() => onSelect(id)} style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '14px 8px', borderRadius: 16,
+      border: `1.5px solid ${selected ? T.green : 'rgba(56,189,248,0.12)'}`,
+      background: selected ? 'rgba(34,197,94,0.1)' : 'rgba(255,255,255,0.03)',
+      cursor: 'pointer', transition: 'all .18s', gap: 4,
+    }}>
+      <span style={{ fontSize: 24 }}>{e}</span>
+      <span style={{ fontSize: 11, fontWeight: 800, color: selected ? T.green : T.textBright, letterSpacing: '.5px' }}>{l}</span>
+      <span style={{ fontSize: 10, color: T.textDim, textAlign: 'center', lineHeight: 1.3 }}>{s}</span>
+      {selected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: T.green, marginTop: 2 }} />}
+    </button>
+  );
+
+  const Toggle = ({ label, val, onT }) => (
+    <div onClick={onT} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 0', borderBottom: '1px solid rgba(56,189,248,0.08)', cursor: 'pointer' }}>
+      <span style={{ fontSize: 13, color: T.textBright, fontFamily: "'DM Sans',sans-serif" }}>{label}</span>
+      <div style={{ width: 44, height: 24, borderRadius: 12, background: val ? T.green : 'rgba(56,189,248,0.12)', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
+        <div style={{ position: 'absolute', top: 2, left: val ? 22 : 2, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .2s' }} />
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ minHeight: '100%', background: 'linear-gradient(180deg,#04091A 0%,#071524 100%)', paddingBottom: 110 }}>
+      {/* Navbar */}
+      <div className="navbar">
+        <button onClick={() => navigate('locationSpecies')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
+          <Ic n="back" s={22} c={T.green} />
+        </button>
+        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
+          <div className="mono" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: T.textBright }}>SPACE DETAILS</div>
+          <div className="mono" style={{ fontSize: 9, color: 'rgba(56,189,248,.4)', letterSpacing: '1px' }}>03 / 03</div>
+        </div>
+        <div style={{ width: 32 }} />
+      </div>
+      <div className="hprog"><div className="hprog-fill" style={{ width: '90%' }} /></div>
+
+      <div style={{ padding: '20px 16px 0', display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+        {/* Project Name */}
+        <div>
+          <div className="slabel" style={{ marginBottom: 8 }}>PROJECT NAME</div>
+          <input className="hinp mono" placeholder="e.g. Home Rooftop, Terrace-01" value={name}
+            onChange={e => setName(e.target.value)} style={{ fontSize: 15 }} autoFocus />
+        </div>
+
+        {/* Surface Type */}
+        <div>
+          <div className="slabel" style={{ marginBottom: 10 }}>SURFACE TYPE</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {surfs.map(s => <Card key={s.id} {...s} selected={surf === s.id} onSelect={setSurf} />)}
+          </div>
+        </div>
+
+        {/* Primary Goal */}
+        <div>
+          <div className="slabel" style={{ marginBottom: 10 }}>PRIMARY GOAL</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+            {goals.map(g => <Card key={g.id} {...g} selected={goal === g.id} onSelect={setGoal} />)}
+          </div>
+        </div>
+
+        {/* Sun & Wind (pre-filled from location) */}
+        <div>
+          <div className="slabel" style={{ marginBottom: 10 }}>SUN & WIND CONDITIONS</div>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+            {[['shade','🌥 Shade'],['partial','⛅ Partial'],['full','☀️ Full Sun']].map(([v,l])=>(
+              <button key={v} type="button" onClick={() => setSun(v)} style={{ flex: 1, padding: '10px 4px', borderRadius: 12, border: `1.5px solid ${sun===v?T.sun:'rgba(56,189,248,0.12)'}`, background: sun===v?'rgba(251,191,36,0.1)':'rgba(255,255,255,0.03)', color: sun===v?T.sun:T.textDim, fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'all .18s' }}>{l}</button>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[['low','🌬 Low'],['medium','💨 Medium'],['high','🌪 High']].map(([v,l])=>(
+              <button key={v} type="button" onClick={() => setWind(v)} style={{ flex: 1, padding: '10px 4px', borderRadius: 12, border: `1.5px solid ${wind===v?T.sky:'rgba(56,189,248,0.12)'}`, background: wind===v?'rgba(56,189,248,0.1)':'rgba(255,255,255,0.03)', color: wind===v?T.sky:T.textDim, fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'all .18s' }}>{l}</button>
+            ))}
+          </div>
+        </div>
+
+        {/* Budget */}
+        <div>
+          <div className="slabel" style={{ marginBottom: 10 }}>BUDGET RANGE</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[['low','💰 Low','Under ₹10k'],['medium','💰💰 Medium','₹10k–30k'],['high','💰💰💰 High','₹30k+']].map(([v,l,sub])=>(
+              <button key={v} type="button" onClick={() => setBudget(v)} style={{ flex: 1, padding: '12px 6px', borderRadius: 12, border: `1.5px solid ${budget===v?T.green:'rgba(56,189,248,0.12)'}`, background: budget===v?'rgba(34,197,94,0.1)':'rgba(255,255,255,0.03)', cursor: 'pointer', transition: 'all .18s', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, color: budget===v?T.green:T.textBright }}>{l}</span>
+                <span style={{ fontSize: 9, color: T.textDim }}>{sub}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Safety */}
+        <div>
+          <div className="slabel" style={{ marginBottom: 4 }}>SAFETY PREFERENCES</div>
+          <Toggle label="🐾 Pet-safe plants only" val={petSafe} onT={() => setPetSafe(p => !p)} />
+          <Toggle label="👶 Child-safe plants only" val={childSafe} onT={() => setChildSafe(p => !p)} />
+        </div>
+
+        {err && <div className="mono" style={{ fontSize: 11, color: T.orange, letterSpacing: '1px' }}>{err}</div>}
+      </div>
+
+      {/* Generate CTA */}
+      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(4,9,26,.97)', padding: '16px 20px 32px', borderTop: '1px solid rgba(56,189,248,.1)', maxWidth: 430, margin: '0 auto', zIndex: 50 }}>
+        <button className={`gbtn${valid ? ' fill' : ''}`} disabled={busy || !valid} onClick={onGenerate}
+          style={{ width: '100%', padding: '16px', borderRadius: 14, fontSize: 14, fontWeight: 700, letterSpacing: '.5px' }}>
+          {busy ? 'Creating your garden…' : '✨ Generate My Garden →'}
+        </button>
+      </div>
+    </div>
+  );
 };
 
 const EnvironmentScreen = ({ navigate, photoSession, setPhotoSession, persistPhotoSession }) => {
@@ -10458,7 +10764,9 @@ export default function App(){
   const [me, setMe] = useState(null);
   const [meLoaded, setMeLoaded] = useState(false);
   const [projects, setProjects] = useState([]);
-  const [onboarding, setOnboarding] = useState({ step: "phone", phoneNumber: "", debugOtp: null });
+  const [introDone, setIntroDone] = useState(() => {
+    try { return localStorage.getItem("hw_intro_done") === "1"; } catch { return false; }
+  });
 
   const [screen,setScreen]=useState(()=>{
     // On reload, restore last screen for authenticated flows (avoids re-showing splash)
@@ -10495,6 +10803,22 @@ export default function App(){
     runwareVisualization: null, // {imageUrl, prompt, mode, hadSeedImage, hadLayoutSchema, hadMask, createdAt}
     regenerationHistory: [],  // [{imageUrl, prompt, mode, createdAt}] — past Runware outputs
   });
+
+  const EMPTY_PHOTO_SESSION = {
+    id: null, projectId: null, projectMeta: null, environment: null,
+    capturedPhoto: null, capturedAt: null, measurementStatus: "not_started",
+    widthM: null, lengthM: null, floorLevel: null, measurementCompletedAt: null,
+    selectedRecommendation: null, generatedVisualization: null,
+    recommendations: [], recommendationTelemetrySessionId: null,
+    telemetryCandidateSnapshotIds: [], frameCrop: null, frameMask: null,
+    runwareVisualization: null, regenerationHistory: [],
+  };
+
+  const startFreshScan = useCallback(() => {
+    setPhotoSession(EMPTY_PHOTO_SESSION);
+    navigate('measure');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate]);
 
   // Ref so navigate can read current photoSession.projectId without stale closure
   const photoSessionRef = useRef(null);
@@ -10606,52 +10930,27 @@ export default function App(){
     if(savedScreen && RESUMABLE.has(savedScreen)){
       navigate(savedScreen);
     } else if (rec) navigate("result");
-    else if (ps.measurementStatus === "ar_complete") navigate("environment");
+    else if (ps.measurementStatus === "ar_complete") navigate("locationSpecies");
     else if (ps.photoData) navigate("photoMeasureAR");
     else navigate("measure");
   }, [navigate]);
 
-  // Load user profile once authenticated
+  // Load user profile (works for authenticated sessions; no-op otherwise)
   useEffect(() => {
     let alive = true;
+    if (status !== "authenticated") return;
     (async () => {
-      if (status !== "authenticated") {
-        if (alive) {
-          setMe(null);
-          setMeLoaded(false);
-        }
-        return;
-      }
       try {
         const res = await fetch("/api/user/me");
         const data = await res.json().catch(() => null);
-        if (!alive) return;
-        if (!res.ok) {
-          setMe(null);
-          setMeLoaded(true);
-          return;
-        }
+        if (!alive || !res.ok) return;
         setMe(data);
         setMeLoaded(true);
-        // Fetch projects alongside me
         fetch("/api/projects").then(r => r.ok ? r.json() : []).then(d => { if (alive && Array.isArray(d)) setProjects(d); }).catch(() => {});
-      } catch {
-        if (!alive) return;
-        setMe(null);
-        setMeLoaded(true);
-      }
+      } catch { /* silent — app works without user profile */ }
     })();
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, [status]);
-
-  // Skip splash/onboarding for already-authenticated users (e.g. after page reload)
-  useEffect(() => {
-    if (status === 'authenticated' && (screen === 'splash' || screen === 'onboarding')) {
-      setScreen('home');
-    }
-  }, [status, screen]);
 
   const persistPhotoSession = useCallback(async (snapshot) => {
     const ps = snapshot ?? photoSession;
@@ -10987,72 +11286,21 @@ export default function App(){
     setPhotoSession,
   ]);
 
-  // Auth gate (keeps existing session handling via NextAuth)
-  if (status === "unauthenticated") {
-    if (onboarding.step === "otp") {
-      return (
-        <AuthShell>
-          <OTPVerificationScreen
-            phoneNumber={onboarding.phoneNumber}
-            initialDebugOtp={onboarding.debugOtp}
-            otpDelivery={onboarding.otpDelivery}
-            otpNotice={onboarding.otpNotice}
-            devToken={onboarding.devToken ?? null}
-            expiresAt={onboarding.expiresAt ?? null}
-            onBack={() =>
-              setOnboarding({
-                step: "phone",
-                phoneNumber: "",
-                debugOtp: null,
-                otpDelivery: undefined,
-                otpNotice: null,
-                devToken: null,
-                expiresAt: null,
-              })}
-            onAuthed={() => { /* session will update */ }}
+  // Show 3-slide intro on first visit; skip if already seen
+  if (!introDone) {
+    return (
+      <>
+        <style>{CSS}</style>
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999 }}>
+          <IntroSlides
+            onDone={() => {
+              try { localStorage.setItem("hw_intro_done", "1"); } catch {}
+              setIntroDone(true);
+              navigate("home");
+            }}
           />
-        </AuthShell>
-      );
-    }
-    return (
-      <AuthShell>
-        <PhoneLoginScreen
-          onOtpSent={({ phoneNumber, debugOtp, otpDelivery, otpNotice, devToken, expiresAt }) =>
-            setOnboarding({
-              step: "otp",
-              phoneNumber,
-              debugOtp:    debugOtp    ?? null,
-              otpDelivery: otpDelivery ?? "console",
-              otpNotice:   otpNotice   ?? null,
-              devToken:    devToken    ?? null,
-              expiresAt:   expiresAt   ?? null,
-            })}
-        />
-      </AuthShell>
-    );
-  }
-
-  // Profile completion gate (skipped if user chose "Setup later")
-  const profileSkipped = (() => { try { return localStorage.getItem('hw_profile_skip') === '1'; } catch { return false; } })();
-  if (status === "authenticated" && meLoaded && me && me.profileCompleted === false && !profileSkipped) {
-    return (
-      <AuthShell>
-        <CompleteProfileScreen
-          initialProfile={me}
-          onCompleted={() => {
-            try { localStorage.removeItem('hw_profile_skip'); } catch {}
-            setMeLoaded(false);
-            fetch("/api/user/me")
-              .then(r => r.json())
-              .then(d => { setMe(d); setMeLoaded(true); })
-              .catch(() => setMeLoaded(true));
-          }}
-          onSkip={() => {
-            try { localStorage.setItem('hw_profile_skip', '1'); } catch {}
-            setMe(m => m ? { ...m, profileCompleted: true } : m);
-          }}
-        />
-      </AuthShell>
+        </div>
+      </>
     );
   }
 
@@ -11074,6 +11322,7 @@ export default function App(){
       projects,
       persistPhotoSession,
       resumeProject,
+      startFreshScan,
     };
     switch(screen){
       case 'splash':       return <SplashScreen onDone={()=>navigate('onboarding')}/>;
@@ -11086,6 +11335,8 @@ export default function App(){
       case 'home':         return <HomeDashboardLight {...p}/>;
       case 'create':      return <ProjectCreation {...p}/>;
       case 'measure':     return <MeasureScreen {...p}/>;
+      case 'locationSpecies': return <LocationSpeciesScreen {...p}/>;
+      case 'spaceDetails': return <SpaceDetailsScreen {...p}/>;
       case 'liveARMeasure':
         return (
           <LiveARMeasurementScreen
@@ -11103,7 +11354,7 @@ export default function App(){
                 capturedPhoto: capturedPhoto ?? prev.capturedPhoto,
                 capturedAt: new Date().toISOString(),
               }));
-              navigate('environment');
+              navigate('locationSpecies');
             }}
             onCancel={() => navigate('measure')}
           />
