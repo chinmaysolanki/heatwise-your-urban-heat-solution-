@@ -10814,12 +10814,6 @@ export default function App(){
     runwareVisualization: null, regenerationHistory: [],
   };
 
-  const startFreshScan = useCallback(() => {
-    setPhotoSession(EMPTY_PHOTO_SESSION);
-    navigate('measure');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
-
   // Ref so navigate can read current photoSession.projectId without stale closure
   const photoSessionRef = useRef(null);
   useEffect(() => { photoSessionRef.current = photoSession; }, [photoSession]);
@@ -10841,6 +10835,12 @@ export default function App(){
       }
     }catch{}
   },[screen]);
+
+  const startFreshScan = useCallback(() => {
+    setPhotoSession(EMPTY_PHOTO_SESSION);
+    navigate('measure');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate]);
 
   const resumeProject = useCallback(async (projectId) => {
     const res = await fetch(`/api/projects/${projectId}`);
