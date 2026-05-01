@@ -10269,10 +10269,10 @@ const LocationSpeciesScreen = ({ navigate, photoSession, setPhotoSession }) => {
 /* ══════════════════════════════════════════════════════════════════
    SPACE DETAILS SCREEN (Step 3 in new flow)
    User fills in space info → triggers AI generation
+   Project name is auto-generated — not asked again here.
 ══════════════════════════════════════════════════════════════════ */
 const SpaceDetailsScreen = ({ navigate, photoSession, setPhotoSession, ensureRecommendation, generatePhotoRecommendations, generateRunwareVisualization, persistPhotoSession }) => {
   const env = photoSession?.environment ?? {};
-  const [name, setName] = useState(photoSession?.projectMeta?.name ?? '');
   const [surf, setSurf] = useState(photoSession?.projectMeta?.surfaceType ?? '');
   const [goal, setGoal] = useState(photoSession?.projectMeta?.primaryGoal ?? '');
   const [sun, setSun] = useState(env.sunExposure ?? 'full');
@@ -10284,172 +10284,246 @@ const SpaceDetailsScreen = ({ navigate, photoSession, setPhotoSession, ensureRec
   const [err, setErr] = useState('');
 
   const surfs = [
-    { id: 'rooftop',  e: '🏢', l: 'ROOFTOP',  s: 'Flat or pitched roof' },
-    { id: 'balcony',  e: '🌇', l: 'BALCONY',  s: 'Apartment balcony' },
-    { id: 'terrace',  e: '🏡', l: 'TERRACE',  s: 'Ground level terrace' },
-    { id: 'indoor',   e: '🪴', l: 'INDOOR',   s: 'Sunlit indoor space' },
+    { id:'rooftop', e:'🏢', l:'Rooftop',  s:'Flat or pitched roof',  grad:'linear-gradient(135deg,#1B3A5C,#2563A8)', sel:'rgba(37,99,168,0.25)', bc:'rgba(56,149,248,0.6)' },
+    { id:'balcony', e:'🌇', l:'Balcony',  s:'Apartment balcony',      grad:'linear-gradient(135deg,#4A1D3A,#9D3C6E)', sel:'rgba(157,60,110,0.25)', bc:'rgba(236,120,180,0.6)' },
+    { id:'terrace', e:'🏡', l:'Terrace',  s:'Ground level terrace',   grad:'linear-gradient(135deg,#1B4332,#2D6A4F)', sel:'rgba(45,106,79,0.25)', bc:'rgba(82,183,136,0.6)' },
+    { id:'indoor',  e:'🪴', l:'Indoor',   s:'Sunlit indoor space',    grad:'linear-gradient(135deg,#3A2D0A,#8B6914)', sel:'rgba(139,105,20,0.25)', bc:'rgba(249,199,79,0.6)' },
   ];
   const goals = [
-    { id: 'cooling',      e: '❄️', l: 'Cooling',      s: 'Reduce heat' },
-    { id: 'food',         e: '🥗', l: 'Food Garden',  s: 'Grow edibles' },
-    { id: 'aesthetic',    e: '🌸', l: 'Aesthetic',    s: 'Visual beauty' },
-    { id: 'biodiversity', e: '🌱', l: 'Biodiversity', s: 'Support wildlife' },
-    { id: 'privacy',      e: '🛡️', l: 'Privacy',      s: 'Natural screening' },
-    { id: 'energy',       e: '⚡', l: 'Energy',        s: 'Lower AC costs' },
+    { id:'cooling',      e:'❄️', l:'Cool Heat',   c:'#38BDF8', bg:'rgba(56,189,248,0.15)', bc:'rgba(56,189,248,0.5)' },
+    { id:'food',         e:'🥗', l:'Grow Food',   c:'#52B788', bg:'rgba(82,183,136,0.15)', bc:'rgba(82,183,136,0.5)' },
+    { id:'aesthetic',    e:'🌸', l:'Beauty',       c:'#F472B6', bg:'rgba(244,114,182,0.15)', bc:'rgba(244,114,182,0.5)' },
+    { id:'biodiversity', e:'🦋', l:'Wildlife',    c:'#A78BFA', bg:'rgba(167,139,250,0.15)', bc:'rgba(167,139,250,0.5)' },
+    { id:'privacy',      e:'🌿', l:'Privacy',     c:'#34D399', bg:'rgba(52,211,153,0.15)', bc:'rgba(52,211,153,0.5)' },
+    { id:'energy',       e:'⚡', l:'Save Energy', c:'#FBBF24', bg:'rgba(251,191,36,0.15)', bc:'rgba(251,191,36,0.5)' },
   ];
 
-  const valid = name.trim() && surf && goal;
+  const valid = surf && goal;
 
   const onGenerate = async () => {
-    if (!valid) { setErr('Please complete all fields above.'); return; }
-    setBusy(true);
-    setErr('');
+    if (!valid) { setErr('Please pick a surface type and goal.'); return; }
+    setBusy(true); setErr('');
     try {
       const goalMap = { cooling:'cooling', food:'food', aesthetic:'aesthetic', biodiversity:'biodiversity', privacy:'privacy', energy:'cooling' };
       const primaryGoal = goalMap[goal] ?? 'mixed';
       const loc = env.locationLabel ?? photoSession?.projectMeta?.location ?? 'Unknown location';
-      const meta = { name: name.trim(), location: loc, surfaceType: surf, primaryGoal: goal, petSafe, childSafe };
+      // Auto-generate name: "Rooftop · May 2026"
+      const surfLabel = surfs.find(s => s.id === surf)?.l ?? 'Garden';
+      const autoName = `${surfLabel} · ${new Date().toLocaleDateString('en-IN', { month:'short', year:'numeric' })}`;
+      const name = photoSession?.projectMeta?.name?.trim() || autoName;
+      const meta = { name, location: loc, surfaceType: surf, primaryGoal: goal, petSafe, childSafe };
 
-      // Create project
       const res = await fetch('/api/projects', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), location: loc, surfaceType: surf, primaryGoal, area: (photoSession?.widthM ?? 0) * (photoSession?.lengthM ?? 0), obstacles: 'Unknown' }),
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ name, location: loc, surfaceType: surf, primaryGoal, area:(photoSession?.widthM??0)*(photoSession?.lengthM??0), obstacles:'Unknown' }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message ?? 'Could not create project');
 
-      // Merge everything into photoSession
-      const spaceType = { rooftop: 'outdoor_rooftop', balcony: 'outdoor_balcony', terrace: 'outdoor_terrace', indoor: 'indoor' }[surf] ?? 'outdoor_rooftop';
+      const spaceType = { rooftop:'outdoor_rooftop', balcony:'outdoor_balcony', terrace:'outdoor_terrace', indoor:'indoor' }[surf] ?? 'outdoor_rooftop';
       setPhotoSession(prev => ({
-        ...prev,
-        projectId: data.id,
-        projectMeta: meta,
-        environment: {
-          ...(prev.environment ?? {}),
-          sunExposure: sun,
-          windLevel: wind,
-          spaceType,
-          budgetRange: budget,
-          environmentSource: prev.environment?.environmentSource ?? 'manual',
-        },
+        ...prev, projectId: data.id, projectMeta: meta,
+        environment: { ...(prev.environment ?? {}), sunExposure:sun, windLevel:wind, spaceType, budgetRange:budget, environmentSource:prev.environment?.environmentSource ?? 'manual' },
       }));
-
       navigate('analysis');
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
-    } finally {
-      setBusy(false);
-    }
+    } finally { setBusy(false); }
   };
 
-  const Card = ({ id, e, l, s, selected, onSelect }) => (
-    <button type="button" onClick={() => onSelect(id)} style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '14px 8px', borderRadius: 16,
-      border: `1.5px solid ${selected ? T.green : 'rgba(56,189,248,0.12)'}`,
-      background: selected ? 'rgba(34,197,94,0.1)' : 'rgba(255,255,255,0.03)',
-      cursor: 'pointer', transition: 'all .18s', gap: 4,
-    }}>
-      <span style={{ fontSize: 24 }}>{e}</span>
-      <span style={{ fontSize: 11, fontWeight: 800, color: selected ? T.green : T.textBright, letterSpacing: '.5px' }}>{l}</span>
-      <span style={{ fontSize: 10, color: T.textDim, textAlign: 'center', lineHeight: 1.3 }}>{s}</span>
-      {selected && <div style={{ width: 6, height: 6, borderRadius: '50%', background: T.green, marginTop: 2 }} />}
-    </button>
+  const SurfCard = ({ id, e, l, s, grad, sel, bc }) => {
+    const on = surf === id;
+    return (
+      <button type="button" onClick={() => setSurf(id)} style={{
+        display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+        padding:'18px 10px', borderRadius:20, border:`2px solid ${on ? bc : 'rgba(255,255,255,0.08)'}`,
+        background: on ? sel : 'rgba(255,255,255,0.04)',
+        cursor:'pointer', gap:8, transition:'all .2s ease', position:'relative', overflow:'hidden',
+        boxShadow: on ? `0 0 20px ${bc.replace('0.6','0.3')}` : 'none',
+      }}>
+        {on && <div style={{ position:'absolute', inset:0, background:grad, opacity:0.18, pointerEvents:'none' }} />}
+        <span style={{ fontSize:30, lineHeight:1, position:'relative', zIndex:1 }}>{e}</span>
+        <span style={{ fontSize:13, fontWeight:800, color: on ? '#fff' : 'rgba(255,255,255,0.7)', position:'relative', zIndex:1 }}>{l}</span>
+        <span style={{ fontSize:10, color:'rgba(255,255,255,0.40)', textAlign:'center', lineHeight:1.35, position:'relative', zIndex:1 }}>{s}</span>
+        {on && <div style={{ width:20, height:3, borderRadius:4, background:bc.replace('0.6','1'), marginTop:2, position:'relative', zIndex:1 }} />}
+      </button>
+    );
+  };
+
+  const GoalChip = ({ id, e, l, c, bg, bc }) => {
+    const on = goal === id;
+    return (
+      <button type="button" onClick={() => setGoal(id)} style={{
+        display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+        padding:'14px 6px', borderRadius:16, border:`1.5px solid ${on ? bc : 'rgba(255,255,255,0.08)'}`,
+        background: on ? bg : 'rgba(255,255,255,0.04)',
+        cursor:'pointer', gap:6, transition:'all .2s ease',
+        boxShadow: on ? `0 0 16px ${bc.replace('0.5','0.2')}` : 'none',
+      }}>
+        <span style={{ fontSize:26, lineHeight:1 }}>{e}</span>
+        <span style={{ fontSize:11, fontWeight:800, color: on ? c : 'rgba(255,255,255,0.60)' }}>{l}</span>
+      </button>
+    );
+  };
+
+  const CondBtn = ({ active, color, bg, onClick, children }) => (
+    <button type="button" onClick={onClick} style={{
+      flex:1, padding:'11px 4px', borderRadius:13,
+      border:`1.5px solid ${active ? color : 'rgba(255,255,255,0.09)'}`,
+      background: active ? bg : 'rgba(255,255,255,0.04)',
+      color: active ? color : 'rgba(255,255,255,0.50)',
+      fontSize:11.5, fontWeight:700, cursor:'pointer', transition:'all .18s',
+      boxShadow: active ? `0 0 10px ${bg}` : 'none',
+    }}>{children}</button>
   );
 
   const Toggle = ({ label, val, onT }) => (
-    <div onClick={onT} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 0', borderBottom: '1px solid rgba(56,189,248,0.08)', cursor: 'pointer' }}>
-      <span style={{ fontSize: 13, color: T.textBright, fontFamily: "'DM Sans',sans-serif" }}>{label}</span>
-      <div style={{ width: 44, height: 24, borderRadius: 12, background: val ? T.green : 'rgba(56,189,248,0.12)', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
-        <div style={{ position: 'absolute', top: 2, left: val ? 22 : 2, width: 20, height: 20, borderRadius: '50%', background: '#fff', transition: 'left .2s' }} />
+    <div onClick={onT} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 0', borderBottom:'1px solid rgba(255,255,255,0.06)', cursor:'pointer' }}>
+      <span style={{ fontSize:13, color:'rgba(255,255,255,0.75)', fontFamily:"'DM Sans',sans-serif" }}>{label}</span>
+      <div style={{ width:46, height:26, borderRadius:13, background: val ? '#52B788' : 'rgba(255,255,255,0.10)', position:'relative', transition:'background .2s', flexShrink:0, boxShadow: val ? '0 0 10px rgba(82,183,136,0.4)' : 'none' }}>
+        <div style={{ position:'absolute', top:3, left: val ? 23:3, width:20, height:20, borderRadius:'50%', background:'#fff', transition:'left .2s', boxShadow:'0 1px 4px rgba(0,0,0,0.3)' }} />
       </div>
     </div>
   );
 
   return (
-    <div style={{ minHeight: '100%', background: 'linear-gradient(180deg,#04091A 0%,#071524 100%)', paddingBottom: 110 }}>
-      {/* Navbar */}
-      <div className="navbar">
-        <button onClick={() => navigate('locationSpecies')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
-          <Ic n="back" s={22} c={T.green} />
+    <div style={{ minHeight:'100%', background:'linear-gradient(180deg,#040C18 0%,#060F1A 100%)', paddingBottom:120, fontFamily:"'DM Sans','Inter',sans-serif" }}>
+      <style>{`
+        @keyframes sdFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        .sd-section{animation:sdFadeUp .35s ease forwards}
+      `}</style>
+
+      {/* ── Header ─────────────────────────────────────────────── */}
+      <div style={{ background:'rgba(4,12,24,0.92)', backdropFilter:'blur(20px)', display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'calc(env(safe-area-inset-top,44px) + 12px)', paddingBottom:12, paddingLeft:16, paddingRight:16, borderBottom:'1px solid rgba(255,255,255,0.06)', position:'sticky', top:0, zIndex:100 }}>
+        <button onClick={() => navigate('locationSpecies')} style={{ background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:10, width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+          <Ic n="back" s={18} c="rgba(255,255,255,0.8)" />
         </button>
-        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
-          <div className="mono" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: T.textBright }}>SPACE DETAILS</div>
-          <div className="mono" style={{ fontSize: 9, color: 'rgba(56,189,248,.4)', letterSpacing: '1px' }}>03 / 03</div>
+        <div style={{ textAlign:'center' }}>
+          <div style={{ fontSize:13, fontWeight:800, color:'#fff', letterSpacing:0.2 }}>Your Space</div>
+          <div style={{ display:'flex', alignItems:'center', gap:6, justifyContent:'center', marginTop:2 }}>
+            {[1,2,3].map(n => (
+              <div key={n} style={{ width: n===3?20:8, height:4, borderRadius:4, background: n===3?'#52B788':'rgba(255,255,255,0.18)', transition:'all .3s' }} />
+            ))}
+          </div>
         </div>
-        <div style={{ width: 32 }} />
+        <div style={{ width:36 }} />
       </div>
-      <div className="hprog"><div className="hprog-fill" style={{ width: '90%' }} /></div>
 
-      <div style={{ padding: '20px 16px 0', display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ padding:'20px 16px 0', display:'flex', flexDirection:'column', gap:28 }}>
 
-        {/* Project Name */}
-        <div>
-          <div className="slabel" style={{ marginBottom: 8 }}>PROJECT NAME</div>
-          <input className="hinp mono" placeholder="e.g. Home Rooftop, Terrace-01" value={name}
-            onChange={e => setName(e.target.value)} style={{ fontSize: 15 }} autoFocus />
-        </div>
-
+        {/* ── Section helper ── */}
         {/* Surface Type */}
-        <div>
-          <div className="slabel" style={{ marginBottom: 10 }}>SURFACE TYPE</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            {surfs.map(s => <Card key={s.id} {...s} selected={surf === s.id} onSelect={setSurf} />)}
+        <div className="sd-section">
+          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
+            <div style={{ width:26, height:26, borderRadius:8, background:'rgba(82,183,136,0.2)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>🏗</div>
+            <span style={{ fontSize:15, fontWeight:800, color:'#fff' }}>Space Type</span>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            {surfs.map(s => <SurfCard key={s.id} {...s} />)}
           </div>
         </div>
 
         {/* Primary Goal */}
-        <div>
-          <div className="slabel" style={{ marginBottom: 10 }}>PRIMARY GOAL</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-            {goals.map(g => <Card key={g.id} {...g} selected={goal === g.id} onSelect={setGoal} />)}
+        <div className="sd-section" style={{ animationDelay:'.06s' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
+            <div style={{ width:26, height:26, borderRadius:8, background:'rgba(167,139,250,0.2)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>🎯</div>
+            <span style={{ fontSize:15, fontWeight:800, color:'#fff' }}>What's your goal?</span>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:10 }}>
+            {goals.map(g => <GoalChip key={g.id} {...g} />)}
           </div>
         </div>
 
-        {/* Sun & Wind (pre-filled from location) */}
-        <div>
-          <div className="slabel" style={{ marginBottom: 10 }}>SUN & WIND CONDITIONS</div>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-            {[['shade','🌥 Shade'],['partial','⛅ Partial'],['full','☀️ Full Sun']].map(([v,l])=>(
-              <button key={v} type="button" onClick={() => setSun(v)} style={{ flex: 1, padding: '10px 4px', borderRadius: 12, border: `1.5px solid ${sun===v?T.sun:'rgba(56,189,248,0.12)'}`, background: sun===v?'rgba(251,191,36,0.1)':'rgba(255,255,255,0.03)', color: sun===v?T.sun:T.textDim, fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'all .18s' }}>{l}</button>
-            ))}
+        {/* Sun & Wind */}
+        <div className="sd-section" style={{ animationDelay:'.12s' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
+            <div style={{ width:26, height:26, borderRadius:8, background:'rgba(249,199,79,0.2)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>🌤</div>
+            <span style={{ fontSize:15, fontWeight:800, color:'#fff' }}>Conditions</span>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {[['low','🌬 Low'],['medium','💨 Medium'],['high','🌪 High']].map(([v,l])=>(
-              <button key={v} type="button" onClick={() => setWind(v)} style={{ flex: 1, padding: '10px 4px', borderRadius: 12, border: `1.5px solid ${wind===v?T.sky:'rgba(56,189,248,0.12)'}`, background: wind===v?'rgba(56,189,248,0.1)':'rgba(255,255,255,0.03)', color: wind===v?T.sky:T.textDim, fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'all .18s' }}>{l}</button>
-            ))}
+          <div style={{ background:'rgba(255,255,255,0.04)', borderRadius:18, padding:'14px', border:'1px solid rgba(255,255,255,0.07)' }}>
+            <div style={{ fontSize:11, color:'rgba(255,255,255,0.40)', fontWeight:700, letterSpacing:1, textTransform:'uppercase', marginBottom:8 }}>Sunlight</div>
+            <div style={{ display:'flex', gap:8, marginBottom:16 }}>
+              <CondBtn active={sun==='shade'}   color='#94A3B8' bg='rgba(148,163,184,0.15)' onClick={()=>setSun('shade')}>🌥 Shade</CondBtn>
+              <CondBtn active={sun==='partial'} color='#FCD34D' bg='rgba(252,211,77,0.15)'  onClick={()=>setSun('partial')}>⛅ Partial</CondBtn>
+              <CondBtn active={sun==='full'}    color='#FFA500' bg='rgba(255,165,0,0.15)'   onClick={()=>setSun('full')}>☀️ Full Sun</CondBtn>
+            </div>
+            <div style={{ fontSize:11, color:'rgba(255,255,255,0.40)', fontWeight:700, letterSpacing:1, textTransform:'uppercase', marginBottom:8 }}>Wind</div>
+            <div style={{ display:'flex', gap:8 }}>
+              <CondBtn active={wind==='low'}    color='#52B788' bg='rgba(82,183,136,0.15)' onClick={()=>setWind('low')}>🍃 Low</CondBtn>
+              <CondBtn active={wind==='medium'} color='#38BDF8' bg='rgba(56,189,248,0.15)' onClick={()=>setWind('medium')}>💨 Medium</CondBtn>
+              <CondBtn active={wind==='high'}   color='#F4845F' bg='rgba(244,132,95,0.15)' onClick={()=>setWind('high')}>🌪 High</CondBtn>
+            </div>
           </div>
         </div>
 
         {/* Budget */}
-        <div>
-          <div className="slabel" style={{ marginBottom: 10 }}>BUDGET RANGE</div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {[['low','💰 Low','Under ₹10k'],['medium','💰💰 Medium','₹10k–30k'],['high','💰💰💰 High','₹30k+']].map(([v,l,sub])=>(
-              <button key={v} type="button" onClick={() => setBudget(v)} style={{ flex: 1, padding: '12px 6px', borderRadius: 12, border: `1.5px solid ${budget===v?T.green:'rgba(56,189,248,0.12)'}`, background: budget===v?'rgba(34,197,94,0.1)':'rgba(255,255,255,0.03)', cursor: 'pointer', transition: 'all .18s', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-                <span style={{ fontSize: 11, fontWeight: 800, color: budget===v?T.green:T.textBright }}>{l}</span>
-                <span style={{ fontSize: 9, color: T.textDim }}>{sub}</span>
-              </button>
-            ))}
+        <div className="sd-section" style={{ animationDelay:'.18s' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
+            <div style={{ width:26, height:26, borderRadius:8, background:'rgba(251,191,36,0.2)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>💰</div>
+            <span style={{ fontSize:15, fontWeight:800, color:'#fff' }}>Budget</span>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:10 }}>
+            {[
+              { v:'low',    e:'🌱', l:'Starter',  sub:'Under ₹10k', c:'#52B788', bg:'rgba(82,183,136,0.15)', bc:'rgba(82,183,136,0.5)' },
+              { v:'medium', e:'🌿', l:'Standard', sub:'₹10k–30k',   c:'#38BDF8', bg:'rgba(56,189,248,0.15)', bc:'rgba(56,189,248,0.5)' },
+              { v:'high',   e:'🌳', l:'Premium',  sub:'₹30k+',      c:'#FBBF24', bg:'rgba(251,191,36,0.15)', bc:'rgba(251,191,36,0.5)' },
+            ].map(({ v, e, l, sub, c, bg, bc }) => {
+              const on = budget === v;
+              return (
+                <button key={v} type="button" onClick={() => setBudget(v)} style={{
+                  padding:'14px 8px', borderRadius:16, border:`1.5px solid ${on ? bc : 'rgba(255,255,255,0.08)'}`,
+                  background: on ? bg : 'rgba(255,255,255,0.04)',
+                  cursor:'pointer', transition:'all .2s ease', display:'flex', flexDirection:'column', alignItems:'center', gap:5,
+                  boxShadow: on ? `0 0 14px ${bc.replace('0.5','0.2')}` : 'none',
+                }}>
+                  <span style={{ fontSize:24 }}>{e}</span>
+                  <span style={{ fontSize:12, fontWeight:800, color: on ? c : 'rgba(255,255,255,0.65)' }}>{l}</span>
+                  <span style={{ fontSize:9.5, color:'rgba(255,255,255,0.38)' }}>{sub}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Safety */}
-        <div>
-          <div className="slabel" style={{ marginBottom: 4 }}>SAFETY PREFERENCES</div>
+        <div className="sd-section" style={{ animationDelay:'.24s' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
+            <div style={{ width:26, height:26, borderRadius:8, background:'rgba(244,114,182,0.2)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>🛡</div>
+            <span style={{ fontSize:15, fontWeight:800, color:'#fff' }}>Safety</span>
+          </div>
           <Toggle label="🐾 Pet-safe plants only" val={petSafe} onT={() => setPetSafe(p => !p)} />
           <Toggle label="👶 Child-safe plants only" val={childSafe} onT={() => setChildSafe(p => !p)} />
         </div>
 
-        {err && <div className="mono" style={{ fontSize: 11, color: T.orange, letterSpacing: '1px' }}>{err}</div>}
+        {err && (
+          <div style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(244,132,95,0.12)', border:'1px solid rgba(244,132,95,0.3)', borderRadius:12, padding:'12px 14px' }}>
+            <span style={{ fontSize:16 }}>⚠️</span>
+            <span style={{ fontSize:12, color:'#F4845F', fontWeight:600 }}>{err}</span>
+          </div>
+        )}
       </div>
 
-      {/* Generate CTA */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(4,9,26,.97)', padding: '16px 20px 32px', borderTop: '1px solid rgba(56,189,248,.1)', maxWidth: 430, margin: '0 auto', zIndex: 50 }}>
-        <button className={`gbtn${valid ? ' fill' : ''}`} disabled={busy || !valid} onClick={onGenerate}
-          style={{ width: '100%', padding: '16px', borderRadius: 14, fontSize: 14, fontWeight: 700, letterSpacing: '.5px' }}>
-          {busy ? 'Creating your garden…' : '✨ Generate My Garden →'}
+      {/* ── Generate CTA ───────────────────────────────────────── */}
+      <div style={{ position:'fixed', bottom:0, left:0, right:0, background:'rgba(4,12,24,0.96)', backdropFilter:'blur(20px)', padding:'14px 16px calc(env(safe-area-inset-bottom,20px) + 14px)', borderTop:'1px solid rgba(255,255,255,0.07)', maxWidth:430, margin:'0 auto', zIndex:50 }}>
+        <button onClick={onGenerate} disabled={busy || !valid} style={{
+          width:'100%', padding:'17px 0', borderRadius:16, border:'none',
+          background: (!valid || busy) ? 'rgba(255,255,255,0.08)' : 'linear-gradient(135deg,#1B4332,#2D6A4F,#52B788)',
+          cursor: (!valid || busy) ? 'default':'pointer',
+          fontSize:15, fontWeight:800, color:'#fff', letterSpacing:0.3,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:10,
+          boxShadow: valid && !busy ? '0 6px 28px rgba(45,106,79,0.5)' : 'none',
+          opacity: (!valid || busy) ? 0.55 : 1, transition:'all .3s ease',
+        }}>
+          {busy
+            ? <><div style={{ width:16,height:16,borderRadius:'50%',border:'2px solid rgba(255,255,255,0.3)',borderTopColor:'#fff',animation:'rotateSlow .8s linear infinite' }} />  Generating your garden…</>
+            : <><span style={{ fontSize:18 }}>✨</span> Generate My Garden Plan →</>
+          }
         </button>
+        {!valid && (
+          <div style={{ fontSize:11, color:'rgba(255,255,255,0.30)', textAlign:'center', marginTop:8 }}>
+            Select a space type and goal to continue
+          </div>
+        )}
       </div>
     </div>
   );
