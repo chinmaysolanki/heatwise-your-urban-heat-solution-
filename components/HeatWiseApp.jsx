@@ -9964,30 +9964,35 @@ const WIND_META={
    Auto-detects location → climate data → recommended species
 ══════════════════════════════════════════════════════════════════ */
 const LocationSpeciesScreen = ({ navigate, photoSession, setPhotoSession }) => {
-  const [phase, setPhase] = useState('detecting'); // detecting|loaded|error|search
+  const [phase, setPhase] = useState('detecting');
   const [envData, setEnvData] = useState(null);
   const [cityQ, setCityQ] = useState('');
   const [cityResults, setCityResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [err, setErr] = useState('');
+  const [selectedSpecies, setSelectedSpeciesLocal] = useState(new Set());
 
-  const heatColor = h => ({ low:'#38BDF8', medium:'#F9C74F', high:'#F4845F', extreme:'#E63946' }[h] ?? T.green);
+  const heatGradient = h => ({
+    low:     'linear-gradient(135deg,#0F4C75,#1B6CA8)',
+    medium:  'linear-gradient(135deg,#7B4F12,#C8862A)',
+    high:    'linear-gradient(135deg,#7B1F1F,#C0392B)',
+    extreme: 'linear-gradient(135deg,#5C0A0A,#A61C1C)',
+  }[h] ?? 'linear-gradient(135deg,#1B4332,#2D6A4F)');
+
+  const heatColor = h => ({ low:'#38BDF8', medium:'#F9C74F', high:'#F4845F', extreme:'#FF6B6B' }[h] ?? '#52B788');
   const heatLabel = h => ({ low:'Cool Climate', medium:'Moderate Heat', high:'Hot Climate', extreme:'Extreme Heat' }[h] ?? 'Detecting…');
-  const heatEmoji = h => ({ low:'🌤', medium:'☀️', high:'🔆', extreme:'🌡️' }[h] ?? '📍');
+  const heatEmoji = h => ({ low:'🌤', medium:'☀️', high:'🔥', extreme:'🌡️' }[h] ?? '📍');
+  const heatBg   = h => ({ low:'rgba(56,189,248,0.12)', medium:'rgba(249,199,79,0.12)', high:'rgba(244,132,95,0.12)', extreme:'rgba(230,57,70,0.12)' }[h] ?? 'rgba(82,183,136,0.12)');
 
   const loadEnv = async (lat, lon) => {
     try {
-      const res = await fetch('/api/env/detect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lat, lon }),
-      });
-      if (!res.ok) throw new Error('Could not load location data');
+      const res = await fetch('/api/env/detect', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ lat, lon }) });
+      if (!res.ok) throw new Error();
       const data = await res.json();
       setEnvData(data);
-      setPhotoSession(prev => ({ ...prev, environment: { ...data, environmentSource: 'auto' } }));
+      setPhotoSession(prev => ({ ...prev, environment: { ...data, environmentSource:'auto' } }));
       setPhase('loaded');
-    } catch (e) {
+    } catch {
       setErr('Could not detect location. Search your city below.');
       setPhase('search');
     }
@@ -9996,7 +10001,7 @@ const LocationSpeciesScreen = ({ navigate, photoSession, setPhotoSession }) => {
   useEffect(() => {
     navigator.geolocation?.getCurrentPosition(
       pos => loadEnv(pos.coords.latitude, pos.coords.longitude),
-      () => { setPhase('search'); setErr('Location access denied. Search your city below.'); },
+      () => { setPhase('search'); setErr('Location access denied — search below.'); },
       { timeout: 8000 }
     );
   }, []);
@@ -10012,7 +10017,6 @@ const LocationSpeciesScreen = ({ navigate, photoSession, setPhotoSession }) => {
     finally { setSearching(false); }
   };
 
-  // Filter species by climate suitability
   const recommendedSpecies = SPECIES_CATALOG.filter(s => {
     if (!envData) return s.cooling >= 6;
     const heat = envData.heatExposure;
@@ -10021,53 +10025,97 @@ const LocationSpeciesScreen = ({ navigate, photoSession, setPhotoSession }) => {
     return s.cooling >= 5;
   }).slice(0, 8);
 
+  const toggleSpecies = code => {
+    setSelectedSpeciesLocal(prev => {
+      const n = new Set(prev);
+      if (n.has(code)) n.delete(code); else n.add(code);
+      return n;
+    });
+  };
+
   const onNext = () => {
-    if (envData) setPhotoSession(prev => ({ ...prev, environment: { ...envData, environmentSource: 'auto' } }));
+    if (envData) setPhotoSession(prev => ({ ...prev, environment: { ...envData, environmentSource:'auto' } }));
     navigate('spaceDetails');
   };
 
+  const heatExp = envData?.heatExposure ?? 'medium';
+  const accentColor = heatColor(heatExp);
+
   return (
-    <div style={{ minHeight: '100%', background: 'linear-gradient(180deg,#04091A 0%,#071524 100%)', paddingBottom: 100 }}>
-      {/* Navbar */}
-      <div className="navbar">
-        <button onClick={() => navigate('measure')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
-          <Ic n="back" s={22} c={T.green} />
+    <div style={{ minHeight:'100%', background:'linear-gradient(180deg,#050D1A 0%,#07151F 50%,#060F18 100%)', paddingBottom:110, fontFamily:"'DM Sans','Inter',sans-serif" }}>
+      <style>{`
+        @keyframes locPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:0.7}}
+        @keyframes locFadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes locShimmer{0%{left:-80%}100%{left:120%}}
+        .loc-card-in{animation:locFadeUp .4s ease forwards}
+        .loc-sp-card{transition:transform .18s ease,box-shadow .18s ease}
+        .loc-sp-card:active{transform:scale(0.96)}
+      `}</style>
+
+      {/* ── Header ───────────────────────────────────────────── */}
+      <div style={{ background:'rgba(5,13,26,0.92)', backdropFilter:'blur(20px)', display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'calc(env(safe-area-inset-top,44px) + 12px)', paddingBottom:12, paddingLeft:16, paddingRight:16, borderBottom:'1px solid rgba(255,255,255,0.06)', position:'sticky', top:0, zIndex:100 }}>
+        <button onClick={() => navigate('measure')} style={{ background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:10, width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+          <Ic n="back" s={18} c="rgba(255,255,255,0.8)" />
         </button>
-        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
-          <div className="mono" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '3px', color: T.textBright }}>LOCATION & SPECIES</div>
-          <div className="mono" style={{ fontSize: 9, color: 'rgba(56,189,248,.4)', letterSpacing: '1px' }}>02 / 03</div>
+        <div style={{ textAlign:'center' }}>
+          <div style={{ fontSize:13, fontWeight:800, color:'#fff', letterSpacing:0.2 }}>Your Climate</div>
+          <div style={{ display:'flex', alignItems:'center', gap:6, justifyContent:'center', marginTop:2 }}>
+            {[1,2,3].map(n => (
+              <div key={n} style={{ width: n===2?20:8, height:4, borderRadius:4, background: n===2?accentColor:'rgba(255,255,255,0.18)', transition:'all .3s' }} />
+            ))}
+          </div>
         </div>
-        <div style={{ width: 32 }} />
+        <div style={{ width:36 }} />
       </div>
-      <div className="hprog"><div className="hprog-fill" style={{ width: '55%' }} /></div>
 
-      <div style={{ padding: '16px 16px 0' }}>
+      <div style={{ padding:'18px 16px 0' }}>
 
-        {/* ── Detecting ── */}
+        {/* ── Detecting spinner ──────────────────────────────── */}
         {phase === 'detecting' && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px', gap: 16 }}>
-            <div style={{ width: 48, height: 48, borderRadius: '50%', border: `3px solid rgba(56,189,248,.2)`, borderTop: `3px solid ${T.sky}`, animation: 'rotateSlow .8s linear infinite' }} />
-            <div style={{ fontSize: 14, color: T.textDim, fontFamily: "'DM Sans',sans-serif" }}>Detecting your location…</div>
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', padding:'60px 20px', gap:20 }}>
+            <div style={{ position:'relative', width:72, height:72 }}>
+              <div style={{ position:'absolute', inset:0, borderRadius:'50%', border:'3px solid rgba(56,189,248,0.12)', borderTop:`3px solid #38BDF8`, animation:'rotateSlow .9s linear infinite' }} />
+              <div style={{ position:'absolute', inset:8, borderRadius:'50%', border:'2px solid rgba(82,183,136,0.15)', borderBottom:'2px solid #52B788', animation:'rotateSlow 1.4s linear infinite reverse' }} />
+              <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:22 }}>📍</div>
+            </div>
+            <div style={{ textAlign:'center' }}>
+              <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:4 }}>Detecting your location</div>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,0.45)' }}>Getting local heat & climate data…</div>
+            </div>
           </div>
         )}
 
-        {/* ── City search fallback ── */}
+        {/* ── Search bar ─────────────────────────────────────── */}
         {(phase === 'search' || phase === 'loaded') && (
-          <div style={{ marginBottom: 14 }}>
-            {err && <div style={{ fontSize: 12, color: T.orange, marginBottom: 8, fontFamily: "'DM Sans',sans-serif" }}>{err}</div>}
-            <div style={{ position: 'relative' }}>
-              <input className="hinp mono" value={cityQ} onChange={e => { setCityQ(e.target.value); searchCity(e.target.value); }}
-                placeholder="Search city or zip code…" style={{ paddingLeft: 38, fontSize: 13 }} />
-              <div style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }}>
-                {searching ? <div style={{ width: 14, height: 14, borderRadius: '50%', border: `2px solid ${T.green}`, borderTopColor: 'transparent', animation: 'rotateSlow .7s linear infinite' }} /> : <Ic n="search" s={14} c="rgba(56,189,248,.5)" />}
+          <div style={{ marginBottom:16 }} className="loc-card-in">
+            {err && (
+              <div style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(244,132,95,0.12)', border:'1px solid rgba(244,132,95,0.25)', borderRadius:12, padding:'10px 14px', marginBottom:12 }}>
+                <span style={{ fontSize:15 }}>⚠️</span>
+                <span style={{ fontSize:12, color:'#F4845F', fontWeight:600 }}>{err}</span>
               </div>
+            )}
+            <div style={{ position:'relative' }}>
+              <div style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', zIndex:2 }}>
+                {searching
+                  ? <div style={{ width:16, height:16, borderRadius:'50%', border:'2px solid #52B788', borderTopColor:'transparent', animation:'rotateSlow .7s linear infinite' }} />
+                  : <span style={{ fontSize:16 }}>🔍</span>
+                }
+              </div>
+              <input
+                value={cityQ}
+                onChange={e => { setCityQ(e.target.value); searchCity(e.target.value); }}
+                placeholder="Search city or location…"
+                style={{ width:'100%', boxSizing:'border-box', background:'rgba(255,255,255,0.07)', border:'1.5px solid rgba(255,255,255,0.12)', borderRadius:14, padding:'13px 14px 13px 44px', fontSize:14, color:'#fff', fontFamily:"'DM Sans',sans-serif", outline:'none' }}
+              />
             </div>
             {cityResults.length > 0 && (
-              <div style={{ background: 'rgba(6,14,34,.98)', border: `1px solid rgba(56,189,248,.15)`, borderRadius: 12, overflow: 'hidden', marginTop: 4 }}>
+              <div style={{ background:'rgba(8,18,36,0.98)', border:'1px solid rgba(56,189,248,0.18)', borderRadius:14, overflow:'hidden', marginTop:6, boxShadow:'0 8px 32px rgba(0,0,0,0.5)' }}>
                 {cityResults.map((r, i) => (
-                  <div key={r.id ?? i} onClick={() => { setCityResults([]); setCityQ(''); setPhase('detecting'); loadEnv(r.latitude, r.longitude); }}
-                    style={{ padding: '11px 14px', borderBottom: i < cityResults.length - 1 ? `1px solid rgba(56,189,248,.08)` : 'none', cursor: 'pointer', fontSize: 13, color: T.textBright, fontFamily: "'DM Sans',sans-serif" }}>
-                    📍 {r.name}{r.admin1 ? `, ${r.admin1}` : ''}{r.country ? `, ${r.country}` : ''}
+                  <div key={r.id ?? i}
+                    onClick={() => { setCityResults([]); setCityQ(''); setPhase('detecting'); loadEnv(r.latitude, r.longitude); }}
+                    style={{ padding:'13px 16px', borderBottom: i < cityResults.length-1 ? '1px solid rgba(255,255,255,0.06)':'none', cursor:'pointer', fontSize:13, color:'#fff', display:'flex', alignItems:'center', gap:8 }}>
+                    <span style={{ fontSize:15 }}>📍</span>
+                    <span style={{ flex:1 }}>{r.name}{r.admin1 ? `, ${r.admin1}`:''}{r.country ? `, ${r.country}`:''}</span>
                   </div>
                 ))}
               </div>
@@ -10075,73 +10123,142 @@ const LocationSpeciesScreen = ({ navigate, photoSession, setPhotoSession }) => {
           </div>
         )}
 
-        {/* ── Location + Climate Card ── */}
+        {/* ── Climate Hero Card ──────────────────────────────── */}
         {phase === 'loaded' && envData && (
-          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1.5px solid rgba(56,189,248,0.15)', borderRadius: 18, padding: '18px 16px', marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-              <div style={{ fontSize: 28 }}>{heatEmoji(envData.heatExposure)}</div>
-              <div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: T.textBright }}>{envData.locationLabel || 'Your Location'}</div>
-                <div style={{ fontSize: 11, color: heatColor(envData.heatExposure), fontWeight: 700, letterSpacing: '1px', marginTop: 2 }}>{heatLabel(envData.heatExposure)}</div>
+          <div className="loc-card-in" style={{ marginBottom:20 }}>
+            <div style={{ background: heatGradient(heatExp), borderRadius:22, overflow:'hidden', position:'relative', boxShadow:`0 12px 40px ${heatBg(heatExp).replace('0.12','0.35')}` }}>
+              {/* shimmer */}
+              <div style={{ position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none' }}>
+                <div style={{ position:'absolute', top:0, bottom:0, width:'60%', background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent)', animation:'locShimmer 3.5s ease-in-out infinite' }} />
               </div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-              {[
-                ['🌡️', `${Math.round(envData.dailyMaxTempC ?? envData.currentTempC ?? 32)}°C`, 'Daily Max'],
-                ['💨', `${Math.round(envData.windSpeedKmh ?? 0)} km/h`, 'Wind'],
-                ['☀️', envData.uvIndex != null ? `UV ${Math.round(envData.uvIndex)}` : 'UV —', 'UV Index'],
-              ].map(([ic, val, lbl]) => (
-                <div key={lbl} style={{ background: 'rgba(56,189,248,0.06)', borderRadius: 12, padding: '10px 8px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 18, marginBottom: 4 }}>{ic}</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: T.textBright }}>{val}</div>
-                  <div style={{ fontSize: 9, color: T.textDim, letterSpacing: '1px', marginTop: 2 }}>{lbl.toUpperCase()}</div>
+              {/* decorative orb */}
+              <div style={{ position:'absolute', top:-30, right:-30, width:130, height:130, borderRadius:'50%', background:'rgba(255,255,255,0.06)', pointerEvents:'none' }} />
+
+              <div style={{ position:'relative', zIndex:2, padding:'20px 18px' }}>
+                {/* top row */}
+                <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:16 }}>
+                  <div>
+                    <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.55)', letterSpacing:2, textTransform:'uppercase', marginBottom:4 }}>Your Location</div>
+                    <div style={{ fontSize:20, fontWeight:900, color:'#fff', lineHeight:1.2 }}>{envData.locationLabel || 'Your Space'}</div>
+                  </div>
+                  <div style={{ background:'rgba(255,255,255,0.15)', borderRadius:16, padding:'8px 12px', display:'flex', alignItems:'center', gap:6, backdropFilter:'blur(8px)' }}>
+                    <span style={{ fontSize:20, animation:'locPulse 2.5s ease infinite' }}>{heatEmoji(heatExp)}</span>
+                    <div>
+                      <div style={{ fontSize:10, color:'rgba(255,255,255,0.65)', fontWeight:600 }}>Climate</div>
+                      <div style={{ fontSize:12, color:'#fff', fontWeight:800 }}>{heatLabel(heatExp)}</div>
+                    </div>
+                  </div>
                 </div>
-              ))}
+
+                {/* stat pills */}
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8 }}>
+                  {[
+                    { icon:'🌡️', val:`${Math.round(envData.dailyMaxTempC ?? envData.currentTempC ?? 32)}°C`, lbl:'Daily Max', color:'rgba(255,107,107,0.85)' },
+                    { icon:'💨', val:`${Math.round(envData.windSpeedKmh ?? 0)} km/h`, lbl:'Wind', color:'rgba(56,189,248,0.85)' },
+                    { icon:'☀️', val: envData.uvIndex != null ? `UV ${Math.round(envData.uvIndex)}` : 'UV —', lbl:'UV Index', color:'rgba(249,199,79,0.85)' },
+                  ].map(({ icon, val, lbl, color }) => (
+                    <div key={lbl} style={{ background:'rgba(0,0,0,0.25)', borderRadius:14, padding:'12px 8px', textAlign:'center', border:'1px solid rgba(255,255,255,0.10)', backdropFilter:'blur(6px)' }}>
+                      <div style={{ fontSize:20, marginBottom:4 }}>{icon}</div>
+                      <div style={{ fontSize:14, fontWeight:900, color:'#fff', marginBottom:1 }}>{val}</div>
+                      <div style={{ fontSize:9, color:'rgba(255,255,255,0.55)', letterSpacing:1, textTransform:'uppercase', fontWeight:600 }}>{lbl}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {/* ── Species Recommendations ── */}
+        {/* ── Species Grid ───────────────────────────────────── */}
         {phase === 'loaded' && (
-          <>
-            <div className="mono" style={{ fontSize: 10, letterSpacing: '2px', color: T.textDim, marginBottom: 12 }}>
-              RECOMMENDED FOR YOUR CLIMATE
+          <div className="loc-card-in">
+            {/* section header */}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14 }}>
+              <div>
+                <div style={{ fontSize:16, fontWeight:800, color:'#fff' }}>Top Picks for You</div>
+                <div style={{ fontSize:11, color:'rgba(255,255,255,0.40)', marginTop:2 }}>Tap cards to select favourites</div>
+              </div>
+              <div style={{ background:'rgba(82,183,136,0.15)', border:'1px solid rgba(82,183,136,0.3)', borderRadius:20, padding:'4px 10px', fontSize:11, fontWeight:700, color:'#52B788' }}>
+                {recommendedSpecies.length} species
+              </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
-              {recommendedSpecies.map(s => (
-                <div key={s.code} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(56,189,248,0.12)', borderRadius: 16, padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 24 }}>{s.emoji}</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: T.textBright, lineHeight: 1.2 }}>{s.name}</div>
-                      <div style={{ fontSize: 10, color: T.textDim, fontStyle: 'italic', lineHeight: 1.2 }}>{s.sci}</div>
+
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:16 }}>
+              {recommendedSpecies.map((s, idx) => {
+                const sel = selectedSpecies.has(s.code);
+                const barW = `${s.cooling * 10}%`;
+                return (
+                  <div
+                    key={s.code}
+                    className="loc-sp-card"
+                    onClick={() => toggleSpecies(s.code)}
+                    style={{
+                      background: sel ? 'rgba(82,183,136,0.18)' : 'rgba(255,255,255,0.05)',
+                      border: sel ? '1.5px solid rgba(82,183,136,0.55)' : '1px solid rgba(255,255,255,0.09)',
+                      borderRadius:18, padding:'14px 12px',
+                      cursor:'pointer', position:'relative', overflow:'hidden',
+                      boxShadow: sel ? '0 0 20px rgba(82,183,136,0.2)' : '0 2px 8px rgba(0,0,0,0.3)',
+                      animationDelay:`${idx*0.06}s`,
+                    }}
+                  >
+                    {sel && (
+                      <div style={{ position:'absolute', top:8, right:8, width:20, height:20, borderRadius:'50%', background:'#52B788', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11 }}>✓</div>
+                    )}
+                    {/* emoji */}
+                    <div style={{ fontSize:32, marginBottom:8, lineHeight:1 }}>{s.emoji}</div>
+                    {/* name */}
+                    <div style={{ fontSize:13, fontWeight:800, color:'#fff', lineHeight:1.2, marginBottom:2 }}>{s.name}</div>
+                    <div style={{ fontSize:10, color:'rgba(255,255,255,0.38)', fontStyle:'italic', marginBottom:10 }}>{s.sci}</div>
+                    {/* cooling bar */}
+                    <div style={{ marginBottom:8 }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4 }}>
+                        <span style={{ fontSize:9.5, color:'rgba(255,255,255,0.45)', fontWeight:600, letterSpacing:0.5 }}>COOLING POWER</span>
+                        <span style={{ fontSize:11, fontWeight:800, color:'#52B788' }}>{s.cooling}/10</span>
+                      </div>
+                      <div style={{ height:5, background:'rgba(255,255,255,0.08)', borderRadius:4, overflow:'hidden' }}>
+                        <div style={{ width:barW, height:'100%', background:`linear-gradient(90deg,#2D6A4F,#74C69D)`, borderRadius:4, transition:'width .5s ease' }} />
+                      </div>
+                    </div>
+                    {/* tags */}
+                    <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+                      {s.drought && <span style={{ fontSize:8.5, background:'rgba(249,199,79,0.15)', color:'#F9C74F', border:'1px solid rgba(249,199,79,0.3)', padding:'2px 7px', borderRadius:8, fontWeight:700 }}>💧 Drought OK</span>}
+                      {s.petSafe && <span style={{ fontSize:8.5, background:'rgba(56,189,248,0.12)', color:'#38BDF8', border:'1px solid rgba(56,189,248,0.25)', padding:'2px 7px', borderRadius:8, fontWeight:700 }}>🐾 Pet Safe</span>}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 9, background: 'rgba(34,197,94,0.12)', color: T.green, padding: '2px 6px', borderRadius: 6, fontWeight: 700 }}>Cool {s.cooling}/10</span>
-                    {s.drought && <span style={{ fontSize: 9, background: 'rgba(251,191,36,0.12)', color: T.gold, padding: '2px 6px', borderRadius: 6, fontWeight: 700 }}>Drought OK</span>}
-                    {s.petSafe && <span style={{ fontSize: 9, background: 'rgba(56,189,248,0.10)', color: T.sky, padding: '2px 6px', borderRadius: 6, fontWeight: 700 }}>Pet Safe</span>}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
-            <div style={{ fontSize: 11, color: T.textDim, textAlign: 'center', marginBottom: 8, fontFamily: "'DM Sans',sans-serif" }}>
-              These species will be fine-tuned after you enter your space details.
+
+            <div style={{ background:'rgba(82,183,136,0.07)', border:'1px solid rgba(82,183,136,0.15)', borderRadius:14, padding:'12px 14px', display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
+              <span style={{ fontSize:18 }}>🤖</span>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,0.55)', lineHeight:1.5 }}>
+                <strong style={{ color:'rgba(255,255,255,0.75)' }}>AI tip:</strong> These species are matched to your climate zone. After space details, we'll fine-tune the list.
+              </div>
             </div>
-          </>
+          </div>
         )}
       </div>
 
-      {/* Bottom CTA */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'rgba(4,9,26,.97)', padding: '16px 20px 32px', borderTop: '1px solid rgba(56,189,248,.1)', maxWidth: 430, margin: '0 auto', zIndex: 50 }}>
-        <button className="gbtn fill" onClick={onNext}
-          disabled={phase === 'detecting'}
-          style={{ width: '100%', padding: '16px', borderRadius: 14, fontSize: 14, fontWeight: 700, letterSpacing: '.5px', opacity: phase === 'detecting' ? 0.5 : 1 }}>
-          {phase === 'detecting' ? 'Detecting location…' : 'Next: Space Details →'}
+      {/* ── Bottom CTA ─────────────────────────────────────────── */}
+      <div style={{ position:'fixed', bottom:0, left:0, right:0, background:'rgba(5,13,26,0.96)', backdropFilter:'blur(20px)', padding:'14px 16px calc(env(safe-area-inset-bottom,20px) + 14px)', borderTop:'1px solid rgba(255,255,255,0.07)', maxWidth:430, margin:'0 auto', zIndex:50 }}>
+        <button onClick={onNext} disabled={phase==='detecting'} style={{
+          width:'100%', padding:'16px 0',
+          borderRadius:16, border:'none',
+          background: phase==='detecting' ? 'rgba(255,255,255,0.08)' : 'linear-gradient(135deg,#2D6A4F,#52B788)',
+          cursor: phase==='detecting' ? 'default':'pointer',
+          fontSize:15, fontWeight:800, color:'#fff', letterSpacing:0.3,
+          display:'flex', alignItems:'center', justifyContent:'center', gap:10,
+          boxShadow: phase==='detecting' ? 'none':'0 6px 24px rgba(45,106,79,0.45)',
+          opacity: phase==='detecting' ? 0.5:1, transition:'all .3s ease',
+        }}>
+          {phase==='detecting'
+            ? <><div style={{ width:16,height:16,borderRadius:'50%',border:'2px solid rgba(255,255,255,0.4)',borderTopColor:'#fff',animation:'rotateSlow .8s linear infinite',marginRight:4 }} /> Detecting…</>
+            : <>{selectedSpecies.size > 0 ? `${selectedSpecies.size} selected · ` : ''}Continue to Space Details →</>
+          }
         </button>
         {phase !== 'loaded' && phase !== 'detecting' && (
-          <button onClick={onNext} style={{ background: 'none', border: 'none', color: T.textDim, fontSize: 12, cursor: 'pointer', marginTop: 10, width: '100%', textAlign: 'center' }}>
-            Skip location step →
+          <button onClick={onNext} style={{ background:'none', border:'none', color:'rgba(255,255,255,0.35)', fontSize:12, cursor:'pointer', marginTop:8, width:'100%', textAlign:'center' }}>
+            Skip →
           </button>
         )}
       </div>
