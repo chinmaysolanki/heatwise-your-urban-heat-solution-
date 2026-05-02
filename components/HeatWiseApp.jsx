@@ -11026,6 +11026,16 @@ export default function App(){
   });
 
   const [screen,setScreen]=useState(()=>{
+    // Check for deep-link from marketing website (?start=scan etc.)
+    try {
+      const deeplink = sessionStorage.getItem('hw_deeplink');
+      if (deeplink) {
+        sessionStorage.removeItem('hw_deeplink');
+        const validScreens = ['home','measure','speciesLib','cityHeat','saved','tips','create'];
+        if (validScreens.includes(deeplink)) return deeplink;
+        if (deeplink === 'scan') return 'measure';
+      }
+    } catch {}
     // On reload, restore last screen for authenticated flows (avoids re-showing splash)
     try{
       const saved=sessionStorage.getItem('hw_screen');
