@@ -13,6 +13,7 @@ const websiteOrigins = (process.env.HEATWISE_WEBSITE_ORIGINS ?? "")
 
 const allowedOrigins = [
   "https://heatwise-liart.vercel.app",
+  "https://heatwise-urban-cooling-buddy.lovable.app", // marketing site
   ...websiteOrigins,
   ...extraOrigins,
 ];
