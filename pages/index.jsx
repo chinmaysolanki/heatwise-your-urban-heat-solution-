@@ -1,20 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import MarketingLayout from "@/components/marketing/MarketingLayout";
 
 const APP = "/app";
 
-/* ─── helpers ─────────────────────────────────────────────── */
-function useInView(threshold = 0.15) {
+/* ─── Scroll-reveal ──────────────────────────────────────────── */
+function useInView(threshold = 0.12) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold });
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold }
+    );
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, []);
   return [ref, visible];
 }
 
+/* ─── Animated counter ──────────────────────────────────────── */
 function useCountUp(target, visible, duration = 1800) {
   const [val, setVal] = useState(0);
   useEffect(() => {
@@ -27,433 +31,410 @@ function useCountUp(target, visible, duration = 1800) {
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }, [visible, target]);
+  }, [visible, target, duration]);
   return val;
 }
 
+/* ─── FadeUp wrapper ─────────────────────────────────────────── */
 function FadeUp({ children, delay = 0, style = {} }) {
   const [ref, vis] = useInView();
   return (
-    <div ref={ref} style={{ opacity: vis ? 1 : 0, transform: vis ? "translateY(0)" : "translateY(36px)", transition: `opacity 0.65s ease ${delay}s, transform 0.65s ease ${delay}s`, ...style }}>
-      {children}
-    </div>
-  );
-}
-
-function GlassCard({ children, style = {}, glow = false }) {
-  return (
-    <div style={{
-      background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)",
-      borderRadius: 20, backdropFilter: "blur(16px)",
-      transition: "all 0.25s ease",
-      ...(glow ? { boxShadow: "0 0 40px rgba(82,183,136,0.12)" } : {}),
+    <div ref={ref} style={{
+      opacity: vis ? 1 : 0,
+      transform: vis ? "translateY(0)" : "translateY(40px)",
+      transition: `opacity 0.7s ease ${delay}s, transform 0.7s ease ${delay}s`,
       ...style,
-    }}
-      onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 20px 60px rgba(82,183,136,0.18)"; e.currentTarget.style.borderColor = "rgba(82,183,136,0.25)"; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = glow ? "0 0 40px rgba(82,183,136,0.12)" : "none"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.09)"; }}
-    >
+    }}>
       {children}
     </div>
   );
 }
 
+/* ─── Section label ─────────────────────────────────────────── */
 function SectionLabel({ n, label }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.30)", letterSpacing: 2 }}>{n} —</span>
+      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 600, color: "rgba(197,193,185,0.30)", letterSpacing: 2 }}>{n} —</span>
       <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 700, color: "#52B788", letterSpacing: 2, textTransform: "uppercase" }}>{label}</span>
     </div>
   );
 }
 
-function CTAButton({ href, children, variant = "primary", style = {} }) {
-  const isPrimary = variant === "primary";
+/* ─── Heat haze particles ───────────────────────────────────── */
+function HeatParticles() {
+  const particles = Array.from({ length: 12 }, (_, i) => ({
+    left: `${8 + i * 7.5}%`,
+    delay: `${(i * 0.4) % 2.4}s`,
+    duration: `${2.8 + (i % 4) * 0.5}s`,
+    size: 4 + (i % 3) * 2,
+  }));
   return (
-    <a href={href} style={{
-      display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px",
-      borderRadius: 14, fontWeight: 800, fontSize: 15, textDecoration: "none",
-      transition: "all 0.22s ease", cursor: "pointer",
-      ...(isPrimary ? {
-        background: "linear-gradient(135deg,#1B4332,#2D6A4F,#52B788)",
-        color: "#fff", boxShadow: "0 6px 28px rgba(82,183,136,0.40)",
-        border: "none",
-      } : {
-        background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.85)",
-        border: "1.5px solid rgba(255,255,255,0.18)", backdropFilter: "blur(8px)",
-      }),
-      ...style,
-    }}
-      onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.04)"; if (isPrimary) e.currentTarget.style.boxShadow = "0 10px 40px rgba(82,183,136,0.55)"; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; if (isPrimary) e.currentTarget.style.boxShadow = "0 6px 28px rgba(82,183,136,0.40)"; }}
-    >
-      {children}
-    </a>
+    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 120, pointerEvents: "none", overflow: "hidden" }}>
+      {particles.map((p, i) => (
+        <div key={i} style={{
+          position: "absolute", bottom: 0, left: p.left,
+          width: p.size, height: p.size, borderRadius: "50%",
+          background: "rgba(255,120,60,0.35)",
+          animation: `heatRise ${p.duration} ${p.delay} infinite ease-in`,
+        }} />
+      ))}
+    </div>
   );
 }
 
-/* ─── SECTIONS ────────────────────────────────────────────── */
-
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 0 — HERO
+═══════════════════════════════════════════════════════════════ */
 function Hero() {
   const [temp, setTemp] = useState(null);
-  const [city, setCity] = useState(null);
-  const [heat, setHeat] = useState(null);
+  const [city, setCity] = useState("your city");
 
   useEffect(() => {
-    // Live climate pill from our own API
-    const load = async (lat, lon) => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(async (pos) => {
       try {
-        const d = await fetch("/api/env/detect", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lat, lon }) }).then(r => r.json());
-        setTemp(Math.round(d.currentTempC ?? d.dailyMaxTempC ?? 34));
-        setCity(d.locationLabel?.split(",")[0] ?? null);
-        setHeat(d.heatExposure ?? "medium");
+        const { latitude: lat, longitude: lon } = pos.coords;
+        const res = await fetch(`/api/env/detect?lat=${lat}&lon=${lon}`);
+        if (!res.ok) return;
+        const d = await res.json();
+        if (d.temperature) setTemp(Math.round(d.temperature));
+        if (d.city) setCity(d.city);
       } catch {}
-    };
-    navigator.geolocation?.getCurrentPosition(
-      p => load(p.coords.latitude, p.coords.longitude),
-      () => load(28.6, 77.2) // Delhi fallback
-    );
+    }, () => {}, { timeout: 5000 });
+    // Store deep-link
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const start = params.get("start");
+      if (start) {
+        sessionStorage.setItem("hw_deeplink", start);
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+    } catch {}
   }, []);
 
-  const heatColor = { low: "#38BDF8", medium: "#F9C74F", high: "#F4845F", extreme: "#E63946" }[heat] ?? "#52B788";
-  const heatLabel = { low: "Cool", medium: "Moderate Heat", high: "Hot", extreme: "Extreme Heat" }[heat] ?? "Detecting";
-
   return (
-    <section style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "100px 24px 80px", position: "relative", overflow: "hidden", textAlign: "center" }}>
-      <style>{`
-        @keyframes heroOrb{0%,100%{transform:scale(1) translate(0,0)}50%{transform:scale(1.08) translate(20px,-20px)}}
-        @keyframes heroShimmer{0%{left:-80%}100%{left:120%}}
-        @keyframes heroPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(1.15)}}
-        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-        @keyframes badgeBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-      `}</style>
+    <section style={{
+      minHeight: "100vh", display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      padding: "120px 24px 100px", textAlign: "center",
+      position: "relative", overflow: "hidden",
+      background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(27,67,50,0.18) 0%, transparent 60%)",
+    }}>
+      {/* Subtle grid bg */}
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 0,
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
+        backgroundSize: "60px 60px",
+        maskImage: "radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 80%)",
+      }} />
+      <HeatParticles />
 
-      {/* Background orbs */}
-      <div style={{ position: "absolute", top: "10%", left: "10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle,rgba(27,67,50,0.35) 0%,transparent 70%)", animation: "heroOrb 12s ease-in-out infinite", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "10%", right: "5%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle,rgba(230,57,70,0.10) 0%,transparent 70%)", animation: "heroOrb 16s ease-in-out infinite reverse", pointerEvents: "none" }} />
-      {/* Grain texture */}
-      <div style={{ position: "absolute", inset: 0, backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E\")", pointerEvents: "none", opacity: 0.4 }} />
-
-      <div style={{ position: "relative", zIndex: 2, maxWidth: 820 }}>
-        {/* Live climate pill */}
-        {city && (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.07)", border: `1px solid ${heatColor}44`, borderRadius: 999, padding: "8px 18px", marginBottom: 28, fontSize: 13, fontWeight: 700, backdropFilter: "blur(12px)", animation: "badgeBob 3s ease-in-out infinite" }}>
-            <span style={{ width: 8, height: 8, borderRadius: "50%", background: heatColor, boxShadow: `0 0 10px ${heatColor}`, display: "inline-block", animation: "heroPulse 2s ease infinite" }} />
-            📍 {city} · {temp}°C · {heatLabel}
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 820 }}>
+        {/* Live temp pill */}
+        <FadeUp>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)",
+            borderRadius: 100, padding: "8px 18px", marginBottom: 36,
+            backdropFilter: "blur(12px)",
+          }}>
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#f87171", animation: "pulse-glow 2s infinite", display: "inline-block" }} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(197,193,185,0.70)", fontFamily: "'JetBrains Mono',monospace" }}>
+              {temp ? `${city} is ${temp}°C right now — let's cool it` : "Live heat data · 14 cities · real-time"}
+            </span>
           </div>
-        )}
+        </FadeUp>
 
         {/* Headline */}
-        <h1 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(40px,7vw,80px)", fontWeight: 700, lineHeight: 1.08, letterSpacing: -2, marginBottom: 24, color: "#fff" }}>
-          Turn urban heat into a<br />
-          <span style={{ background: "linear-gradient(135deg,#52B788,#95D5B2)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>living green canopy</span>
-        </h1>
+        <FadeUp delay={0.1}>
+          <h1 style={{
+            fontSize: "clamp(40px,7vw,88px)", fontWeight: 900, lineHeight: 1.04,
+            letterSpacing: "-3px", marginBottom: 28,
+            fontFamily: "'Space Grotesk',sans-serif",
+            color: "#fff",
+          }}>
+            Turn urban heat into a{" "}
+            <span style={{ background: "linear-gradient(135deg,#52B788 0%,#74C69D 40%,#38BDF8 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              living green canopy
+            </span>
+          </h1>
+        </FadeUp>
 
-        <p style={{ fontSize: "clamp(16px,2vw,20px)", color: "rgba(255,255,255,0.58)", lineHeight: 1.65, marginBottom: 40, maxWidth: 580, margin: "0 auto 40px" }}>
-          AI-matched plants. Climate-aware layouts. Real cooling — measured in degrees.
-        </p>
+        {/* Sub */}
+        <FadeUp delay={0.2}>
+          <p style={{ fontSize: "clamp(16px,2.2vw,20px)", color: "rgba(197,193,185,0.65)", lineHeight: 1.75, maxWidth: 560, margin: "0 auto 48px", fontWeight: 400 }}>
+            AI-matched plants. Climate-aware layouts. Real cooling — measured in degrees.
+            Transform any rooftop, balcony or terrace in minutes.
+          </p>
+        </FadeUp>
 
         {/* CTAs */}
-        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap", marginBottom: 56 }}>
-          <CTAButton href={`${APP}?start=scan`}>
-            📷 Scan My Space
-          </CTAButton>
-          <CTAButton href="/how-it-works" variant="ghost">
-            ▶ See How It Works
-          </CTAButton>
-        </div>
+        <FadeUp delay={0.3}>
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center", marginBottom: 56 }}>
+            <a href={`${APP}?start=scan`} style={{
+              background: "linear-gradient(135deg,#1B4332,#2D6A4F,#52B788)",
+              color: "#fff", padding: "16px 32px", borderRadius: 100,
+              fontWeight: 700, fontSize: 16, textDecoration: "none",
+              display: "flex", alignItems: "center", gap: 8,
+              boxShadow: "0 8px 32px rgba(82,183,136,0.40)",
+              transition: "all 0.25s ease",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.04)"; e.currentTarget.style.boxShadow = "0 12px 48px rgba(82,183,136,0.55)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(82,183,136,0.40)"; }}
+            >📷 Scan My Space</a>
+            <a href={`${APP}`} style={{
+              background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+              color: "rgba(197,193,185,0.85)", padding: "16px 32px", borderRadius: 100,
+              fontWeight: 600, fontSize: 16, textDecoration: "none", transition: "all 0.25s ease",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.09)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; }}
+            >▶ Watch 90s Demo</a>
+          </div>
+        </FadeUp>
 
-        {/* Floating stat badges */}
-        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-          {[
-            { icon: "🌡", val: "−4.2°C", label: "avg cooling", delay: 0 },
-            { icon: "🏠", val: "2,800+", label: "green rooftops", delay: 0.1 },
-            { icon: "⚡", val: "18%",    label: "AC bill drop",  delay: 0.2 },
-            { icon: "🌿", val: "800+",   label: "species",       delay: 0.3 },
-          ].map(({ icon, val, label, delay }) => (
-            <div key={label} style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 14, padding: "12px 18px", animation: `badgeBob ${2.5 + delay}s ease-in-out infinite`, animationDelay: `${delay}s` }}>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", marginBottom: 2 }}>{icon} {label}</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", fontFamily: "'Space Grotesk',sans-serif" }}>{val}</div>
+        {/* Social proof + temp comparison */}
+        <FadeUp delay={0.4}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 32, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ display: "flex" }}>
+                {["🟢","🟢","🟢","🟢","🟢"].map((_, i) => (
+                  <div key={i} style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#1B4332,#52B788)", border: "2px solid #0d0d0d", marginLeft: i > 0 ? -8 : 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>🌿</div>
+                ))}
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>4.9/5</div>
+                <div style={{ fontSize: 11, color: "rgba(197,193,185,0.45)" }}>2,800+ households</div>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Scroll cue */}
-      <div style={{ position: "absolute", bottom: 32, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, animation: "float 2s ease-in-out infinite" }}>
-        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", letterSpacing: 2, fontFamily: "'JetBrains Mono',monospace" }}>SCROLL</span>
-        <div style={{ width: 1, height: 40, background: "linear-gradient(to bottom,rgba(82,183,136,0.5),transparent)" }} />
+            <div style={{ width: 1, height: 36, background: "rgba(255,255,255,0.08)" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 22, fontWeight: 900, color: "#f87171", fontFamily: "'Space Grotesk',sans-serif", letterSpacing: -0.5 }}>42.7°C</div>
+                <div style={{ fontSize: 10, color: "rgba(197,193,185,0.35)", letterSpacing: 1 }}>BEFORE</div>
+              </div>
+              <div style={{ fontSize: 18, color: "rgba(255,255,255,0.25)" }}>→</div>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 22, fontWeight: 900, color: "#52B788", fontFamily: "'Space Grotesk',sans-serif", letterSpacing: -0.5 }}>38.5°C</div>
+                <div style={{ fontSize: 10, color: "rgba(197,193,185,0.35)", letterSpacing: 1 }}>AFTER</div>
+              </div>
+              <div style={{ padding: "4px 12px", background: "rgba(82,183,136,0.15)", border: "1px solid rgba(82,183,136,0.25)", borderRadius: 100, fontSize: 12, fontWeight: 800, color: "#52B788" }}>−4.2°C</div>
+            </div>
+          </div>
+        </FadeUp>
       </div>
     </section>
   );
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   SOCIAL PROOF — Media logos marquee
+═══════════════════════════════════════════════════════════════ */
+const LOGOS = ["Times of India", "YourStory", "Smart Cities India", "NDTV", "IIT Bombay", "The Hindu", "Inc42", "Forbes India"];
+
 function SocialProof() {
-  const logos = ["Times of India", "YourStory", "Smart Cities India", "NDTV", "IIT Bombay", "Mint", "Economic Times"];
+  const repeated = [...LOGOS, ...LOGOS];
   return (
-    <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "18px 0", overflow: "hidden", position: "relative" }}>
-      <style>{`@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
-      <div style={{ display: "flex", gap: 60, animation: "marquee 22s linear infinite", width: "max-content" }}>
-        {[...logos, ...logos].map((l, i) => (
-          <span key={i} style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.20)", whiteSpace: "nowrap", letterSpacing: 1, textTransform: "uppercase" }}>{l}</span>
+    <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "24px 0", overflow: "hidden", position: "relative" }}>
+      <div style={{ display: "flex", width: "max-content", animation: "marquee 28s linear infinite" }}>
+        {repeated.map((logo, i) => (
+          <div key={i} style={{ padding: "0 48px", fontSize: 13, fontWeight: 600, color: "rgba(197,193,185,0.25)", whiteSpace: "nowrap", fontFamily: "'Space Grotesk',sans-serif", letterSpacing: 0.5 }}>
+            {logo}
+          </div>
         ))}
       </div>
     </div>
   );
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 01 — THE PROBLEM
+═══════════════════════════════════════════════════════════════ */
+function StatCount({ target, suffix = "", prefix = "", vis }) {
+  const val = useCountUp(target, vis);
+  return <span>{prefix}{val}{suffix}</span>;
+}
+
 function Problem() {
-  const [ref, vis] = useInView();
-  const c1 = useCountUp(7, vis); const c2 = useCountUp(8, vis); const c3 = useCountUp(72, vis);
-
+  const [ref, vis] = useInView(0.15);
   return (
-    <section style={{ padding: "100px 24px", maxWidth: 1200, margin: "0 auto" }}>
-      <FadeUp><SectionLabel n="01" label="The Heat Crisis" /></FadeUp>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
-        <FadeUp>
-          <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(32px,4vw,52px)", fontWeight: 700, lineHeight: 1.15, marginBottom: 20, letterSpacing: -1 }}>
-            Urban rooftops are <span style={{ color: "#F4845F" }}>7°C hotter</span> than they need to be
-          </h2>
-          <p style={{ fontSize: 16, color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
-            India's cities are heating up fast. Concrete rooftops absorb and re-radiate solar energy all night long — driving up AC costs, worsening air quality, and making outdoor spaces unusable for months.
-          </p>
-        </FadeUp>
+    <section ref={ref} style={{ padding: "100px 24px", maxWidth: 1100, margin: "0 auto" }}>
+      <FadeUp>
+        <SectionLabel n="01" label="The Problem" />
+        <h2 style={{ fontSize: "clamp(32px,5vw,60px)", fontWeight: 900, color: "#fff", letterSpacing: -2, lineHeight: 1.1, marginBottom: 20, fontFamily: "'Space Grotesk',sans-serif", maxWidth: 680 }}>
+          The heat crisis is real.
+        </h2>
+        <p style={{ fontSize: 18, color: "rgba(197,193,185,0.55)", lineHeight: 1.8, maxWidth: 560, marginBottom: 60 }}>
+          Indian cities are becoming dangerously hot. Concrete absorbs heat all day and radiates it at night — and your rooftops sit empty while your AC works overtime.
+        </p>
+      </FadeUp>
 
-        <div ref={ref} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {[
-            { n: `+${c1}°C`, label: "Rooftops hotter than green areas", color: "#F4845F", icon: "🌡" },
-            { n: `${c2}%`, label: "More electricity per extra degree", color: "#F9C74F", icon: "⚡" },
-            { n: `${c3}%`, label: "Of urban rooftops sit empty today", color: "#38BDF8", icon: "🏢" },
-          ].map(({ n, label, color, icon }) => (
-            <GlassCard key={label} style={{ padding: "20px 24px", display: "flex", alignItems: "center", gap: 20 }}>
-              <div style={{ fontSize: 28, width: 52, height: 52, borderRadius: 14, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
-              <div>
-                <div style={{ fontSize: 32, fontWeight: 800, color, fontFamily: "'Space Grotesk',sans-serif", lineHeight: 1 }}>{n}</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.50)", marginTop: 4 }}>{label}</div>
+      {/* Stat cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 20, marginBottom: 60 }}>
+        {[
+          { val: 7, suffix: "°C", label: "Hotter than surrounding rural areas", sub: "Urban heat island effect in Indian metros", color: "#f87171" },
+          { val: 0, suffix: "%", label: "Rooftop utilisation", sub: "Most rooftops sit empty while cities cook", color: "#fb923c" },
+          { val: 72, suffix: "%", label: "AC energy wasted", sub: "Fighting heat that could be reduced at source", color: "#fbbf24" },
+          { val: 8, suffix: "%", label: "CO₂ from urban cooling", sub: "More ACs = more heat = more ACs — a vicious loop", color: "#a78bfa" },
+        ].map((s, i) => (
+          <FadeUp key={i} delay={i * 0.08}>
+            <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "28px 24px" }}>
+              <div style={{ fontSize: "clamp(40px,5vw,56px)", fontWeight: 900, color: s.color, fontFamily: "'Space Grotesk',sans-serif", letterSpacing: -2, lineHeight: 1, marginBottom: 10 }}>
+                <StatCount target={s.val} suffix={s.suffix} vis={vis} />
               </div>
-            </GlassCard>
-          ))}
-        </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 6 }}>{s.label}</div>
+              <div style={{ fontSize: 12, color: "rgba(197,193,185,0.40)", lineHeight: 1.6 }}>{s.sub}</div>
+            </div>
+          </FadeUp>
+        ))}
       </div>
+
+      {/* Quote callout */}
+      <FadeUp>
+        <div style={{ background: "rgba(248,113,113,0.06)", border: "1px solid rgba(248,113,113,0.15)", borderRadius: 20, padding: "32px 36px", display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div style={{ fontSize: 36 }}>🌡️</div>
+          <div>
+            <p style={{ fontSize: 16, color: "rgba(197,193,185,0.75)", lineHeight: 1.8, fontStyle: "italic" }}>
+              "Without intervention, average summer temperatures in Indian metros could reach <strong style={{ color: "#f87171" }}>50°C by 2040</strong> — making outdoor activity impossible for most of the year."
+            </p>
+            <div style={{ fontSize: 12, color: "rgba(197,193,185,0.35)", marginTop: 12 }}>— National Action Plan on Climate Change (NAPCC), India</div>
+          </div>
+        </div>
+      </FadeUp>
     </section>
   );
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 02 — HOW IT WORKS
+═══════════════════════════════════════════════════════════════ */
 function HowItWorks() {
   const steps = [
-    { n: "01", icon: "📐", title: "Scan & Measure", body: "Point your camera at any rooftop, terrace or balcony. Computer vision measures your space precisely — no tape measure needed.", color: "#38BDF8" },
-    { n: "02", icon: "📍", title: "Detect Your Climate", body: "We pull live temperature, UV, humidity and wind data for your exact location and classify your heat zone in real time.", color: "#52B788" },
-    { n: "03", icon: "🌿", title: "Get Your AI Garden Plan", body: "Our AI picks species, builds your layout, estimates cooling impact in °C, and connects you with verified local installers.", color: "#A78BFA" },
-  ];
-  return (
-    <section style={{ padding: "100px 24px", maxWidth: 1200, margin: "0 auto" }}>
-      <FadeUp><SectionLabel n="02" label="How It Works" /></FadeUp>
-      <FadeUp delay={0.1}>
-        <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(32px,4vw,52px)", fontWeight: 700, letterSpacing: -1, marginBottom: 60, maxWidth: 500 }}>
-          Three steps to a <span style={{ color: "#52B788" }}>cooler space</span>
-        </h2>
-      </FadeUp>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24 }}>
-        {steps.map(({ n, icon, title, body, color }, i) => (
-          <FadeUp key={n} delay={i * 0.12}>
-            <GlassCard style={{ padding: "32px 28px", height: "100%" }}>
-              <div style={{ fontSize: 11, fontFamily: "'JetBrains Mono',monospace", fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 2, marginBottom: 20 }}>{n}</div>
-              <div style={{ width: 56, height: 56, borderRadius: 16, background: `${color}18`, border: `1px solid ${color}33`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, marginBottom: 20 }}>{icon}</div>
-              <h3 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 20, fontWeight: 700, color, marginBottom: 12 }}>{title}</h3>
-              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.52)", lineHeight: 1.7 }}>{body}</p>
-            </GlassCard>
-          </FadeUp>
-        ))}
-      </div>
-      <FadeUp delay={0.4} style={{ textAlign: "center", marginTop: 48 }}>
-        <CTAButton href="/how-it-works">See detailed walkthrough →</CTAButton>
-      </FadeUp>
-    </section>
-  );
-}
-
-function Features() {
-  const feats = [
-    { icon: "🌡", title: "Live Heat Detection", body: "Real-time climate data refreshed every 15 min from Open-Meteo API.", color: "#F4845F" },
-    { icon: "🤖", title: "AI Layout Engine",    body: "Species placement optimised for your heat zone, sun exposure and wind.", color: "#A78BFA" },
-    { icon: "📊", title: "Cooling Impact Score", body: "See estimated °C reduction, humidity gain, and CO₂ offset before you plant.", color: "#38BDF8" },
-    { icon: "🌿", title: "800+ Verified Species", body: "Drought-tolerant, pet-safe, native Indian species curated by horticulturists.", color: "#52B788" },
-    { icon: "🏗",  title: "Installer Network",   body: "Verified green-space contractors across 14 Indian cities, quoted in 24 hrs.", color: "#F9C74F" },
-    { icon: "📱", title: "Any Device",           body: "Scan from phone, manage from desktop. Works on iOS, Android, and web.", color: "#74C69D" },
-  ];
-  return (
-    <section style={{ padding: "100px 24px", maxWidth: 1200, margin: "0 auto" }}>
-      <FadeUp><SectionLabel n="03" label="Capabilities" /></FadeUp>
-      <FadeUp delay={0.1}>
-        <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(32px,4vw,52px)", fontWeight: 700, letterSpacing: -1, marginBottom: 60 }}>
-          Everything your garden needs
-        </h2>
-      </FadeUp>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18 }}>
-        {feats.map(({ icon, title, body, color }, i) => (
-          <FadeUp key={title} delay={i * 0.07}>
-            <GlassCard style={{ padding: "28px 24px" }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: `${color}15`, border: `1px solid ${color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 16 }}>{icon}</div>
-              <h3 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 16, fontWeight: 700, marginBottom: 8, color: "#fff" }}>{title}</h3>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.48)", lineHeight: 1.65 }}>{body}</p>
-            </GlassCard>
-          </FadeUp>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function BeforeAfter() {
-  const [pos, setPos] = useState(50);
-  const ref = useRef(null);
-  const drag = useRef(false);
-
-  const move = (clientX) => {
-    if (!drag.current || !ref.current) return;
-    const r = ref.current.getBoundingClientRect();
-    setPos(Math.min(95, Math.max(5, ((clientX - r.left) / r.width) * 100)));
-  };
-
-  return (
-    <section style={{ padding: "100px 24px", maxWidth: 1200, margin: "0 auto" }}>
-      <FadeUp><SectionLabel n="04" label="Real Results" /></FadeUp>
-      <FadeUp delay={0.1}>
-        <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(28px,4vw,48px)", fontWeight: 700, letterSpacing: -1, marginBottom: 10 }}>Before & after — drag to compare</h2>
-        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.45)", marginBottom: 40 }}>Mumbai rooftop · 42.2°C → 28.4°C surface temperature</p>
-      </FadeUp>
-      <FadeUp delay={0.2}>
-        <div ref={ref} style={{ position: "relative", borderRadius: 24, overflow: "hidden", height: 420, cursor: "ew-resize", border: "1px solid rgba(255,255,255,0.10)", userSelect: "none" }}
-          onMouseDown={() => drag.current = true}
-          onMouseUp={() => drag.current = false}
-          onMouseMove={e => move(e.clientX)}
-          onTouchStart={() => drag.current = true}
-          onTouchEnd={() => drag.current = false}
-          onTouchMove={e => move(e.touches[0].clientX)}
-        >
-          {/* "After" — green */}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#071A10,#1B4332,#2D6A4F)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 64, marginBottom: 12 }}>🌿</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#74C69D" }}>After</div>
-              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", marginTop: 4 }}>28.4°C · 6 species installed</div>
-            </div>
+    {
+      n: "01", icon: "📷", title: "Scan & measure",
+      desc: "Point your camera at any rooftop, balcony, or terrace. Our vision AI detects surface area, sun exposure, and obstacles in real time.",
+      demo: (
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono',monospace", color: "#52B788" }}>SCANNING</span>
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#52B788", display: "inline-block", animation: "pulse-glow 1.5s infinite" }} />
           </div>
-          {/* "Before" — heat, clipped */}
-          <div style={{ position: "absolute", inset: 0, clipPath: `inset(0 ${100 - pos}% 0 0)`, background: "linear-gradient(135deg,#2D0A0A,#7B1F1F,#C0392B)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 64, marginBottom: 12 }}>🌡</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#FF6B6B" }}>Before</div>
-              <div style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", marginTop: 4 }}>42.2°C · bare concrete</div>
-            </div>
+          <div style={{ fontSize: 28, fontWeight: 900, color: "#fff", fontFamily: "'Space Grotesk',sans-serif" }}>18.6 m²</div>
+          <div style={{ fontSize: 12, color: "rgba(197,193,185,0.45)" }}>Surface detected · terrace</div>
+          <div style={{ height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 4, marginTop: 16, overflow: "hidden" }}>
+            <div style={{ height: "100%", width: "72%", background: "linear-gradient(90deg,#52B788,#74C69D)", borderRadius: 4 }} />
           </div>
-          {/* Divider handle */}
-          <div style={{ position: "absolute", top: 0, bottom: 0, left: `${pos}%`, width: 3, background: "#fff", transform: "translateX(-50%)" }}>
-            <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 40, height: 40, borderRadius: "50%", background: "#fff", border: "3px solid rgba(82,183,136,0.8)", boxShadow: "0 0 20px rgba(82,183,136,0.5)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>⟺</div>
-          </div>
+          <div style={{ fontSize: 11, color: "rgba(197,193,185,0.35)", marginTop: 6 }}>Full sun · 72% scan complete</div>
         </div>
-
-        {/* Stats row */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginTop: 20 }}>
-          {[["−3.8°C","Surface temp","#52B788"],["42%","Humidity gain","#38BDF8"],["6","Species","#A78BFA"],["8 wks","To full cover","#F9C74F"]].map(([v, l, c]) => (
-            <div key={l} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "16px", textAlign: "center" }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: c, fontFamily: "'Space Grotesk',sans-serif" }}>{v}</div>
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", marginTop: 4 }}>{l}</div>
+      ),
+      color: "#52B788",
+    },
+    {
+      n: "02", icon: "🌡️", title: "Detect your climate",
+      desc: "Live weather data from Open-Meteo gives us your exact microclimate — temperature, UV index, humidity, and wind — updated hourly.",
+      demo: (
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 20 }}>
+          <div style={{ fontSize: 11, fontFamily: "'JetBrains Mono',monospace", color: "#38BDF8", marginBottom: 14 }}>LIVE CLIMATE DATA</div>
+          {[["🌡️", "38.2°C", "Feels like 44°C"],["☀️","UV 9.4","Extreme — shade critical"],["💧","58% RH","Moderate humidity"],["💨","12 km/h","NW breeze"]].map(([ic, val, sub]) => (
+            <div key={val} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+              <span style={{ fontSize: 16 }}>{ic}</span>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{val}</div>
+                <div style={{ fontSize: 11, color: "rgba(197,193,185,0.40)" }}>{sub}</div>
+              </div>
             </div>
           ))}
         </div>
-      </FadeUp>
-    </section>
-  );
-}
-
-function Testimonials() {
-  const testi = [
-    { name: "Amar Patel", city: "Mumbai · Juhu", q: "Our terrace went from 52°C to 38°C. My AC bill dropped 22% in the first summer. Worth every rupee.", stars: 5 },
-    { name: "Ravi Krishnan", city: "Bengaluru · Indiranagar", q: "HeatWise scanned our society rooftop in 8 minutes. 18% electricity bill reduction across 32 flats now.", stars: 5 },
-    { name: "Priya Shah", city: "Pune · Kothrud", q: "I was skeptical but the AI plan was spot-on. 6 species, all thriving. The balcony is 4°C cooler.", stars: 5 },
+      ),
+      color: "#38BDF8",
+    },
+    {
+      n: "03", icon: "🌿", title: "Get your AI garden plan",
+      desc: "AI cross-references your scan with 800+ climate-matched species. Get a ranked layout with projected cooling impact per zone.",
+      demo: (
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 20 }}>
+          <div style={{ fontSize: 11, fontFamily: "'JetBrains Mono',monospace", color: "#a78bfa", marginBottom: 14 }}>AI PLAN READY</div>
+          {[["🌴","Areca Palm","−2.1°C","#52B788"],["🎋","Bamboo","−1.4°C","#38BDF8"],["🍌","Banana","−1.3°C","#a78bfa"]].map(([ic, name, cool, col]) => (
+            <div key={name} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+              <span style={{ fontSize: 18 }}>{ic}</span>
+              <div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{name}</div></div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: col }}>{cool}</div>
+            </div>
+          ))}
+          <div style={{ marginTop: 14, padding: "10px 14px", background: "rgba(82,183,136,0.12)", border: "1px solid rgba(82,183,136,0.20)", borderRadius: 12, textAlign: "center" }}>
+            <span style={{ fontSize: 15, fontWeight: 900, color: "#52B788" }}>−3.8°C</span>
+            <span style={{ fontSize: 12, color: "rgba(197,193,185,0.55)", marginLeft: 6 }}>projected cooling</span>
+          </div>
+        </div>
+      ),
+      color: "#a78bfa",
+    },
   ];
+
   return (
-    <section style={{ padding: "100px 24px", maxWidth: 1200, margin: "0 auto" }}>
-      <FadeUp><SectionLabel n="05" label="Real People" /></FadeUp>
-      <FadeUp delay={0.1}>
-        <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(28px,4vw,48px)", fontWeight: 700, letterSpacing: -1, marginBottom: 50 }}>
-          Cooler homes, happier people
-        </h2>
-      </FadeUp>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
-        {testi.map(({ name, city, q, stars }, i) => (
-          <FadeUp key={name} delay={i * 0.1}>
-            <GlassCard style={{ padding: "28px 24px", borderLeft: "3px solid rgba(82,183,136,0.4)", height: "100%" }}>
-              <div style={{ display: "flex", gap: 2, marginBottom: 16 }}>{Array(stars).fill("⭐").join("")}</div>
-              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.75)", lineHeight: 1.7, marginBottom: 20, fontStyle: "italic" }}>"{q}"</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg,#1B4332,#52B788)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, color: "#fff" }}>{name[0]}</div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{name}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.40)" }}>{city}</div>
+    <section style={{ padding: "100px 24px", background: "rgba(255,255,255,0.01)", borderTop: "1px solid rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <FadeUp style={{ marginBottom: 64 }}>
+          <SectionLabel n="02" label="How It Works" />
+          <h2 style={{ fontSize: "clamp(30px,4.5vw,54px)", fontWeight: 900, color: "#fff", letterSpacing: -2, lineHeight: 1.1, fontFamily: "'Space Grotesk',sans-serif", maxWidth: 500 }}>
+            From scan to cool plan in under 5 minutes.
+          </h2>
+        </FadeUp>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 28 }}>
+          {steps.map((step, i) => (
+            <FadeUp key={i} delay={i * 0.12}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 14, background: `${step.color}18`, border: `1px solid ${step.color}33`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{step.icon}</div>
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: step.color, letterSpacing: 2, fontFamily: "'JetBrains Mono',monospace" }}>STEP {step.n}</div>
+                    <div style={{ fontSize: 17, fontWeight: 700, color: "#fff" }}>{step.title}</div>
+                  </div>
                 </div>
+                <p style={{ fontSize: 14, color: "rgba(197,193,185,0.55)", lineHeight: 1.8 }}>{step.desc}</p>
+                {step.demo}
               </div>
-            </GlassCard>
-          </FadeUp>
-        ))}
+            </FadeUp>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
-function Pricing() {
-  const [annual, setAnnual] = useState(false);
-  const plans = [
-    { name: "Starter", icon: "🌱", price: 0, apriceM: 0, desc: "For curious homeowners", features: ["1 scan per month", "Basic AI plant plan", "Species recommendations", "Community support"], cta: "Start Free", href: `${APP}?start=scan`, popular: false },
-    { name: "Green", icon: "🌿", price: 499, apriceM: 399, desc: "For active gardeners", features: ["Unlimited scans", "Full AI layout engine", "Cooling impact score", "Installer connect", "Analytics dashboard", "Priority support"], cta: "Get Started", href: `${APP}?start=scan`, popular: true },
-    { name: "Pro / Society", icon: "🌳", price: 2499, apriceM: 1999, desc: "For housing societies & builders", features: ["Multi-space management", "Society-wide dashboard", "API access", "Dedicated advisor", "Custom species list", "SLA support"], cta: "Talk to Us", href: "/contact", popular: false },
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 03 — CAPABILITIES
+═══════════════════════════════════════════════════════════════ */
+function Capabilities() {
+  const caps = [
+    { icon: "🛰️", title: "Live heat detection", desc: "Open-Meteo integration streams hourly temperature, UV, humidity, and wind for your exact microclimate.", color: "#f87171" },
+    { icon: "🤖", title: "AI layout engine", desc: "ML-optimised plant placement calculates shade, transpiration, and cooling per m² — not guesswork.", color: "#52B788" },
+    { icon: "📊", title: "Cooling impact scoring", desc: "Every layout gets a projected °C reduction, validated against 2,400+ real green installations.", color: "#38BDF8" },
+    { icon: "🌱", title: "800+ verified species", desc: "Curated library scored on 14 trait axes — heat tolerance, water need, root depth, canopy density.", color: "#a78bfa" },
+    { icon: "🏗️", title: "Installer network", desc: "Verified green-installation partners in 14 cities. Transparent quotes, progress photos, post-install measurement.", color: "#fb923c" },
+    { icon: "📱", title: "Cross-device sync", desc: "Start on mobile, finish on desktop. Projects sync instantly — share with your RWA committee or architect.", color: "#f472b6" },
   ];
 
   return (
-    <section id="pricing" style={{ padding: "100px 24px", maxWidth: 1200, margin: "0 auto" }}>
-      <FadeUp><SectionLabel n="06" label="Pricing" /></FadeUp>
-      <FadeUp delay={0.1} style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 50, flexWrap: "wrap", gap: 20 }}>
-        <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(28px,4vw,48px)", fontWeight: 700, letterSpacing: -1 }}>
-          Plant a plan that <span style={{ color: "#52B788" }}>grows with you</span>
+    <section style={{ padding: "100px 24px", maxWidth: 1100, margin: "0 auto" }}>
+      <FadeUp style={{ marginBottom: 64 }}>
+        <SectionLabel n="03" label="Capabilities" />
+        <h2 style={{ fontSize: "clamp(30px,4.5vw,54px)", fontWeight: 900, color: "#fff", letterSpacing: -2, lineHeight: 1.1, fontFamily: "'Space Grotesk',sans-serif", maxWidth: 520 }}>
+          Everything you need to cool a city block.
         </h2>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 12, padding: "8px 14px" }}>
-          <span style={{ fontSize: 13, color: annual ? "rgba(255,255,255,0.40)" : "#fff", fontWeight: 600 }}>Monthly</span>
-          <div onClick={() => setAnnual(a => !a)} style={{ width: 44, height: 24, borderRadius: 12, background: annual ? "#52B788" : "rgba(255,255,255,0.15)", position: "relative", cursor: "pointer", transition: "background .2s" }}>
-            <div style={{ position: "absolute", top: 2, left: annual ? 22 : 2, width: 20, height: 20, borderRadius: "50%", background: "#fff", transition: "left .2s" }} />
-          </div>
-          <span style={{ fontSize: 13, color: annual ? "#52B788" : "rgba(255,255,255,0.40)", fontWeight: 600 }}>Annual <span style={{ fontSize: 10, background: "rgba(82,183,136,0.2)", color: "#52B788", borderRadius: 6, padding: "2px 6px", marginLeft: 4 }}>−20%</span></span>
-        </div>
       </FadeUp>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
-        {plans.map(({ name, icon, price, apriceM, desc, features, cta, href, popular }, i) => (
-          <FadeUp key={name} delay={i * 0.1}>
-            <div style={{
-              background: popular ? "linear-gradient(160deg,rgba(45,106,79,0.3),rgba(82,183,136,0.15))" : "rgba(255,255,255,0.04)",
-              border: popular ? "1.5px solid rgba(82,183,136,0.5)" : "1px solid rgba(255,255,255,0.09)",
-              borderRadius: 24, padding: "32px 28px", height: "100%", display: "flex", flexDirection: "column",
-              boxShadow: popular ? "0 0 40px rgba(82,183,136,0.15)" : "none", position: "relative",
-            }}>
-              {popular && <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: "linear-gradient(135deg,#1B4332,#52B788)", color: "#fff", fontSize: 11, fontWeight: 800, padding: "4px 14px", borderRadius: 20, whiteSpace: "nowrap" }}>MOST POPULAR</div>}
-              <div style={{ fontSize: 32, marginBottom: 10 }}>{icon}</div>
-              <div style={{ fontSize: 20, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", marginBottom: 4 }}>{name}</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.40)", marginBottom: 20 }}>{desc}</div>
-              <div style={{ marginBottom: 24 }}>
-                <span style={{ fontSize: 42, fontWeight: 800, fontFamily: "'Space Grotesk',sans-serif", color: popular ? "#74C69D" : "#fff" }}>
-                  {price === 0 ? "Free" : `₹${annual ? apriceM : price}`}
-                </span>
-                {price > 0 && <span style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", marginLeft: 4 }}>/mo</span>}
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 28 }}>
-                {features.map(f => (
-                  <div key={f} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>
-                    <span style={{ color: "#52B788", fontSize: 12 }}>✓</span>{f}
-                  </div>
-                ))}
-              </div>
-              <CTAButton href={href} variant={popular ? "primary" : "ghost"} style={{ textAlign: "center", justifyContent: "center" }}>
-                {cta} →
-              </CTAButton>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 20 }}>
+        {caps.map((c, i) => (
+          <FadeUp key={i} delay={(i % 3) * 0.08}>
+            <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 20, padding: "28px 24px", transition: "all 0.25s ease", height: "100%" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.045)"; e.currentTarget.style.borderColor = `${c.color}33`; e.currentTarget.style.transform = "translateY(-3px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.025)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              <div style={{ width: 48, height: 48, borderRadius: 14, background: `${c.color}14`, border: `1px solid ${c.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 18 }}>{c.icon}</div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 10 }}>{c.title}</h3>
+              <p style={{ fontSize: 13, color: "rgba(197,193,185,0.50)", lineHeight: 1.75 }}>{c.desc}</p>
             </div>
           </FadeUp>
         ))}
@@ -462,37 +443,420 @@ function Pricing() {
   );
 }
 
-function FinalCTA() {
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 04 — REAL RESULTS (Before/After slider)
+═══════════════════════════════════════════════════════════════ */
+function BeforeAfter() {
+  const [pos, setPos] = useState(55);
+  const dragging = useRef(false);
+  const el = useRef(null);
+
+  const onMove = useCallback((clientX) => {
+    if (!dragging.current || !el.current) return;
+    const rect = el.current.getBoundingClientRect();
+    const pct = Math.max(8, Math.min(92, ((clientX - rect.left) / rect.width) * 100));
+    setPos(pct);
+  }, []);
+
+  useEffect(() => {
+    const up = () => { dragging.current = false; };
+    const move = (e) => onMove(e.touches ? e.touches[0].clientX : e.clientX);
+    window.addEventListener("mouseup", up);
+    window.addEventListener("touchend", up);
+    window.addEventListener("mousemove", move);
+    window.addEventListener("touchmove", move, { passive: true });
+    return () => {
+      window.removeEventListener("mouseup", up);
+      window.removeEventListener("touchend", up);
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("touchmove", move);
+    };
+  }, [onMove]);
+
   return (
-    <section style={{ padding: "80px 24px 120px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 0%,rgba(27,67,50,0.5) 0%,transparent 70%)", pointerEvents: "none" }} />
-      <FadeUp style={{ position: "relative", zIndex: 2 }}>
-        <div style={{ fontSize: 64, marginBottom: 20, display: "inline-block", animation: "float 3s ease-in-out infinite" }}>🌿</div>
-        <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(32px,5vw,60px)", fontWeight: 700, letterSpacing: -1.5, marginBottom: 16 }}>
-          Your rooftop is waiting
-        </h2>
-        <p style={{ fontSize: 18, color: "rgba(255,255,255,0.50)", marginBottom: 40, maxWidth: 480, margin: "0 auto 40px" }}>
-          Join 2,800+ households who've already started cooling their city.
-        </p>
-        <CTAButton href={`${APP}?start=scan`} style={{ fontSize: 16, padding: "16px 36px" }}>
-          📷 Start Your Free Scan →
-        </CTAButton>
+    <section style={{ padding: "100px 24px", background: "rgba(255,255,255,0.01)", borderTop: "1px solid rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <FadeUp style={{ marginBottom: 64 }}>
+          <SectionLabel n="04" label="Real Results" />
+          <h2 style={{ fontSize: "clamp(30px,4.5vw,54px)", fontWeight: 900, color: "#fff", letterSpacing: -2, lineHeight: 1.1, fontFamily: "'Space Grotesk',sans-serif", maxWidth: 560 }}>
+            Real degrees. Real rooftops.
+          </h2>
+        </FadeUp>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }} className="results-grid">
+          {/* Drag slider */}
+          <FadeUp>
+            <div ref={el} style={{ position: "relative", borderRadius: 24, overflow: "hidden", cursor: "col-resize", userSelect: "none", aspectRatio: "4/3", background: "#111" }}
+              onMouseDown={() => { dragging.current = true; }}
+              onTouchStart={() => { dragging.current = true; }}
+            >
+              {/* After (full width) */}
+              <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,#0a2015,#1B4332,#2D6A4F)", gap: 16 }}>
+                <div style={{ fontSize: 56 }}>🌿</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#52B788" }}>After — 6 species planted</div>
+                <div style={{ fontSize: 40, fontWeight: 900, color: "#52B788", fontFamily: "'Space Grotesk',sans-serif" }}>28.4°C</div>
+                <div style={{ fontSize: 13, color: "rgba(197,193,185,0.50)" }}>+42% humidity · 8 weeks</div>
+              </div>
+
+              {/* Before (clipped) */}
+              <div style={{ position: "absolute", inset: 0, clipPath: `inset(0 ${100 - pos}% 0 0)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,#2a0a0a,#4a1a1a,#8b2020)", gap: 16 }}>
+                <div style={{ fontSize: 56 }}>🌡️</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#f87171" }}>Before — bare concrete</div>
+                <div style={{ fontSize: 40, fontWeight: 900, color: "#f87171", fontFamily: "'Space Grotesk',sans-serif" }}>42.2°C</div>
+                <div style={{ fontSize: 13, color: "rgba(197,193,185,0.50)" }}>↑ Heat radiates all night</div>
+              </div>
+
+              {/* Divider */}
+              <div style={{ position: "absolute", top: 0, bottom: 0, left: `${pos}%`, width: 2, background: "#fff", transform: "translateX(-1px)" }}>
+                <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 36, height: 36, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(0,0,0,0.5)", fontSize: 14 }}>⟺</div>
+              </div>
+            </div>
+            <div style={{ textAlign: "center", marginTop: 14, fontSize: 12, color: "rgba(197,193,185,0.35)" }}>Drag to compare ←→</div>
+          </FadeUp>
+
+          {/* Stats */}
+          <FadeUp delay={0.15}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              {[
+                { label: "Surface temp drop", val: "−13.8°C", sub: "From 42.2°C to 28.4°C", color: "#52B788" },
+                { label: "Felt temperature", val: "−3.8°C", sub: "Average cooling across the zone", color: "#38BDF8" },
+                { label: "Humidity increase", val: "+42%", sub: "Passive evaporative cooling", color: "#a78bfa" },
+                { label: "Installation time", val: "8 weeks", sub: "Full canopy established", color: "#fb923c" },
+              ].map((s, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 22px", background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16 }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "rgba(197,193,185,0.70)" }}>{s.label}</div>
+                    <div style={{ fontSize: 12, color: "rgba(197,193,185,0.35)", marginTop: 3 }}>{s.sub}</div>
+                  </div>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: s.color, fontFamily: "'Space Grotesk',sans-serif" }}>{s.val}</div>
+                </div>
+              ))}
+            </div>
+          </FadeUp>
+        </div>
+      </div>
+      <style>{`@media(max-width:768px){.results-grid{grid-template-columns:1fr !important;}}`}</style>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 05 — SPECIES SHOWCASE
+═══════════════════════════════════════════════════════════════ */
+const SPECIES = [
+  { name: "Neem", latin: "Azadirachta indica", icon: "🌳", score: 96, tags: ["Native", "Medicinal", "Repels bugs"], color: "#52B788" },
+  { name: "Snake Plant", latin: "Sansevieria trifasciata", icon: "🌵", score: 92, tags: ["Indoor", "Drought OK", "Night O₂"], color: "#38BDF8" },
+  { name: "Money Plant", latin: "Epipremnum aureum", icon: "🍃", score: 88, tags: ["Indoor", "Beginner"], color: "#74C69D" },
+  { name: "Curry Leaf", latin: "Murraya koenigii", icon: "🌿", score: 85, tags: ["Native", "Edible", "Medicinal"], color: "#a78bfa" },
+  { name: "Lemongrass", latin: "Cymbopogon citratus", icon: "🌾", score: 81, tags: ["Edible", "Repels bugs", "Pollinator"], color: "#fb923c" },
+  { name: "Tulsi", latin: "Ocimum sanctum", icon: "🌱", score: 78, tags: ["Native", "Medicinal", "Edible"], color: "#f472b6" },
+  { name: "Aloe Vera", latin: "Aloe barbadensis", icon: "🪴", score: 73, tags: ["Drought OK", "Medicinal", "Indoor"], color: "#fbbf24" },
+  { name: "Marigold", latin: "Tagetes erecta", icon: "🌻", score: 65, tags: ["Pollinator", "Repels bugs", "Native"], color: "#52B788" },
+];
+
+function SpeciesShowcase() {
+  return (
+    <section style={{ padding: "100px 24px", maxWidth: 1100, margin: "0 auto" }}>
+      <FadeUp style={{ marginBottom: 64 }}>
+        <SectionLabel n="05" label="Species Library" />
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 20 }}>
+          <h2 style={{ fontSize: "clamp(30px,4.5vw,54px)", fontWeight: 900, color: "#fff", letterSpacing: -2, lineHeight: 1.1, fontFamily: "'Space Grotesk',sans-serif" }}>
+            800+ species.<br />Every one ranked.
+          </h2>
+          <a href="/species" style={{ fontSize: 14, fontWeight: 700, color: "#52B788", textDecoration: "none", display: "flex", alignItems: "center", gap: 6, borderBottom: "1px solid rgba(82,183,136,0.30)", paddingBottom: 2 }}>View full library →</a>
+        </div>
+      </FadeUp>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 16 }}>
+        {SPECIES.map((s, i) => (
+          <FadeUp key={s.name} delay={(i % 4) * 0.07}>
+            <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 18, padding: "22px 20px", transition: "all 0.25s ease" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = `${s.color}40`; e.currentTarget.style.transform = "translateY(-3px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+                <div style={{ fontSize: 28 }}>{s.icon}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{s.name}</div>
+                  <div style={{ fontSize: 11, color: "rgba(197,193,185,0.35)", fontStyle: "italic" }}>{s.latin}</div>
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: s.color, fontFamily: "'Space Grotesk',sans-serif" }}>{s.score}</div>
+              </div>
+              {/* Score bar */}
+              <div style={{ height: 3, background: "rgba(255,255,255,0.07)", borderRadius: 3, marginBottom: 14, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${s.score}%`, background: `linear-gradient(90deg,${s.color},${s.color}99)`, borderRadius: 3 }} />
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {s.tags.map(t => (
+                  <span key={t} style={{ fontSize: 10, fontWeight: 600, color: s.color, background: `${s.color}14`, border: `1px solid ${s.color}28`, borderRadius: 100, padding: "2px 9px" }}>{t}</span>
+                ))}
+              </div>
+            </div>
+          </FadeUp>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 06 — TESTIMONIALS
+═══════════════════════════════════════════════════════════════ */
+const TESTIMONIALS = [
+  { name: "Aanya Mehta", location: "Mumbai, Bandra", quote: "Our terrace went from 44°C to 36°C in two months. The kids actually use it now in May.", stars: 5 },
+  { name: "Ravi Krishnan", location: "Bengaluru, Indiranagar", quote: "The AI plan picked native species I'd never have considered. Maintenance is almost zero.", stars: 5 },
+  { name: "Priya Shah", location: "Pune, Kothrud", quote: "Our society's electricity bill dropped 18% after greening four rooftops. Pays for itself.", stars: 5 },
+];
+
+function Testimonials() {
+  return (
+    <section style={{ padding: "100px 24px", background: "rgba(255,255,255,0.01)", borderTop: "1px solid rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <FadeUp style={{ textAlign: "center", marginBottom: 64 }}>
+          <SectionLabel n="06" label="What people say" />
+          <h2 style={{ fontSize: "clamp(28px,4vw,50px)", fontWeight: 900, color: "#fff", letterSpacing: -2, fontFamily: "'Space Grotesk',sans-serif" }}>
+            Real households. Real cooling.
+          </h2>
+        </FadeUp>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 24 }}>
+          {TESTIMONIALS.map((t, i) => (
+            <FadeUp key={i} delay={i * 0.1}>
+              <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)", borderLeft: "3px solid #52B788", borderRadius: 20, padding: "32px 28px", height: "100%" }}>
+                <div style={{ display: "flex", gap: 2, marginBottom: 20 }}>
+                  {Array.from({ length: t.stars }).map((_, j) => <span key={j} style={{ color: "#fbbf24", fontSize: 14 }}>★</span>)}
+                </div>
+                <p style={{ fontSize: 16, color: "rgba(197,193,185,0.80)", lineHeight: 1.75, marginBottom: 24, fontStyle: "italic" }}>"{t.quote}"</p>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{t.name}</div>
+                  <div style={{ fontSize: 12, color: "rgba(197,193,185,0.40)" }}>{t.location}</div>
+                </div>
+              </div>
+            </FadeUp>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 07 — LIVE CITY HEAT COVERAGE
+═══════════════════════════════════════════════════════════════ */
+const CITIES = [
+  { name: "Delhi",     temp: 46.2, tier: 4 },
+  { name: "Mumbai",    temp: 42.7, tier: 3 },
+  { name: "Kolkata",   temp: 41.8, tier: 3 },
+  { name: "Chennai",   temp: 43.4, tier: 3 },
+  { name: "Bengaluru", temp: 39.6, tier: 2 },
+  { name: "Hyderabad", temp: 44.1, tier: 4 },
+  { name: "Ahmedabad", temp: 45.8, tier: 4 },
+  { name: "Jaipur",    temp: 44.9, tier: 4 },
+  { name: "Pune",      temp: 41.2, tier: 3 },
+  { name: "Lucknow",   temp: 43.7, tier: 3 },
+  { name: "Surat",     temp: 42.3, tier: 3 },
+  { name: "Kochi",     temp: 36.4, tier: 1 },
+];
+
+const TIER_COLORS = { 1: "#52B788", 2: "#fbbf24", 3: "#fb923c", 4: "#f87171" };
+const TIER_LABELS = { 1: "<39°C", 2: "39–42°C", 3: "42–45°C", 4: ">45°C" };
+
+function LiveCoverage() {
+  return (
+    <section style={{ padding: "100px 24px", maxWidth: 1100, margin: "0 auto" }}>
+      <FadeUp style={{ marginBottom: 64 }}>
+        <SectionLabel n="07" label="Live Coverage" />
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 20, marginBottom: 12 }}>
+          <h2 style={{ fontSize: "clamp(28px,4vw,50px)", fontWeight: 900, color: "#fff", letterSpacing: -2, fontFamily: "'Space Grotesk',sans-serif" }}>
+            Tracking heat across<br />12 metros. Live.
+          </h2>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {Object.entries(TIER_LABELS).map(([tier, label]) => (
+              <div key={tier} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: TIER_COLORS[tier] }} />
+                <span style={{ fontSize: 11, color: "rgba(197,193,185,0.45)" }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ fontSize: 12, color: "rgba(197,193,185,0.30)", fontFamily: "'JetBrains Mono',monospace" }}>MODIS LST · 1km resolution · updated hourly</div>
+      </FadeUp>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(160px,1fr))", gap: 14 }}>
+        {CITIES.map((c, i) => (
+          <FadeUp key={c.name} delay={(i % 6) * 0.06}>
+            <div style={{ background: "rgba(255,255,255,0.025)", border: `1px solid ${TIER_COLORS[c.tier]}30`, borderRadius: 16, padding: "20px 16px", textAlign: "center", transition: "all 0.25s ease" }}
+              onMouseEnter={e => { e.currentTarget.style.background = `${TIER_COLORS[c.tier]}10`; e.currentTarget.style.transform = "translateY(-3px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.025)"; e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: TIER_COLORS[c.tier] }} />
+                <span style={{ fontSize: 11, color: "rgba(197,193,185,0.50)", fontWeight: 600 }}>{c.name}</span>
+              </div>
+              <div style={{ fontSize: 28, fontWeight: 900, color: TIER_COLORS[c.tier], fontFamily: "'Space Grotesk',sans-serif", letterSpacing: -1 }}>{c.temp}°</div>
+              <div style={{ fontSize: 11, color: "rgba(197,193,185,0.30)", marginTop: 4 }}>surface temp</div>
+            </div>
+          </FadeUp>
+        ))}
+      </div>
+
+      <FadeUp style={{ marginTop: 40, textAlign: "center" }}>
+        <a href={`${APP}?start=scan`} style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 700, color: "#52B788", textDecoration: "none" }}>
+          📍 Get cooling plan for your city →
+        </a>
       </FadeUp>
     </section>
   );
 }
 
-/* ─── PAGE ────────────────────────────────────────────────── */
-export default function HomePage() {
+/* ═══════════════════════════════════════════════════════════════
+   PRICING
+═══════════════════════════════════════════════════════════════ */
+function Pricing() {
+  const [annual, setAnnual] = useState(false);
+
+  const plans = [
+    {
+      name: "Starter", price: "Free", priceAnnual: "Free", badge: null,
+      desc: "Perfect for homeowners starting their first green project.",
+      features: ["1 scan / month", "Basic AI layout plan", "Species recommendations", "Email support"],
+      cta: "Get started free", ctaHref: `${APP}?start=scan`, ghost: false,
+    },
+    {
+      name: "Green", price: "₹499", priceAnnual: "₹399", badge: "Most Popular",
+      desc: "For households serious about measurable cooling.",
+      features: ["Unlimited scans", "Full AI layout engine", "Cooling impact analytics", "Installer connection", "Priority support"],
+      cta: "Start Green plan", ctaHref: `${APP}`, ghost: false,
+    },
+    {
+      name: "Society / Pro", price: "₹2,499", priceAnnual: "₹1,999", badge: null,
+      desc: "For RWAs, corporates, and multi-space management.",
+      features: ["All Green features", "Multi-space dashboard", "Analytics & reporting", "Dedicated advisor", "API access"],
+      cta: "Contact us", ctaHref: "/contact", ghost: true,
+    },
+  ];
+
+  return (
+    <section id="pricing" style={{ padding: "100px 24px", background: "rgba(255,255,255,0.01)", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <FadeUp style={{ textAlign: "center", marginBottom: 64 }}>
+          <SectionLabel n="08" label="Pricing" />
+          <h2 style={{ fontSize: "clamp(28px,4.5vw,52px)", fontWeight: 900, color: "#fff", letterSpacing: -2, fontFamily: "'Space Grotesk',sans-serif", marginBottom: 24 }}>
+            Start free. Scale as you grow.
+          </h2>
+          {/* Toggle */}
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 100, padding: "4px 6px" }}>
+            <button onClick={() => setAnnual(false)} style={{ padding: "8px 20px", borderRadius: 100, border: "none", background: !annual ? "#fff" : "transparent", color: !annual ? "#0d0d0d" : "rgba(197,193,185,0.55)", fontWeight: 700, fontSize: 13, cursor: "pointer", transition: "all 0.2s" }}>Monthly</button>
+            <button onClick={() => setAnnual(true)} style={{ padding: "8px 20px", borderRadius: 100, border: "none", background: annual ? "#fff" : "transparent", color: annual ? "#0d0d0d" : "rgba(197,193,185,0.55)", fontWeight: 700, fontSize: 13, cursor: "pointer", transition: "all 0.2s" }}>
+              Annual <span style={{ color: annual ? "#1B4332" : "#52B788", fontSize: 11 }}>−20%</span>
+            </button>
+          </div>
+        </FadeUp>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 20, alignItems: "stretch" }}>
+          {plans.map((plan, i) => (
+            <FadeUp key={plan.name} delay={i * 0.1}>
+              <div style={{
+                background: plan.badge ? "rgba(82,183,136,0.06)" : "rgba(255,255,255,0.025)",
+                border: plan.badge ? "1px solid rgba(82,183,136,0.25)" : "1px solid rgba(255,255,255,0.07)",
+                borderRadius: 24, padding: "36px 28px", display: "flex", flexDirection: "column", height: "100%",
+                boxShadow: plan.badge ? "0 0 60px rgba(82,183,136,0.10)" : "none",
+              }}>
+                {plan.badge && (
+                  <div style={{ display: "inline-block", fontSize: 11, fontWeight: 800, color: "#52B788", background: "rgba(82,183,136,0.15)", border: "1px solid rgba(82,183,136,0.25)", borderRadius: 100, padding: "4px 14px", marginBottom: 16, letterSpacing: 0.5 }}>{plan.badge}</div>
+                )}
+                <div style={{ fontSize: 15, fontWeight: 700, color: "rgba(197,193,185,0.80)", marginBottom: 8 }}>{plan.name}</div>
+                <div style={{ marginBottom: 6 }}>
+                  <span style={{ fontSize: 40, fontWeight: 900, color: "#fff", fontFamily: "'Space Grotesk',sans-serif", letterSpacing: -1 }}>{annual ? plan.priceAnnual : plan.price}</span>
+                  {plan.price !== "Free" && <span style={{ fontSize: 13, color: "rgba(197,193,185,0.40)", marginLeft: 6 }}>/month</span>}
+                </div>
+                <p style={{ fontSize: 13, color: "rgba(197,193,185,0.45)", lineHeight: 1.7, marginBottom: 28 }}>{plan.desc}</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32, flex: 1 }}>
+                  {plan.features.map(f => (
+                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", background: "rgba(82,183,136,0.15)", border: "1px solid rgba(82,183,136,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#52B788", flexShrink: 0 }}>✓</div>
+                      <span style={{ fontSize: 13, color: "rgba(197,193,185,0.65)" }}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+                <a href={plan.ctaHref} style={{
+                  display: "block", textAlign: "center", padding: "14px 24px", borderRadius: 100,
+                  fontWeight: 700, fontSize: 14, textDecoration: "none", transition: "all 0.22s ease",
+                  ...(plan.ghost
+                    ? { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(197,193,185,0.80)" }
+                    : { background: "linear-gradient(135deg,#1B4332,#52B788)", color: "#fff", boxShadow: "0 6px 24px rgba(82,183,136,0.30)" }
+                  ),
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.03)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; }}
+                >{plan.cta}</a>
+              </div>
+            </FadeUp>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FINAL CTA
+═══════════════════════════════════════════════════════════════ */
+function FinalCTA() {
+  return (
+    <section style={{ padding: "120px 24px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(27,67,50,0.20) 0%, transparent 65%)", pointerEvents: "none" }} />
+      <HeatParticles />
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 640, margin: "0 auto" }}>
+        <FadeUp>
+          <div style={{ fontSize: 56, marginBottom: 24, animation: "float 4s ease-in-out infinite" }}>🌿</div>
+          <h2 style={{ fontSize: "clamp(32px,5vw,60px)", fontWeight: 900, color: "#fff", letterSpacing: -2, lineHeight: 1.1, marginBottom: 20, fontFamily: "'Space Grotesk',sans-serif" }}>
+            Your city can be cooler.<br />Start now — it's free.
+          </h2>
+          <p style={{ fontSize: 17, color: "rgba(197,193,185,0.55)", lineHeight: 1.75, marginBottom: 40 }}>
+            Scan your rooftop, balcony, or terrace. Get an AI-matched plant plan. Measure real cooling. No consultant required.
+          </p>
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
+            <a href={`${APP}?start=scan`} style={{
+              background: "linear-gradient(135deg,#1B4332,#2D6A4F,#52B788)",
+              color: "#fff", padding: "18px 40px", borderRadius: 100,
+              fontWeight: 700, fontSize: 17, textDecoration: "none",
+              boxShadow: "0 8px 40px rgba(82,183,136,0.45)",
+              display: "flex", alignItems: "center", gap: 10,
+              transition: "all 0.25s ease",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.05)"; e.currentTarget.style.boxShadow = "0 12px 56px rgba(82,183,136,0.60)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 8px 40px rgba(82,183,136,0.45)"; }}
+            >📷 Start Free Scan →</a>
+          </div>
+          <div style={{ marginTop: 28, display: "flex", justifyContent: "center", gap: 28, flexWrap: "wrap" }}>
+            {["No credit card required", "Results in 2 minutes", "14 cities · live installer network"].map(s => (
+              <div key={s} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ color: "#52B788", fontSize: 12 }}>✓</span>
+                <span style={{ fontSize: 12, color: "rgba(197,193,185,0.40)" }}>{s}</span>
+              </div>
+            ))}
+          </div>
+        </FadeUp>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE
+═══════════════════════════════════════════════════════════════ */
+export default function Home() {
   return (
     <MarketingLayout>
       <Hero />
       <SocialProof />
       <Problem />
       <HowItWorks />
-      <Features />
+      <Capabilities />
       <BeforeAfter />
+      <SpeciesShowcase />
       <Testimonials />
+      <LiveCoverage />
       <Pricing />
       <FinalCTA />
     </MarketingLayout>
