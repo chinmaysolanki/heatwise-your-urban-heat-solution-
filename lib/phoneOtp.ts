@@ -85,16 +85,23 @@ export function usesConsoleOtpDelivery(): boolean {
 }
 
 export async function sendOtpSms(params: { phoneNumber: string; otpCode: string }): Promise<void> {
-  // Production-ready abstraction: wire Twilio/etc here.
-  // For now: log OTP in non-production to keep local demos unblocked.
-  const allowDevOtp = String(process.env.HEATWISE_DEV_OTP ?? "").toLowerCase() === "true";
-  if (process.env.NODE_ENV !== "production" || allowDevOtp) {
-    // eslint-disable-next-line no-console
-    console.log(`[HeatWise OTP] ${params.phoneNumber}: ${params.otpCode}`);
-    return;
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken  = process.env.TWILIO_AUTH_TOKEN;
+  const fromNumber = process.env.TWILIO_PHONE_NUMBER;
+
+  if (!accountSid || !authToken || !fromNumber) {
+    throw new Error("Twilio credentials not configured (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER)");
   }
 
-  throw new Error("SMS provider not configured. Set up sendOtpSms for production.");
+  // Dynamic import keeps Twilio out of the module graph until actually needed
+  const twilio = (await import("twilio")).default;
+  const client = twilio(accountSid, authToken);
+
+  await client.messages.create({
+    body: `Your HeatWise verification code is: ${params.otpCode}\n\nValid for 10 minutes. Do not share this code.`,
+    from: fromNumber,
+    to: params.phoneNumber,
+  });
 }
 
 export async function findOrCreateUserByPhone(phoneNumber: string) {

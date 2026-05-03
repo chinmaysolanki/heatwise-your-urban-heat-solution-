@@ -3,7 +3,6 @@ import crypto from "crypto";
 import {
   normalizePhoneNumber,
   verifyOtpAndConsume,
-  usesConsoleOtpDelivery,
 } from "@/lib/phoneOtp";
 
 /** Must match signDevToken() in send-otp.ts */
@@ -36,7 +35,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // ── Dev / no-DB mode ──────────────────────────────────────────────────────
-  if (usesConsoleOtpDelivery()) {
+  // Use same detection logic as send-otp.ts: check if DATABASE_URL is a postgres
+  // connection string, not NODE_ENV. On Vercel without a postgres DATABASE_URL,
+  // NODE_ENV=production but we still cannot hit the DB — so we use the stateless
+  // dev token path. This was the root cause of the "DATABASE_URL not found" crash.
+  const dbUrl        = process.env.DATABASE_URL ?? "";
+  const isPostgres   = dbUrl.startsWith("postgres");
+  const forceDevOtp  = String(process.env.HEATWISE_DEV_OTP ?? "").toLowerCase() === "true";
+  if (!isPostgres || forceDevOtp) {
     const devToken    = String(body.devToken ?? "");
     const expiresAtMs = Number(body.expiresAt ? new Date(body.expiresAt).getTime() : 0);
 

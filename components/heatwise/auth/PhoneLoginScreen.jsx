@@ -79,31 +79,7 @@ export function PhoneLoginScreen({ onOtpSent }) {
           </button>
         </div>
 
-        {debugOtp && (
-          <div
-            className="mono"
-            style={{
-              marginTop: 16,
-              fontSize: 11,
-              padding: "12px 14px",
-              borderRadius: 10,
-              background: "rgba(0,255,136,.08)",
-              border: "1px solid rgba(0,255,136,.22)",
-              color: "rgba(224,245,232,.95)",
-              lineHeight: 1.5,
-            }}
-          >
-            <span style={{ color: T.textDim }}>Your code (dev — no SMS):</span>{" "}
-            <strong className="ng" style={{ letterSpacing: "3px" }}>
-              {debugOtp}
-            </strong>
-          </div>
-        )}
       </div>
-
-      <p className="mono" style={{ marginTop: 18, color: "rgba(184,220,192,.45)", fontSize: 10, lineHeight: 1.6 }}>
-        Local builds show the code on-screen and in the server terminal instead of SMS.
-      </p>
     </div>
   );
 }

@@ -22,38 +22,57 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: "Invalid phone number" });
   }
 
-  const otpCode    = generateOtpCode();
-  const expiresAt  = Date.now() + 10 * 60_000;  // 10 min
-  const devToken   = signDevToken(phoneNumber, otpCode, expiresAt);
+  const otpCode   = generateOtpCode();
+  const expiresAt = Date.now() + 10 * 60_000; // 10 min
+  const devToken  = signDevToken(phoneNumber, otpCode, expiresAt);
 
-  // Try to persist to DB (works in production with Neon; skipped silently otherwise)
-  let savedToDb = false;
-  try {
-    const isPostgres = (process.env.DATABASE_URL ?? "").startsWith("postgres");
-    const devOtp     = String(process.env.HEATWISE_DEV_OTP ?? "").toLowerCase() === "true";
-    if (isPostgres && !devOtp) {
-      const { createOrReplaceOtp, sendOtpSms } = await import("@/lib/phoneOtp");
-      await createOrReplaceOtp({ phoneNumber, otpCode, ttlMinutes: 10 });
+  const isPostgres = (process.env.DATABASE_URL ?? "").startsWith("postgres");
+  const isTwilio   = !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER);
+  const devOtp     = String(process.env.HEATWISE_DEV_OTP ?? "").toLowerCase() === "true";
+
+  // ── Send real SMS via Twilio (independent of DB) ──────────────────────────
+  let smsSent = false;
+  if (isTwilio && !devOtp) {
+    try {
+      const { sendOtpSms } = await import("@/lib/phoneOtp");
       await sendOtpSms({ phoneNumber, otpCode });
-      savedToDb = true;
+      smsSent = true;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[HeatWise OTP] Twilio send failed:", err);
     }
-  } catch {
-    // DB not connected or SMS not configured — fall through to stateless dev mode
-    savedToDb = false;
   }
 
-  // Log OTP to server console always (visible in Vercel function logs)
-  // eslint-disable-next-line no-console
-  console.log(`[HeatWise OTP] ${phoneNumber}: ${otpCode}`);
+  // ── Persist to DB for DB-backed verification (Neon/postgres) ─────────────
+  let savedToDb = false;
+  if (isPostgres && !devOtp) {
+    try {
+      const { createOrReplaceOtp } = await import("@/lib/phoneOtp");
+      await createOrReplaceOtp({ phoneNumber, otpCode, ttlMinutes: 10 });
+      savedToDb = true;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[HeatWise OTP] DB save failed:", err);
+    }
+  }
+
+  // ── Console fallback (always log when not sent via SMS) ───────────────────
+  if (!smsSent) {
+    // eslint-disable-next-line no-console
+    console.log(`[HeatWise OTP] ${phoneNumber}: ${otpCode}`);
+  }
 
   return res.status(200).json({
     ok:         true,
     phoneNumber,
     expiresAt:  new Date(expiresAt).toISOString(),
-    delivery:   savedToDb ? "sms" : "console",
-    debugOtp:   savedToDb ? undefined : otpCode,
+    // "sms" when Twilio delivered it; "console" when falling back to log
+    delivery:   smsSent ? "sms" : "console",
+    // Only expose the raw code in dev/console mode — never when SMS was sent
+    debugOtp:   smsSent ? undefined : otpCode,
+    // devToken is needed by verify-otp when DB is not available for verification
     devToken:   savedToDb ? undefined : devToken,
-    notice:     savedToDb
+    notice:     smsSent
       ? undefined
       : "Dev mode — no SMS sent. Your code is shown below.",
   });

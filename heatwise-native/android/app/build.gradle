@@ -57,6 +57,11 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
+
+    // ── ARCore — Google Play Services for AR ─────────────────────────────
+    // Required for ViroReact ARCore plane detection & world-space anchors.
+    // Min ARCore-supported API level is 24 (Android 7.0).
+    implementation 'com.google.ar:core:1.44.0'
 }
 
 apply from: 'capacitor.build.gradle'

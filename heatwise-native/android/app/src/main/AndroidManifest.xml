@@ -20,6 +20,16 @@
         android:name="android.hardware.camera.any"
         android:required="false" />
 
+    <!-- ── ARCore (Google Play Services for AR) ──────────────────────────── -->
+    <!-- required=false: app installs on non-AR devices; AR features degrade gracefully -->
+    <uses-feature
+        android:name="android.hardware.camera.ar"
+        android:required="false" />
+    <!-- Tells Play Store this app uses ARCore; prompts install of ARCore service if missing -->
+    <meta-data
+        android:name="com.google.ar.core"
+        android:value="optional" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

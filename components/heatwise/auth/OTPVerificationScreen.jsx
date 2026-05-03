@@ -54,7 +54,7 @@ export function OTPVerificationScreen({ phoneNumber, initialDebugOtp, otpDeliver
     } finally {
       setBusy(false);
     }
-  }, [onAuthed, otp, phoneNumber]);
+  }, [onAuthed, otp, phoneNumber, devToken, expiresAt]);
 
   return (
     <div className="auth-card" style={{ margin: "0 auto" }}>
@@ -79,13 +79,13 @@ export function OTPVerificationScreen({ phoneNumber, initialDebugOtp, otpDeliver
             lineHeight: 1.55,
             padding: "12px 14px",
             borderRadius: 10,
-            background: "rgba(255,184,0,.1)",
-            border: "1px solid rgba(255,184,0,.28)",
-            color: "rgba(255,230,180,.95)",
+            background: "rgba(56,189,248,.08)",
+            border: "1px solid rgba(56,189,248,.2)",
+            color: "rgba(184,220,232,.9)",
           }}
         >
-          {notice ||
-            "No SMS in this environment. Use the code below or your dev server terminal ([HeatWise OTP])."}
+          Code sent — check your messages. Didn't receive it?{" "}
+          <span style={{ color: "rgba(56,189,248,.9)", fontWeight: 700 }}>Tap Resend.</span>
         </div>
       )}
 
@@ -108,21 +108,6 @@ export function OTPVerificationScreen({ phoneNumber, initialDebugOtp, otpDeliver
           disabled={busy}
         />
 
-        {debugOtp && (
-          <div
-            className="mono"
-            style={{
-              marginTop: 14,
-              fontSize: 11,
-              padding: "10px 12px",
-              borderRadius: 10,
-              background: "rgba(0,255,136,.07)",
-              border: "1px solid rgba(0,255,136,.2)",
-            }}
-          >
-            Code: <strong className="ng" style={{ letterSpacing: "3px" }}>{debugOtp}</strong>
-          </div>
-        )}
 
         {error && (
           <div className="mono" style={{ marginTop: 12, fontSize: 11, color: T.orange, letterSpacing: "0.5px" }}>

@@ -11,6 +11,16 @@ export function CompleteProfileScreen({ initialProfile, onCompleted, onSkip }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
 
+  const fieldErrors = useMemo(() => {
+    const a = Number(age);
+    return {
+      email: email && !String(email).includes("@") ? "Enter a valid email address" : null,
+      city: city && city.trim().length < 2 ? "Enter your city" : null,
+      state: state && state.trim().length < 2 ? "Enter your state" : null,
+      age: age && (!Number.isFinite(a) || a < 1 || a > 120) ? "Age must be between 1 and 120" : null,
+    };
+  }, [age, city, email, state]);
+
   const valid = useMemo(() => {
     const a = Number(age);
     return (
@@ -65,23 +75,25 @@ export function CompleteProfileScreen({ initialProfile, onCompleted, onSkip }) {
 
       <div style={{ marginTop: 22 }}>
         {[
-          ["EMAIL", email, setEmail, "email", "you@example.com"],
-          ["CITY", city, setCity, "text", "e.g. Pune"],
-          ["STATE", state, setState, "text", "e.g. Maharashtra"],
-          ["COUNTRY", country, setCountry, "text", "e.g. India"],
-          ["AGE", age, setAge, "number", "e.g. 28"],
-        ].map(([label, val, setter, type, placeholder]) => (
+          ["EMAIL", email, setEmail, "email", "you@example.com", fieldErrors.email],
+          ["CITY", city, setCity, "text", "e.g. Pune", fieldErrors.city],
+          ["STATE", state, setState, "text", "e.g. Maharashtra", fieldErrors.state],
+          ["COUNTRY", country, setCountry, "text", "e.g. India", null],
+          ["AGE", age, setAge, "number", "e.g. 28", fieldErrors.age],
+        ].map(([label, val, setter, type, placeholder, fieldErr]) => (
           <div key={label} style={{ marginBottom: 12 }}>
             <div className="slabel" style={{ marginBottom: 8 }}>{label}</div>
             <input
               className="hinp mono"
               value={val}
+              style={fieldErr ? { borderColor: "rgba(244,63,94,0.6)" } : undefined}
               onChange={e => setter(e.target.value)}
               type={type}
               inputMode={label === "AGE" ? "numeric" : undefined}
               placeholder={placeholder}
               disabled={busy}
             />
+            {fieldErr && <div style={{ fontSize: 11, color: "rgba(244,63,94,0.9)", marginTop: 4, fontFamily: "'DM Sans',sans-serif" }}>{fieldErr}</div>}
           </div>
         ))}
 
