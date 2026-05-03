@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import MarketingLayout from "../components/marketing/MarketingLayout";
+import MarketingLayout from "@/components/marketing/MarketingLayout";
 
 const C = {
   CREAM: "#fafaf6",

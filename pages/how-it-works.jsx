@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import MarketingLayout from "../components/marketing/MarketingLayout";
+import MarketingLayout from "@/components/marketing/MarketingLayout";
 
 const C = {
   CREAM: "#fafaf6",
@@ -179,7 +179,7 @@ export default function HowItWorksPage() {
             From a blank rooftop to a thriving green canopy in three steps — powered by satellite data, AR scanning and a recommendation engine trained on 50,000+ Indian rooftops.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}>
-            <GreenBtn href="/app?start=scan" size="lg">📷 Try It Free</GreenBtn>
+            <GreenBtn href="/?start=scan" size="lg">📷 Try It Free</GreenBtn>
           </motion.div>
         </div>
       </section>
@@ -335,7 +335,7 @@ export default function HowItWorksPage() {
             style={{ fontSize: 17, color: C.GREEN_PALE, opacity: 0.8, marginBottom: 40 }}>
             Scan your space for free. Get your AI plan in minutes.
           </motion.p>
-          <GreenBtn href="/app?start=scan" size="lg">📷 Start Free Scan →</GreenBtn>
+          <GreenBtn href="/?start=scan" size="lg">📷 Start Free Scan →</GreenBtn>
         </div>
       </section>
     </MarketingLayout>

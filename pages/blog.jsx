@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import MarketingLayout from "../components/marketing/MarketingLayout";
+import MarketingLayout from "@/components/marketing/MarketingLayout";
 
 const C = {
   CREAM: "#fafaf6",
@@ -305,7 +305,7 @@ export default function BlogPage() {
           <p style={{ fontSize: 16, lineHeight: 1.7, color: C.FOREST, opacity: 0.7, marginBottom: 32 }}>
             Scan your space for free and get an AI cooling plan backed by the same research you've been reading.
           </p>
-          <Link href="/app?start=scan"
+          <Link href="/?start=scan"
             style={{ display: "inline-flex", alignItems: "center", gap: 8, background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, color: "#fff", fontWeight: 700, fontSize: 16, padding: "14px 32px", borderRadius: 999, textDecoration: "none" }}>
             📷 Start Free Scan →
           </Link>

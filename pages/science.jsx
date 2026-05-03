@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import MarketingLayout from "../components/marketing/MarketingLayout";
+import MarketingLayout from "@/components/marketing/MarketingLayout";
 
 const C = {
   CREAM: "#fafaf6",
@@ -269,7 +269,7 @@ export default function SciencePage() {
             style={{ fontSize: 16, lineHeight: 1.7, color: C.FOREST, opacity: 0.7, marginBottom: 36 }}>
             Every HeatWise recommendation is backed by the same science described here. Scan your space and see your personalised cooling estimate.
           </motion.p>
-          <Link href="/app?start=scan"
+          <Link href="/?start=scan"
             style={{ display: "inline-flex", alignItems: "center", gap: 8, background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, color: "#fff", fontWeight: 700, fontSize: 17, padding: "16px 36px", borderRadius: 999, textDecoration: "none" }}>
             📷 Scan My Space →
           </Link>

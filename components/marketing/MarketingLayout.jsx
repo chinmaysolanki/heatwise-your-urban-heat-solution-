@@ -264,7 +264,7 @@ function NavCTA() {
   const [hovered, setHovered] = useState(false);
   return (
     <Link
-      href="/app?start=scan"
+      href="/?start=scan"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
