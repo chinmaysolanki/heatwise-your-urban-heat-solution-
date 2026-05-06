@@ -2936,7 +2936,7 @@ const ProjectCreation = ({ navigate, setPhotoSession }) => {
 
   /* ── Bottom CTA ── */
   const NextBtn = ({ label='Next →', disabled=false, onClick }) => (
-    <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(4,9,26,.97)',padding:'16px 20px 32px',borderTop:'1px solid rgba(56,189,248,.1)',maxWidth:430,margin:'0 auto',zIndex:50}}>
+    <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(4,9,26,.97)',padding:'16px 20px 0',paddingBottom:'calc(env(safe-area-inset-bottom, 0px) + 16px)',borderTop:'1px solid rgba(56,189,248,.1)',maxWidth:430,margin:'0 auto',zIndex:50}}>
       <button className={`gbtn${!disabled?' fill':''}`} disabled={disabled} onClick={onClick}
         style={{width:'100%',padding:'16px',borderRadius:14,fontSize:14,fontWeight:700,letterSpacing:'.5px'}}>
         {label}
@@ -4094,7 +4094,7 @@ const ResultScreen = ({ navigate, selectedRecommendation, photoSession, setActiv
           </div>
         </div>
       </div>
-      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(4,9,26,.97)',padding:'12px 20px 32px',borderTop:'1px solid rgba(56,189,248,.1)',maxWidth:430,margin:'0 auto',display:'flex',flexDirection:'column',gap:10}}>
+      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(4,9,26,.97)',padding:'12px 20px 0',paddingBottom:'calc(env(safe-area-inset-bottom, 0px) + 12px)',borderTop:'1px solid rgba(56,189,248,.1)',maxWidth:430,margin:'0 auto',display:'flex',flexDirection:'column',gap:10}}>
         {runwareError && (
           <div style={{padding:'10px 14px',borderRadius:10,background:'rgba(244,63,94,0.10)',border:'1px solid rgba(244,63,94,0.30)',fontSize:11,color:'#F43F5E',fontFamily:"'DM Sans',sans-serif",lineHeight:1.4}}>
             {runwareError}
@@ -4711,7 +4711,7 @@ const BeforeAfterVisualizationScreen = ({ navigate, photoSession, selectedRecomm
       </div>
 
       {/* Actions */}
-      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(4,9,26,.97)',padding:'12px 20px 32px',borderTop:'1px solid rgba(56,189,248,.1)',maxWidth:430,margin:'0 auto',display:'flex',flexDirection:'column',gap:10}}>
+      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(4,9,26,.97)',padding:'12px 20px 0',paddingBottom:'calc(env(safe-area-inset-bottom, 0px) + 12px)',borderTop:'1px solid rgba(56,189,248,.1)',maxWidth:430,margin:'0 auto',display:'flex',flexDirection:'column',gap:10}}>
         <button
           className="gbtn"
           disabled={visLoading || !photoSession?.capturedPhoto || !rec}
@@ -4927,7 +4927,7 @@ const ReportScreen = ({ navigate, selectedRecommendation, photoSession, me, setP
     ? `${photoSession.projectMeta.name} · ${photoSession.projectMeta.location || "Unknown location"}`
     : "My Garden Project";
   return(
-    <div style={{paddingBottom:20}}>
+    <div style={{paddingBottom:80}}>
       <div className="navbar">
         <button onClick={()=>navigate('result')} style={{background:'none',border:'none',cursor:'pointer',display:'flex'}}><Ic n="back" s={22} c={T.green}/></button>
         <div style={{position:'absolute',left:'50%',transform:'translateX(-50%)',textAlign:'center'}}>
@@ -5315,7 +5315,7 @@ const InstallScreen = ({ navigate, selectedRecommendation, photoSession, me, set
           )}
         </div>
       </div>
-      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(4,9,26,.97)',padding:'12px 20px 32px',borderTop:'1px solid rgba(56,189,248,.1)',maxWidth:430,margin:'0 auto'}}>
+      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(4,9,26,.97)',padding:'12px 20px 0',paddingBottom:'calc(env(safe-area-inset-bottom, 0px) + 12px)',borderTop:'1px solid rgba(56,189,248,.1)',maxWidth:430,margin:'0 auto'}}>
         <button
           className="gbtn"
           onClick={()=>{
@@ -11658,7 +11658,7 @@ export default function App(){
       <div style={{width:'100%',height:'100vh',overflow:'hidden',position:'relative',background:'transparent',display:'flex',flexDirection:'column'}}>
         <div className="hw-phone-bg" aria-hidden="true" />
         {/* Screen container — use scr-fixed for screens that manage their own internal scroll */}
-        <div className={`${screen==='home'?'scr-fixed':'scr'} ${anim}`} key={screen} style={{position:'absolute',top:0,bottom:showNav?56:0,left:0,right:0}}>
+        <div className={`${screen==='home'?'scr-fixed':'scr'} ${anim}`} key={screen} style={{position:'absolute',top:0,bottom:showNav?'calc(56px + env(safe-area-inset-bottom, 0px))':0,left:0,right:0}}>
           {render()}
         </div>
         {/* Bottom nav */}
