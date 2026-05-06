@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import MarketingLayout from "./MarketingLayout";
+import { APP_URL } from "../../lib/config";
 
 const C = {
   CREAM: "#fafaf6",
@@ -76,7 +77,7 @@ const METHODOLOGY_STEPS = [
   { num: "02", title: "Climate Modelling", desc: "We run a modified ENVI-met microclimate model calibrated to Indian urban morphologies, incorporating 14 years of ECMWF ERA5 reanalysis data for your location." },
   { num: "03", title: "Species Compatibility Scoring", desc: "800+ species are evaluated against 47 bioclimatic variables. Scores weight cooling efficiency (40%), survival probability (35%) and maintenance burden (25%)." },
   { num: "04", title: "Layout Optimisation", desc: "A genetic algorithm solves the plant placement problem, maximising shade overlap and transpiration coverage while respecting structural load limits and user budget." },
-  { num: "05", title: "Cooling Prediction", desc: "A Random Forest model trained on 3,250+ monitored installations predicts expected temperature reduction, with 91% accuracy at ±0.5°C confidence interval." },
+  { num: "05", title: "Cooling Prediction", desc: "A Random Forest model trained on climate and vegetation data predicts expected temperature reduction for your specific space, validated against post-installation measurements." },
   { num: "06", title: "Continuous Monitoring", desc: "Post-installation, satellite and weather data track actual vs predicted performance. Insights feed back into model retraining monthly." },
 ];
 
@@ -115,7 +116,7 @@ export default function SciencePage() {
           </motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
             style={{ fontSize: 18, lineHeight: 1.7, color: C.FOREST, opacity: 0.7, marginBottom: 40 }}>
-            We don't make unverified claims. Every temperature prediction is grounded in peer-reviewed research, calibrated models and real post-installation monitoring data from 3,250+ sites.
+            We don't make unverified claims. Every temperature prediction is grounded in peer-reviewed research, calibrated climate models and ongoing post-installation monitoring.
           </motion.p>
           {/* Stats */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }} className="sci-stats">
@@ -123,7 +124,7 @@ export default function SciencePage() {
             {[
               { val: "91%", label: "Prediction accuracy" },
               { val: "±0.5°C", label: "Confidence interval" },
-              { val: "3,250+", label: "Monitored sites" },
+              { val: "800+", label: "Species evaluated" },
               { val: "6", label: "Published papers" },
             ].map((s) => (
               <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
@@ -269,7 +270,7 @@ export default function SciencePage() {
             style={{ fontSize: 16, lineHeight: 1.7, color: C.FOREST, opacity: 0.7, marginBottom: 36 }}>
             Every HeatWise recommendation is backed by the same science described here. Scan your space and see your personalised cooling estimate.
           </motion.p>
-          <Link href="/?start=scan"
+          <Link href={APP_URL}
             style={{ display: "inline-flex", alignItems: "center", gap: 8, background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, color: "#fff", fontWeight: 700, fontSize: 17, padding: "16px 36px", borderRadius: 999, textDecoration: "none" }}>
             📷 Scan My Space →
           </Link>

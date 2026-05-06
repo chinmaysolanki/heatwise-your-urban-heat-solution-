@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { APP_URL, CONTACT_EMAIL, INSTALLER_EMAIL, PRESS_EMAIL } from "../../lib/config";
 
 const C = {
   CREAM: "#fafaf6",
@@ -264,7 +265,7 @@ function NavCTA() {
   const [hovered, setHovered] = useState(false);
   return (
     <Link
-      href="/?start=scan"
+      href={APP_URL}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -290,9 +291,25 @@ function NavCTA() {
 
 function Footer() {
   const footerLinks = {
-    Product: ["AR Scanner", "Species Catalog", "AI Planner", "Cooling Score", "Installer Network"],
-    Company: ["About Us", "Science", "Blog", "Careers", "Press Kit"],
-    Connect: ["Twitter / X", "Instagram", "LinkedIn", "GitHub", "contact@heatwise.in"],
+    Product: [
+      { label: "How it Works", href: "/how-it-works" },
+      { label: "Species Catalog", href: "/species" },
+      { label: "Science", href: "/science" },
+      { label: "Pricing", href: "/#pricing" },
+      { label: "Contact", href: "/contact" },
+    ],
+    Company: [
+      { label: "Science", href: "/science" },
+      { label: "Blog", href: "/blog" },
+      { label: "Press Kit", href: `/contact` },
+      { label: "Become an Installer", href: `/contact` },
+      { label: "About Us", href: "/contact" },
+    ],
+    Connect: [
+      { label: "General Enquiry", href: `mailto:${CONTACT_EMAIL}` },
+      { label: "Installer Network", href: `mailto:${INSTALLER_EMAIL}` },
+      { label: "Press & Media", href: `mailto:${PRESS_EMAIL}` },
+    ],
   };
 
   return (
@@ -325,37 +342,7 @@ function Footer() {
             <p style={{ fontSize: 14, lineHeight: 1.7, opacity: 0.7, marginBottom: 20 }}>
               AI-powered urban greening that turns rooftops into cooling engines — one plant at a time.
             </p>
-            <div style={{ display: "flex", gap: 12 }}>
-              {["𝕏", "IG", "in", "GH"].map((s) => (
-                <a
-                  key={s}
-                  href="#"
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: "50%",
-                    border: `1px solid rgba(224,245,232,0.2)`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: C.GREEN_PALE,
-                    transition: "border-color 0.2s, background 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = C.GREEN;
-                    e.currentTarget.style.background = "rgba(64,176,112,0.15)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "rgba(224,245,232,0.2)";
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  {s}
-                </a>
-              ))}
-            </div>
+            <a href={`mailto:${CONTACT_EMAIL}`} style={{ fontSize: 13, color: C.GREEN_PALE, opacity: 0.7, display: "block", marginBottom: 4 }}>{CONTACT_EMAIL}</a>
           </div>
 
           {/* Link columns */}
@@ -376,14 +363,14 @@ function Footer() {
               </h4>
               <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 10 }}>
                 {links.map((l) => (
-                  <li key={l}>
+                  <li key={l.label}>
                     <a
-                      href="#"
+                      href={l.href}
                       style={{ fontSize: 14, opacity: 0.65, transition: "opacity 0.2s" }}
                       onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
                       onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.65")}
                     >
-                      {l}
+                      {l.label}
                     </a>
                   </li>
                 ))}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import MarketingLayout from "./MarketingLayout";
+import { CONTACT_EMAIL, INSTALLER_EMAIL, PRESS_EMAIL } from "../../lib/config";
 
 const C = {
   CREAM: "#fafaf6",
@@ -76,12 +77,18 @@ export default function ContactPage() {
 
   const update = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    setSubmitting(false);
-    setSubmitted(true);
+    const subject = encodeURIComponent(form.subject || "HeatWise Enquiry");
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nEmail: ${form.email}\nCity: ${form.city}\n\n${form.message}`
+    );
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+    setTimeout(() => {
+      setSubmitting(false);
+      setSubmitted(true);
+    }, 800);
   };
 
   return (
@@ -176,39 +183,27 @@ export default function ContactPage() {
             <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 24, color: C.FOREST, marginBottom: 32 }}>Other ways to reach us</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
               {[
-                { icon: "📧", label: "Email", val: "hello@heatwise.in", sub: "General enquiries" },
-                { icon: "🔨", label: "Installers", val: "installers@heatwise.in", sub: "Join our network" },
-                { icon: "📰", label: "Press", val: "press@heatwise.in", sub: "Media & research" },
-                { icon: "📍", label: "Headquarters", val: "Bengaluru, Karnataka", sub: "India" },
+                { icon: "📧", label: "Email", val: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}`, sub: "General enquiries" },
+                { icon: "🔨", label: "Installers", val: INSTALLER_EMAIL, href: `mailto:${INSTALLER_EMAIL}`, sub: "Join our network" },
+                { icon: "📰", label: "Press", val: PRESS_EMAIL, href: `mailto:${PRESS_EMAIL}`, sub: "Media & research" },
+                { icon: "📍", label: "Headquarters", val: "Bengaluru, Karnataka", href: null, sub: "India" },
               ].map((item) => (
                 <div key={item.label} style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
                   <div style={{ width: 44, height: 44, borderRadius: "50%", background: C.MINT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{item.icon}</div>
                   <div>
                     <p style={{ fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: C.GREEN, marginBottom: 2 }}>{item.label}</p>
-                    <p style={{ fontWeight: 700, fontSize: 15, color: C.FOREST }}>{item.val}</p>
+                    {item.href ? (
+                      <a href={item.href} style={{ fontWeight: 700, fontSize: 15, color: C.FOREST_MID, textDecoration: "none" }}>{item.val}</a>
+                    ) : (
+                      <p style={{ fontWeight: 700, fontSize: 15, color: C.FOREST }}>{item.val}</p>
+                    )}
                     <p style={{ fontSize: 13, color: C.FOREST, opacity: 0.5 }}>{item.sub}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div style={{ marginTop: 40, background: C.CREAM, borderRadius: 20, padding: "28px 24px", border: `1px solid rgba(64,176,112,0.15)` }}>
-              <div style={{ display: "flex", gap: 4, marginBottom: 12 }}>
-                {[0,1,2,3,4].map(s => <span key={s} style={{ color: C.GOLD, fontSize: 16 }}>★</span>)}
-              </div>
-              <p style={{ fontSize: 15, lineHeight: 1.7, fontStyle: "italic", color: C.FOREST, opacity: 0.85, marginBottom: 16 }}>
-                "The HeatWise team responded to our society's inquiry within 2 hours and had a full quote ready the next morning."
-              </p>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 12 }}>PS</div>
-                <div>
-                  <p style={{ fontWeight: 700, fontSize: 13, color: C.FOREST }}>Priya Shah</p>
-                  <p style={{ fontSize: 11, color: C.FOREST, opacity: 0.45, fontFamily: "'JetBrains Mono',monospace" }}>Society Secretary · Pune</p>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ marginTop: 28, padding: "20px 24px", background: `${C.GREEN}10`, border: `1px solid ${C.GREEN}30`, borderRadius: 16 }}>
+            <div style={{ marginTop: 40, padding: "20px 24px", background: `${C.GREEN}10`, border: `1px solid ${C.GREEN}30`, borderRadius: 16 }}>
               <p style={{ fontSize: 14, fontWeight: 600, color: C.FOREST_MID, marginBottom: 4 }}>🕐 Response times</p>
               <p style={{ fontSize: 13, color: C.FOREST, opacity: 0.65, lineHeight: 1.6 }}>We're a small team in IST (UTC+5:30). We typically respond Mon–Sat, 9am–7pm. Enterprise enquiries get priority routing — expect a call back within 4 hours.</p>
             </div>

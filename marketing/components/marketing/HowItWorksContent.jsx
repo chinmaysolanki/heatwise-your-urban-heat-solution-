@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import MarketingLayout from "./MarketingLayout";
+import { APP_URL } from "../../lib/config";
 
 const C = {
   CREAM: "#fafaf6",
@@ -38,14 +39,14 @@ function GreenBtn({ children, href, size = "md" }) {
 }
 
 const FAQ_ITEMS = [
-  { q: "How accurate is the AR scan?", a: "Our AR engine achieves ±8cm dimensional accuracy on most modern smartphones. We cross-validate with GPS microclimate data to ensure cooling predictions are within ±0.5°C of actual post-installation measurements." },
-  { q: "What if my plants die?", a: "Every HeatWise plan comes with a 90-day plant health guarantee. If any plant in your AI-selected plan doesn't thrive within 90 days when following our care schedule, we'll replace it for free — no questions asked." },
+  { q: "How accurate is the AR scan?", a: "Our AR engine achieves ±8cm dimensional accuracy on most modern smartphones. We cross-validate with GPS microclimate data to build a cooling prediction specific to your space." },
+  { q: "What if my plants don't do well?", a: "Our AI selects species with high survival rates for your exact climate — temperature, humidity, UV and seasonal rainfall. If a plant underperforms, your care dashboard will flag it and our support team will help troubleshoot. Reach us at hello@heatwise.in." },
   { q: "How does the AI pick species?", a: "Our model considers your exact GPS coordinates, current and historical temperature/humidity/UV, available sunlight hours, surface type, budget and maintenance preference. It runs 800+ species through a compatibility matrix and ranks by cooling efficiency × survival probability." },
-  { q: "Do you deliver plants?", a: "Yes — through our network of verified nursery partners in all 14 cities. Delivery typically takes 3–5 business days. All plants are acclimatised to your city's climate zone before dispatch." },
-  { q: "Can installers do everything?", a: "Our verified installers handle soil preparation, container selection, planting, irrigation setup and initial care training. They're background-checked, rated by past customers, and carry liability insurance." },
-  { q: "What's the actual cooling impact?", a: "Across our 3,250+ installed projects, we've measured an average surface temperature reduction of 4.2°C and a 38% improvement in perceived comfort. Results vary by species density, orientation and city — your Cooling Score report gives you a personalised estimate." },
-  { q: "Is there a refund policy?", a: "Starter is free. Green and Pro plans offer a 14-day full refund if you're not satisfied — just email us. Plant delivery refunds follow our nursery partner's standard policy (damage in transit is covered 100%)." },
-  { q: "Do you work with housing societies?", a: "Absolutely. Our Pro/Society plan handles multi-unit projects — we've done entire floors, podium gardens and society compounds. Contact our sales team for a customised quote and phased implementation plan." },
+  { q: "Do you deliver plants?", a: "We're building a network of verified nursery partners across Indian cities. Delivery availability varies by location — check during checkout and we'll show you what's available in your area." },
+  { q: "Can installers do everything?", a: "Our verified installers handle soil preparation, container selection, planting, irrigation setup and initial care training. They're background-checked and rated by past customers." },
+  { q: "What's the actual cooling impact?", a: "Cooling impact depends on plant density, species mix, rooftop orientation and local climate. Scientific research on urban greening consistently shows 2–8°C surface temperature reductions. Your personalised Cooling Score report will give you a space-specific estimate based on your scan data." },
+  { q: "Is there a refund policy?", a: "Starter is free. Green and Pro plans offer a 14-day full refund if you're not satisfied — just email us." },
+  { q: "Do you work with housing societies?", a: "Absolutely. Our Pro/Society plan handles multi-unit projects — floors, podium gardens and society compounds. Contact our sales team for a customised quote and phased implementation plan." },
 ];
 
 function FAQAccordion() {
@@ -138,8 +139,8 @@ export default function HowItWorksPage() {
             ))}
           </div>
           <div style={{ background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, color: "#fff", borderRadius: 12, padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontWeight: 700, fontSize: 15 }}>Expected cooling</span>
-            <span style={{ fontWeight: 800, fontSize: 20, fontFamily: "'Space Grotesk',sans-serif" }}>−3.8°C</span>
+            <span style={{ fontWeight: 700, fontSize: 15 }}>AI-optimised layout</span>
+            <span style={{ fontWeight: 800, fontSize: 20, fontFamily: "'Space Grotesk',sans-serif" }}>✓ Ready</span>
           </div>
         </div>
       ),
@@ -176,10 +177,10 @@ export default function HowItWorksPage() {
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
             style={{ fontSize: 18, lineHeight: 1.7, color: C.FOREST, opacity: 0.7, marginBottom: 40, maxWidth: 600, margin: "0 auto 40px" }}>
-            From a blank rooftop to a thriving green canopy in three steps — powered by satellite data, AR scanning and a recommendation engine trained on 50,000+ Indian rooftops.
+            From a blank rooftop to a thriving green canopy in three steps — powered by satellite data, AR scanning and a recommendation engine built for Indian climate conditions.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}>
-            <GreenBtn href="/?start=scan" size="lg">📷 Try It Free</GreenBtn>
+            <GreenBtn href={APP_URL} size="lg">📷 Try It Free</GreenBtn>
           </motion.div>
         </div>
       </section>
@@ -335,7 +336,7 @@ export default function HowItWorksPage() {
             style={{ fontSize: 17, color: C.GREEN_PALE, opacity: 0.8, marginBottom: 40 }}>
             Scan your space for free. Get your AI plan in minutes.
           </motion.p>
-          <GreenBtn href="/?start=scan" size="lg">📷 Start Free Scan →</GreenBtn>
+          <GreenBtn href={APP_URL} size="lg">📷 Start Free Scan →</GreenBtn>
         </div>
       </section>
     </MarketingLayout>

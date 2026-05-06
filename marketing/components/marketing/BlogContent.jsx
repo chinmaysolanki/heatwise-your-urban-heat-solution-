@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import MarketingLayout from "./MarketingLayout";
+import { APP_URL, CONTACT_EMAIL } from "../../lib/config";
 
 const C = {
   CREAM: "#fafaf6",
@@ -140,7 +141,7 @@ const POSTS = [
   },
 ];
 
-function PostCard({ post, featured }) {
+function PostCard({ post, featured, onClick }) {
   const [hov, setHov] = useState(false);
   if (featured) {
     return (
@@ -149,6 +150,7 @@ function PostCard({ post, featured }) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         whileHover={{ y: -4 }}
+        onClick={onClick}
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
         style={{ background: "#fff", borderRadius: 24, overflow: "hidden", boxShadow: hov ? "0 16px 48px rgba(26,56,40,0.12)" : "0 4px 20px rgba(26,56,40,0.07)", border: `1px solid rgba(26,56,40,0.08)`, transition: "box-shadow 0.3s", cursor: "pointer" }}
@@ -173,6 +175,7 @@ function PostCard({ post, featured }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       whileHover={{ y: -4, boxShadow: "0 12px 36px rgba(64,176,112,0.1)" }}
+      onClick={onClick}
       style={{ background: "#fff", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 12px rgba(26,56,40,0.05)", border: `1px solid rgba(26,56,40,0.08)`, transition: "box-shadow 0.3s", cursor: "pointer", display: "flex", flexDirection: "column" }}
     >
       <div style={{ background: `linear-gradient(135deg, ${post.color}18, ${post.color}06)`, padding: "32px 28px 24px", flex: 1, position: "relative", overflow: "hidden" }}>
@@ -192,6 +195,20 @@ function PostCard({ post, featured }) {
 
 export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState("All");
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const [postToast, setPostToast] = useState(false);
+
+  const handleSubscribe = () => {
+    if (!email) return;
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=Blog%20Subscription&body=Please%20add%20me%20to%20your%20blog%20newsletter%3A%20${encodeURIComponent(email)}`;
+    setSubscribed(true);
+  };
+
+  const handlePostClick = () => {
+    setPostToast(true);
+    setTimeout(() => setPostToast(false), 3000);
+  };
 
   const filtered = POSTS.filter((p) => activeCategory === "All" || p.category === activeCategory);
   const featuredPosts = filtered.filter((p) => p.featured);
@@ -199,6 +216,15 @@ export default function BlogPage() {
 
   return (
     <MarketingLayout title="HeatWise Blog — Urban Cooling Insights" description="Science, case studies, how-to guides and species deep-dives from the HeatWise team.">
+      {/* Post coming-soon toast */}
+      <AnimatePresence>
+        {postToast && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
+            style={{ position: "fixed", bottom: 32, left: "50%", transform: "translateX(-50%)", background: C.FOREST, color: "#fff", borderRadius: 999, padding: "12px 28px", fontSize: 14, fontWeight: 600, zIndex: 9999, boxShadow: "0 8px 32px rgba(0,0,0,0.2)", whiteSpace: "nowrap" }}>
+            📖 Full article coming soon — subscribe to get notified!
+          </motion.div>
+        )}
+      </AnimatePresence>
       <style>{`
         @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 16px 2px rgba(64,176,112,0.3); } 50% { box-shadow: 0 0 32px 8px rgba(64,176,112,0.6); } }
@@ -218,17 +244,25 @@ export default function BlogPage() {
           </motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
             style={{ fontSize: 17, lineHeight: 1.7, color: C.FOREST, opacity: 0.7, marginBottom: 40 }}>
-            Deep dives into urban heat science, plant cooling data, case studies from our 3,250+ installations and practical how-to guides for every Indian city.
+            Deep dives into urban heat science, plant cooling data, how-to guides and species research for every Indian city.
           </motion.p>
           {/* Newsletter signup */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-            style={{ display: "flex", gap: 8, maxWidth: 440, margin: "0 auto", background: "#fff", borderRadius: 999, padding: "6px 6px 6px 20px", boxShadow: "0 4px 20px rgba(26,56,40,0.08)", border: `1px solid rgba(64,176,112,0.2)` }}>
-            <input type="email" placeholder="your@email.com" style={{ flex: 1, border: "none", outline: "none", fontSize: 14, color: C.FOREST, background: "transparent", fontFamily: "'DM Sans',sans-serif" }} />
-            <button style={{ background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, color: "#fff", border: "none", borderRadius: 999, padding: "10px 20px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap" }}>
-              Subscribe →
-            </button>
-          </motion.div>
-          <p style={{ fontSize: 12, color: C.FOREST, opacity: 0.4, marginTop: 12 }}>No spam. One email per week, max. Unsubscribe any time.</p>
+          {subscribed ? (
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ fontSize: 15, color: C.FOREST_MID, fontWeight: 600, marginTop: 8 }}>
+              🌿 Thanks! We'll be in touch soon.
+            </motion.p>
+          ) : (
+            <>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                style={{ display: "flex", gap: 8, maxWidth: 440, margin: "0 auto", background: "#fff", borderRadius: 999, padding: "6px 6px 6px 20px", boxShadow: "0 4px 20px rgba(26,56,40,0.08)", border: `1px solid rgba(64,176,112,0.2)` }}>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" style={{ flex: 1, border: "none", outline: "none", fontSize: 14, color: C.FOREST, background: "transparent", fontFamily: "'DM Sans',sans-serif" }} />
+                <button onClick={handleSubscribe} style={{ background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, color: "#fff", border: "none", borderRadius: 999, padding: "10px 20px", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap" }}>
+                  Subscribe →
+                </button>
+              </motion.div>
+              <p style={{ fontSize: 12, color: C.FOREST, opacity: 0.4, marginTop: 12 }}>No spam. One email per week, max. Unsubscribe any time.</p>
+            </>
+          )}
         </div>
       </section>
 
@@ -262,7 +296,7 @@ export default function BlogPage() {
                   <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: C.GREEN, marginBottom: 20, opacity: 0.8 }}>Featured</p>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 24 }} className="featured-grid">
                     <style>{`@media (max-width: 768px) { .featured-grid { grid-template-columns: 1fr !important; } }`}</style>
-                    {featuredPosts.map((post) => <PostCard key={post.id} post={post} featured />)}
+                    {featuredPosts.map((post) => <PostCard key={post.id} post={post} featured onClick={handlePostClick} />)}
                   </div>
                 </div>
               )}
@@ -277,7 +311,7 @@ export default function BlogPage() {
                     <style>{`@media (max-width: 900px) { .posts-grid { grid-template-columns: repeat(2,1fr) !important; } } @media (max-width: 600px) { .posts-grid { grid-template-columns: 1fr !important; } }`}</style>
                     {regularPosts.map((post, i) => (
                       <motion.div key={post.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06, duration: 0.4 }}>
-                        <PostCard post={post} featured={false} />
+                        <PostCard post={post} featured={false} onClick={handlePostClick} />
                       </motion.div>
                     ))}
                   </div>
@@ -305,7 +339,7 @@ export default function BlogPage() {
           <p style={{ fontSize: 16, lineHeight: 1.7, color: C.FOREST, opacity: 0.7, marginBottom: 32 }}>
             Scan your space for free and get an AI cooling plan backed by the same research you've been reading.
           </p>
-          <Link href="/?start=scan"
+          <Link href={APP_URL}
             style={{ display: "inline-flex", alignItems: "center", gap: 8, background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, color: "#fff", fontWeight: 700, fontSize: 16, padding: "14px 32px", borderRadius: 999, textDecoration: "none" }}>
             📷 Start Free Scan →
           </Link>

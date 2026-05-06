@@ -1043,8 +1043,8 @@ export function LiveARMeasurementScreen({ projectId, photoSessionId, onApplied, 
     video:      { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" },
     galleryImg: { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", background: "#000" },
     canvas:     { position: "absolute", inset: 0, width: "100%", height: "100%", touchAction: "none" },
-    topBar:     { position: "absolute", top: 0, left: 0, right: 0, zIndex: 20, paddingTop: "calc(env(safe-area-inset-top, 44px) + 12px)", paddingBottom: "12px", paddingLeft: "20px", paddingRight: "20px", background: "linear-gradient(to bottom, rgba(9,22,14,0.85) 0%, transparent 100%)", display: "flex", alignItems: "center", justifyContent: "space-between" },
-    bottomBar:  { position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 20, padding: "16px 20px 40px", background: "linear-gradient(to top, rgba(9,22,14,0.92) 0%, transparent 100%)", display: "flex", flexDirection: "column", gap: 10 },
+    topBar:     { position: "absolute", top: 0, left: 0, right: 0, zIndex: 20, paddingTop: "calc(env(safe-area-inset-top, 44px) + 8px)", paddingBottom: "10px", paddingLeft: "16px", paddingRight: "16px", background: "linear-gradient(to bottom, rgba(9,22,14,0.80) 0%, transparent 100%)", display: "flex", alignItems: "center", justifyContent: "space-between" },
+    bottomBar:  { position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 20, padding: "10px 20px calc(env(safe-area-inset-bottom,16px) + 8px)", background: "linear-gradient(to top, rgba(9,22,14,0.95) 0%, rgba(9,22,14,0.6) 70%, transparent 100%)", display: "flex", flexDirection: "column", gap: 8 },
     btn:        { border: "none", borderRadius: 14, padding: "14px 0", fontWeight: 700, fontSize: 14, letterSpacing: ".5px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" },
     btnPrimary: { background: "linear-gradient(135deg,#1B4332,#2D6A4F,#40916C)", color: "#fff", boxShadow: "0 4px 16px rgba(45,106,79,.35)" },
     btnGhost:   { background: "#fff", color: C.textDim, border: "1px solid rgba(0,0,0,0.10)" },
@@ -1274,219 +1274,150 @@ export function LiveARMeasurementScreen({ projectId, photoSessionId, onApplied, 
             )}
           </div>
 
-          {/* Right: gallery switch + reset + re-shoot — fixed width */}
+          {/* Right: re-shoot + gallery switch */}
           <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-            {/* Re-shoot: shown when frame is frozen from live capture */}
             {capturedLiveFrame && captureMode === "gallery" && phase === "active" && (
               <button
-                onClick={() => {
-                  setCapturedLiveFrame(null);
-                  setCorners([]);
-                  resultRef.current = null;
-                  startCamera();
-                }}
+                onClick={() => { setCapturedLiveFrame(null); setCorners([]); resultRef.current = null; startCamera(); }}
                 style={{ ...S.btn, padding: "7px 10px", fontSize: 11, fontWeight: 700, background: "rgba(82,183,136,0.15)", color: "#52B788", border: "1px solid rgba(82,183,136,0.35)", borderRadius: 12, letterSpacing: "0.3px" }}
-                title="Return to live camera"
-              >
-                ↩ Live
-              </button>
+              >↩ Live</button>
             )}
             {captureMode === "live" && phase === "active" && (
               <button
                 onClick={openGallery}
                 style={{ ...S.btn, padding: "7px 11px", fontSize: 13, background: "rgba(64,145,108,0.15)", color: C.sky, border: "1px solid rgba(64,145,108,0.30)", borderRadius: 12 }}
                 title="Use photo from gallery"
-              >
-                🖼
-              </button>
+              >🖼</button>
             )}
-            {canReset && (
-              <button
-                onClick={() => { setCorners([]); resultRef.current = null; }}
-                style={{ ...S.btn, padding: "7px 11px", fontSize: 11, fontWeight: 700, background: "rgba(231,111,81,0.12)", color: "rgba(231,111,81,0.9)", border: "1px solid rgba(231,111,81,0.28)", borderRadius: 12, letterSpacing: "0.5px" }}
-              >
-                ↺ Reset
-              </button>
-            )}
-            {!canReset && !captureMode.includes("gallery") && <div style={{ width: 56 }} />}
+            {phase === "active" && !(captureMode === "live") && <div style={{ width: 40 }} />}
           </div>
         </div>
 
         {/* ── Bottom bar ──────────────────────────────────────────────────── */}
         <div style={S.bottomBar}>
 
-          {/* ── Corner progress tracker ─────────────────────────────────── */}
-          {phase === "active" && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-              {/* Row of dots with connector lines */}
-              <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
-                {CORNER_LABELS.map((lbl, i) => {
-                  const placed   = corners.length > i;
-                  const isNext   = corners.length === i;
-                  const color    = CORNER_COLORS[i]!;
-                  return (
-                    <React.Fragment key={lbl}>
-                      {/* Connector line between dots */}
-                      {i > 0 && (
-                        <div style={{
-                          width: 28, height: 2, borderRadius: 1,
-                          background: corners.length >= i
-                            ? `linear-gradient(to right, ${CORNER_COLORS[i - 1]}, ${color})`
-                            : "rgba(255,255,255,0.10)",
-                          transition: "background .4s",
-                        }} />
-                      )}
-                      {/* Corner dot */}
-                      <div style={{
-                        width: isNext ? 38 : 32, height: isNext ? 38 : 32,
-                        borderRadius: "50%",
-                        background: placed
-                          ? color.replace("1)", "0.22)")
-                          : isNext
-                            ? "rgba(255,255,255,0.08)"
-                            : "rgba(255,255,255,0.04)",
-                        border: `${isNext ? 2.5 : 2}px solid ${placed ? color : isNext ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.15)"}`,
-                        boxShadow: isNext ? `0 0 10px rgba(255,255,255,0.18)` : placed ? `0 0 8px ${color.replace("1)", "0.35)")}` : "none",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: placed ? 13 : 12, fontWeight: 800,
-                        color: placed ? color : isNext ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.22)",
-                        transition: "all .3s",
-                        flexShrink: 0,
-                      }}>
-                        {placed ? "✓" : lbl}
-                      </div>
-                    </React.Fragment>
-                  );
-                })}
-              </div>
-
-              {/* "Tap corner X" instruction under dots */}
-              {corners.length < 4 && (
-                <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(216,243,220,0.7)", letterSpacing: "0.3px" }}>
-                  {corners.length === 0
-                    ? "Tap corner  A  to start"
-                    : `Tap corner  ${CORNER_LABELS[corners.length]}  next`}
-                </div>
-              )}
-              {corners.length === 4 && !canConfirm && (
-                <div style={{ fontSize: 12, fontWeight: 600, color: "#52B788" }}>All 4 corners placed!</div>
-              )}
-            </div>
-          )}
-
-          {/* ── Angle guidance (live mode only) ────────────────────────── */}
+          {/* ── Live mode: shutter row with corner tracker inline ───────── */}
           {captureMode === "live" && phase === "active" && (
-            <div style={{ background: "rgba(9,22,14,0.55)", borderRadius: 14, padding: "8px 12px", border: "1px solid rgba(82,183,136,0.12)" }}>
-              {/* Active angle tip */}
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                <span style={{ fontSize: 18 }}>{ANGLE_META[am].icon}</span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "1.5px", color: ANGLE_META[am].color }}>{ANGLE_META[am].label}</div>
-                  <div style={{ fontSize: 10, color: "rgba(216,243,220,0.55)", marginTop: 1 }}>{ANGLE_META[am].tip}</div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+              {/* Corner progress — left side */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4, flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+                  {CORNER_LABELS.map((lbl, i) => {
+                    const placed = corners.length > i;
+                    const isNext = corners.length === i;
+                    const color  = CORNER_COLORS[i]!;
+                    return (
+                      <React.Fragment key={lbl}>
+                        {i > 0 && (
+                          <div style={{ width: 16, height: 2, borderRadius: 1, background: corners.length >= i ? `linear-gradient(to right, ${CORNER_COLORS[i-1]}, ${color})` : "rgba(255,255,255,0.12)", transition: "background .4s" }} />
+                        )}
+                        <div style={{
+                          width: isNext ? 30 : 26, height: isNext ? 30 : 26, borderRadius: "50%",
+                          background: placed ? color.replace("1)", "0.22)") : isNext ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)",
+                          border: `2px solid ${placed ? color : isNext ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.15)"}`,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 11, fontWeight: 800,
+                          color: placed ? color : isNext ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.22)",
+                          transition: "all .3s", flexShrink: 0,
+                        }}>{placed ? "✓" : lbl}</div>
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(216,243,220,0.55)", letterSpacing: "0.3px" }}>
+                  {corners.length < 4
+                    ? (corners.length === 0 ? "Tap corner A to start" : `Next: corner ${CORNER_LABELS[corners.length]}`)
+                    : "✓ All 4 placed"}
                 </div>
               </div>
-              {/* Mini angle strip */}
-              <div style={{ display: "flex", justifyContent: "center", gap: 6 }}>
-                {(["overhead","high","mid","low","horizontal"] as AngleMode[]).map(key => {
-                  const active = am === key;
-                  return (
-                    <div key={key} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, opacity: active ? 1 : 0.3, transition: "opacity .3s" }}>
-                      <div style={{ width: active ? 28 : 22, height: active ? 28 : 22, borderRadius: "50%", background: active ? ANGLE_META[key].color.replace("1)", "0.18)") : "transparent", border: `1.5px solid ${active ? ANGLE_META[key].color : "rgba(255,255,255,0.2)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: active ? 13 : 11, transition: "all .3s" }}>
-                        {ANGLE_META[key].icon}
-                      </div>
-                      <div style={{ fontSize: 6, fontWeight: 700, letterSpacing: "0.4px", color: active ? ANGLE_META[key].color : "rgba(216,243,220,0.35)" }}>
-                        {ANGLE_META[key].label.split(" ")[0]}
-                      </div>
-                    </div>
-                  );
-                })}
+
+              {/* Shutter button — centre */}
+              <button
+                onClick={handleCaptureLive}
+                style={{
+                  width: 68, height: 68, borderRadius: "50%",
+                  border: "3px solid rgba(255,255,255,0.88)",
+                  background: "transparent",
+                  cursor: "pointer", padding: 0, flexShrink: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: "0 0 0 2px rgba(255,255,255,0.20), 0 4px 20px rgba(0,0,0,0.4)",
+                  WebkitTapHighlightColor: "transparent",
+                  transition: "transform .1s",
+                }}
+                onPointerDown={e => (e.currentTarget.style.transform = "scale(0.92)")}
+                onPointerUp={e => (e.currentTarget.style.transform = "scale(1)")}
+                onPointerLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+              >
+                <div style={{ width: 50, height: 50, borderRadius: "50%", background: "rgba(255,255,255,0.94)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontSize: 22 }}>📷</span>
+                </div>
+              </button>
+
+              {/* Reset / gallery — right side */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flex: 1 }}>
+                {canReset && (
+                  <button
+                    onClick={() => { setCorners([]); resultRef.current = null; }}
+                    style={{ border: "1px solid rgba(231,111,81,0.3)", borderRadius: 10, padding: "6px 12px", background: "rgba(231,111,81,0.12)", cursor: "pointer", fontSize: 11, fontWeight: 700, color: "rgba(231,111,81,0.9)", letterSpacing: "0.4px" }}
+                  >↺ Reset</button>
+                )}
               </div>
             </div>
           )}
 
-          {/* ── Gallery angle picker ────────────────────────────────────── */}
+          {/* ── Gallery/frozen mode: compact angle row + corner tracker ─── */}
           {captureMode === "gallery" && phase === "active" && (() => {
             const gam = detectAngleMode(galleryBeta, 0);
             const GALLERY_ANGLES: { label: string; icon: string; beta: number; key: AngleMode }[] = [
-              { label: "OVERHEAD", icon: "⬇", beta: 20,  key: "overhead" },
-              { label: "HIGH",     icon: "↙", beta: 42,  key: "high"     },
-              { label: "MID",      icon: "↘", beta: 60,  key: "mid"      },
-              { label: "LOW",      icon: "→", beta: 76,  key: "low"      },
+              { label: "OVHD", icon: "⬇", beta: 20, key: "overhead" },
+              { label: "HIGH", icon: "↙", beta: 42, key: "high"     },
+              { label: "MID",  icon: "↘", beta: 60, key: "mid"      },
+              { label: "LOW",  icon: "→", beta: 76, key: "low"      },
             ];
             return (
-              <div style={{ background: "rgba(9,22,14,0.55)", borderRadius: 14, padding: "8px 12px", border: "1px solid rgba(64,145,108,0.18)" }}>
-                <div style={{ textAlign: "center", fontSize: 9, color: C.sky, letterSpacing: "1.5px", fontWeight: 800, marginBottom: 8 }}>
-                  🖼  HOW WAS THE PHOTO TAKEN?
-                </div>
-                <div style={{ display: "flex", justifyContent: "center", gap: 6 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between" }}>
+                {/* Angle picker */}
+                <div style={{ display: "flex", gap: 5 }}>
                   {GALLERY_ANGLES.map(ga => {
                     const active = gam === ga.key;
                     return (
                       <button
                         key={ga.key}
                         onClick={() => { setGalleryBeta(ga.beta); setCorners([]); resultRef.current = null; }}
-                        style={{ border: `1.5px solid ${active ? C.sky : "rgba(64,145,108,0.22)"}`, borderRadius: 12, padding: "7px 10px", background: active ? "rgba(64,145,108,0.2)" : "rgba(9,22,14,0.5)", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, minWidth: 54, boxShadow: active ? "0 0 10px rgba(64,145,108,0.25)" : "none", transition: "all .2s" }}
+                        style={{ border: `1.5px solid ${active ? C.sky : "rgba(64,145,108,0.20)"}`, borderRadius: 9, padding: "5px 8px", background: active ? "rgba(64,145,108,0.22)" : "rgba(9,22,14,0.5)", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, minWidth: 40, transition: "all .2s" }}
                       >
-                        <span style={{ fontSize: 16 }}>{ga.icon}</span>
-                        <span style={{ fontSize: 7, fontWeight: 800, letterSpacing: "0.8px", color: active ? C.sky : "rgba(64,145,108,0.5)" }}>{ga.label}</span>
+                        <span style={{ fontSize: 13 }}>{ga.icon}</span>
+                        <span style={{ fontSize: 7, fontWeight: 800, letterSpacing: "0.3px", color: active ? C.sky : "rgba(64,145,108,0.5)" }}>{ga.label}</span>
                       </button>
                     );
                   })}
                 </div>
-                <div style={{ textAlign: "center", fontSize: 9, color: "rgba(216,243,220,0.3)", marginTop: 6, letterSpacing: "0.3px" }}>
-                  Select the angle that matches how the photo was taken · changing angle resets corners
+                {/* Corner progress */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
+                    {CORNER_LABELS.map((lbl, i) => {
+                      const placed = corners.length > i;
+                      const isNext = corners.length === i;
+                      const color  = CORNER_COLORS[i]!;
+                      return (
+                        <React.Fragment key={lbl}>
+                          {i > 0 && <div style={{ width: 12, height: 2, borderRadius: 1, background: corners.length >= i ? `linear-gradient(to right, ${CORNER_COLORS[i-1]}, ${color})` : "rgba(255,255,255,0.12)" }} />}
+                          <div style={{ width: isNext ? 30 : 26, height: isNext ? 30 : 26, borderRadius: "50%", background: placed ? color.replace("1)", "0.22)") : isNext ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)", border: `2px solid ${placed ? color : isNext ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.15)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: placed ? color : isNext ? "#fff" : "rgba(255,255,255,0.22)", transition: "all .3s", flexShrink: 0 }}>
+                            {placed ? "✓" : lbl}
+                          </div>
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                  <div style={{ fontSize: 10, color: "rgba(216,243,220,0.5)" }}>
+                    {corners.length < 4 ? (corners.length === 0 ? "Tap corner A" : `Next: ${CORNER_LABELS[corners.length]}`) : "✓ All placed"}
+                  </div>
                 </div>
               </div>
             );
           })()}
 
-          {/* ── Live capture shutter button ─────────────────────────────── */}
-          {captureMode === "live" && phase === "active" && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", paddingTop: 4, paddingBottom: 2 }}>
-              {/* Outer label row */}
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "2px", color: "rgba(216,243,220,0.45)" }}>
-                  CAPTURE & MEASURE
-                </div>
-                {/* Shutter button — classic camera ring design */}
-                <button
-                  onClick={handleCaptureLive}
-                  style={{
-                    position: "relative",
-                    width: 72, height: 72,
-                    borderRadius: "50%",
-                    border: "3px solid rgba(255,255,255,0.90)",
-                    background: "rgba(255,255,255,0.0)",
-                    cursor: "pointer",
-                    padding: 0,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    boxShadow: "0 0 0 2px rgba(255,255,255,0.25), 0 4px 24px rgba(0,0,0,0.35)",
-                    WebkitTapHighlightColor: "transparent",
-                    transition: "transform .1s, box-shadow .1s",
-                  }}
-                  onPointerDown={e => (e.currentTarget.style.transform = "scale(0.93)")}
-                  onPointerUp={e => (e.currentTarget.style.transform = "scale(1)")}
-                  onPointerLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-                  title="Capture frame and measure"
-                >
-                  {/* Inner white disc */}
-                  <div style={{
-                    width: 52, height: 52, borderRadius: "50%",
-                    background: "rgba(255,255,255,0.95)",
-                    boxShadow: "0 0 12px rgba(255,255,255,0.3)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    <span style={{ fontSize: 20 }}>📷</span>
-                  </div>
-                </button>
-                <div style={{ fontSize: 9, color: "rgba(216,243,220,0.35)", letterSpacing: "0.5px" }}>
-                  {corners.length > 0 ? "Freeze frame · keep corners" : "Freeze frame to pin corners"}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ── Confirm / status ────────────────────────────────────────── */}
+          {/* ── Confirm ────────────────────────────────────────────────────── */}
           {canConfirm && (
             <button style={{ ...S.btn, ...S.btnPrimary, fontSize: 15, letterSpacing: "0.8px" }} onClick={handleConfirm} disabled={applying || confirmDone}>
               {applying ? "SAVING…" : confirmDone ? "✓ CONFIRMED" : `CONFIRM  ${resultRef.current?.polygon?.areaSqM.toFixed(1) ?? "—"} m²  →`}

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import MarketingLayout from "./MarketingLayout";
+import { APP_URL } from "../../lib/config";
 
 const C = {
   CREAM: "#fafaf6",
@@ -126,7 +127,7 @@ function HeroSection() {
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75, duration: 0.5 }}
             style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 40 }}>
-            <GreenBtn href="/?start=scan" size="lg">📷 Scan My Space</GreenBtn>
+            <GreenBtn href={APP_URL} size="lg">📷 Scan My Space</GreenBtn>
             <GhostBtn href="/how-it-works" size="lg">▶ Watch 90s Demo</GhostBtn>
           </motion.div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 0.5 }}
@@ -315,7 +316,7 @@ function HowItWorksSection() {
 function CapabilitiesSection() {
   const features = [
     { icon: "🌡️", title: "Live Heat Detection", desc: "Real-time surface temperature mapping using satellite + weather station fusion." },
-    { icon: "🤖", title: "AI Layout Engine", desc: "Proprietary model trained on 50,000+ rooftop configurations across Indian climates." },
+    { icon: "🤖", title: "AI Layout Engine", desc: "Proprietary recommendation engine optimised for Indian climate zones and rooftop conditions." },
     { icon: "❄️", title: "Cooling Impact Score", desc: "Precise before/after predictions — we're transparent about what each plant will do." },
     { icon: "🌿", title: "800+ Verified Species", desc: "Every plant tagged by climate zone, sun tolerance, water need and cooling efficiency." },
     { icon: "🔨", title: "Installer Network", desc: "Vetted green-thumb pros across Indian cities who can execute your plan end-to-end." },
@@ -468,7 +469,7 @@ function TestimonialsSection() {
               </div>
             ))}
           </div>
-          <GreenBtn href="/?start=scan" size="lg">📷 Get Early Access</GreenBtn>
+          <GreenBtn href={APP_URL} size="lg">📷 Get Early Access</GreenBtn>
         </motion.div>
       </div>
     </section>
@@ -584,8 +585,8 @@ function HeatMapSection() {
 function PricingSection() {
   const [annual, setAnnual] = useState(false);
   const tiers = [
-    { emoji: "🌱", name: "Starter", tagline: "Explore for free", monthly: 0, yearly: 0, cta: "Get Started", ctaHref: "/app", popular: false, perks: ["1 space scan", "Basic species match", "3 layout suggestions", "Community support"] },
-    { emoji: "🌿", name: "Green", tagline: "For homeowners", monthly: 499, yearly: 399, cta: "Start Free Trial", ctaHref: "/app?start=scan", popular: true, perks: ["Unlimited scans", "Full AI layout plans", "800+ species access", "Cooling score reports", "Email support", "PDF export"] },
+    { emoji: "🌱", name: "Starter", tagline: "Explore for free", monthly: 0, yearly: 0, cta: "Get Started", ctaHref: APP_URL, popular: false, perks: ["1 space scan", "Basic species match", "3 layout suggestions", "Community support"] },
+    { emoji: "🌿", name: "Green", tagline: "For homeowners", monthly: 499, yearly: 399, cta: "Start Free Trial", ctaHref: APP_URL, popular: true, perks: ["Unlimited scans", "Full AI layout plans", "800+ species access", "Cooling score reports", "Email support", "PDF export"] },
     { emoji: "🌳", name: "Pro / Society", tagline: "For buildings & groups", monthly: 2499, yearly: 1999, cta: "Contact Sales", ctaHref: "/contact", popular: false, perks: ["Everything in Green", "Multi-unit management", "Installer coordination", "Custom reports", "API access", "Dedicated support"] },
   ];
   return (
@@ -711,7 +712,7 @@ function FinalCTA() {
           Scan once. Get a plan. Watch your city breathe.
         </motion.p>
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.5 }} style={{ marginBottom: 32 }}>
-          <GreenBtn href="/?start=scan" size="lg">📷 Start Free Scan →</GreenBtn>
+          <GreenBtn href={APP_URL} size="lg">📷 Start Free Scan →</GreenBtn>
         </motion.div>
         <div style={{ display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
           {["No credit card", "2-min scan", "Free to start"].map((badge) => (

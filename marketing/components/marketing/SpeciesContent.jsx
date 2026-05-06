@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MarketingLayout from "./MarketingLayout";
+import { APP_URL } from "../../lib/config";
 
 const C = {
   CREAM: "#fafaf6",
@@ -241,7 +242,7 @@ export default function SpeciesPage() {
                     <span key={tag} style={{ background: C.MINT, color: C.FOREST_MID, borderRadius: 999, padding: "4px 12px", fontSize: 12, fontWeight: 600 }}>{tag}</span>
                   ))}
                 </div>
-                <a href="/?start=scan"
+                <a href={APP_URL}
                   style={{ display: "block", textAlign: "center", padding: "14px 0", borderRadius: 999, background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, color: "#fff", fontWeight: 700, fontSize: 15, textDecoration: "none" }}>
                   Get Plan with {selected.name} →
                 </a>

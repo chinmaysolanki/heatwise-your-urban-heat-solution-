@@ -9,7 +9,6 @@ import { Ic } from "@/components/heatwise/ui/Icon";
 import { BottomNav } from "@/components/heatwise/ui/BottomNav";
 import { buildInstallerExport } from "@/lib/installerExport";
 import { LiveARMeasurementScreen } from "@/live-ar/screens/LiveARMeasurementScreen";
-import { useSession } from "next-auth/react";
 import { IntroSlides } from "@/components/heatwise/IntroSlides";
 import {
   buildRecommendationGenerateRequestFromPhotoSession,
@@ -5660,24 +5659,11 @@ const SettingsScreen = () => {
               <div style={{fontSize:11,color:'#40916C'}}>
                 {profile?.email || "Add an email for reports"}
               </div>
-              {profile?.phoneNumber && (
-                <div style={{fontSize:11,color:'#2D6A4F',marginTop:3,fontWeight:600}}>
-                  {profile.phoneNumber} {profile.phoneVerified ? <span style={{color:'#40916C'}}>· verified</span> : ""}
-                </div>
-              )}
             </div>
           </div>
 
           {/* Fields */}
           <div style={{display:"grid",gridTemplateColumns:"1fr",gap:12,marginBottom:14}}>
-            <div>
-              <div style={labelStyle}>MOBILE NUMBER</div>
-              <input
-                value={profile?.phoneNumber || ""}
-                readOnly disabled
-                style={{...inputStyle, background:'rgba(240,240,240,0.85)', color:'#6B7280'}}
-              />
-            </div>
             <div>
               <div style={labelStyle}>EMAIL</div>
               <input
@@ -10108,7 +10094,7 @@ const LocationSpeciesScreen = ({ navigate, photoSession, setPhotoSession }) => {
   const accentColor = heatColor(heatExp);
 
   return (
-    <div style={{ minHeight:'100%', background:'linear-gradient(180deg,#050D1A 0%,#07151F 50%,#060F18 100%)', paddingBottom:110, fontFamily:"'DM Sans','Inter',sans-serif" }}>
+    <div style={{ height:'100%', display:'flex', flexDirection:'column', background:'linear-gradient(180deg,#050D1A 0%,#07151F 50%,#060F18 100%)', fontFamily:"'DM Sans','Inter',sans-serif" }}>
       <style>{`
         @keyframes locPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:0.7}}
         @keyframes locFadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -10119,7 +10105,7 @@ const LocationSpeciesScreen = ({ navigate, photoSession, setPhotoSession }) => {
       `}</style>
 
       {/* ── Header ───────────────────────────────────────────── */}
-      <div style={{ background:'rgba(5,13,26,0.92)', backdropFilter:'blur(20px)', display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'calc(env(safe-area-inset-top,44px) + 12px)', paddingBottom:12, paddingLeft:16, paddingRight:16, borderBottom:'1px solid rgba(255,255,255,0.06)', position:'sticky', top:0, zIndex:100 }}>
+      <div style={{ flexShrink:0, background:'rgba(5,13,26,0.92)', backdropFilter:'blur(20px)', display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'calc(env(safe-area-inset-top,44px) + 12px)', paddingBottom:12, paddingLeft:16, paddingRight:16, borderBottom:'1px solid rgba(255,255,255,0.06)', zIndex:100 }}>
         <button onClick={() => navigate('measure')} style={{ background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:10, width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
           <Ic n="back" s={18} c="rgba(255,255,255,0.8)" />
         </button>
@@ -10134,7 +10120,7 @@ const LocationSpeciesScreen = ({ navigate, photoSession, setPhotoSession }) => {
         <div style={{ width:36 }} />
       </div>
 
-      <div style={{ padding:'18px 16px 0' }}>
+      <div style={{ flex:1, minHeight:0, overflowY:'auto', WebkitOverflowScrolling:'touch', padding:'18px 16px 20px' }}>
 
         {/* ── Detecting spinner ──────────────────────────────── */}
         {phase === 'detecting' && (
@@ -10306,7 +10292,7 @@ const LocationSpeciesScreen = ({ navigate, photoSession, setPhotoSession }) => {
       </div>
 
       {/* ── Bottom CTA ─────────────────────────────────────────── */}
-      <div style={{ position:'fixed', bottom:0, left:0, right:0, background:'rgba(5,13,26,0.96)', backdropFilter:'blur(20px)', padding:'14px 16px calc(env(safe-area-inset-bottom,20px) + 14px)', borderTop:'1px solid rgba(255,255,255,0.07)', maxWidth:430, margin:'0 auto', zIndex:50 }}>
+      <div style={{ flexShrink:0, background:'rgba(5,13,26,0.96)', backdropFilter:'blur(20px)', padding:'14px 16px calc(env(safe-area-inset-bottom,0px) + 14px)', borderTop:'1px solid rgba(255,255,255,0.07)', zIndex:50 }}>
         <button onClick={onNext} disabled={phase==='detecting'} style={{
           width:'100%', padding:'16px 0',
           borderRadius:16, border:'none',
@@ -10453,14 +10439,14 @@ const SpaceDetailsScreen = ({ navigate, photoSession, setPhotoSession, ensureRec
   );
 
   return (
-    <div style={{ minHeight:'100%', background:'linear-gradient(180deg,#040C18 0%,#060F1A 100%)', paddingBottom:120, fontFamily:"'DM Sans','Inter',sans-serif" }}>
+    <div style={{ height:'100%', display:'flex', flexDirection:'column', background:'linear-gradient(180deg,#040C18 0%,#060F1A 100%)', fontFamily:"'DM Sans','Inter',sans-serif" }}>
       <style>{`
         @keyframes sdFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
         .sd-section{animation:sdFadeUp .35s ease forwards}
       `}</style>
 
       {/* ── Header ─────────────────────────────────────────────── */}
-      <div style={{ background:'rgba(4,12,24,0.92)', backdropFilter:'blur(20px)', display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'calc(env(safe-area-inset-top,44px) + 12px)', paddingBottom:12, paddingLeft:16, paddingRight:16, borderBottom:'1px solid rgba(255,255,255,0.06)', position:'sticky', top:0, zIndex:100 }}>
+      <div style={{ flexShrink:0, background:'rgba(4,12,24,0.92)', backdropFilter:'blur(20px)', display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:'calc(env(safe-area-inset-top,44px) + 12px)', paddingBottom:12, paddingLeft:16, paddingRight:16, borderBottom:'1px solid rgba(255,255,255,0.06)', zIndex:100 }}>
         <button onClick={() => navigate('locationSpecies')} style={{ background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:10, width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
           <Ic n="back" s={18} c="rgba(255,255,255,0.8)" />
         </button>
@@ -10475,7 +10461,8 @@ const SpaceDetailsScreen = ({ navigate, photoSession, setPhotoSession, ensureRec
         <div style={{ width:36 }} />
       </div>
 
-      <div style={{ padding:'20px 16px 0', display:'flex', flexDirection:'column', gap:28 }}>
+      {/* ── Scrollable content ──────────────────────────────────── */}
+      <div style={{ flex:1, minHeight:0, overflowY:'auto', WebkitOverflowScrolling:'touch', padding:'20px 16px 20px', display:'flex', flexDirection:'column', gap:28 }}>
 
         {/* ── Section helper ── */}
         {/* Surface Type */}
@@ -10570,7 +10557,7 @@ const SpaceDetailsScreen = ({ navigate, photoSession, setPhotoSession, ensureRec
       </div>
 
       {/* ── Generate CTA ───────────────────────────────────────── */}
-      <div style={{ position:'fixed', bottom:0, left:0, right:0, background:'rgba(4,12,24,0.96)', backdropFilter:'blur(20px)', padding:'14px 16px calc(env(safe-area-inset-bottom,20px) + 14px)', borderTop:'1px solid rgba(255,255,255,0.07)', maxWidth:430, margin:'0 auto', zIndex:50 }}>
+      <div style={{ flexShrink:0, background:'rgba(4,12,24,0.96)', backdropFilter:'blur(20px)', padding:'14px 16px calc(env(safe-area-inset-bottom,0px) + 14px)', borderTop:'1px solid rgba(255,255,255,0.07)', zIndex:50 }}>
         <button onClick={onGenerate} disabled={busy || !valid} style={{
           width:'100%', padding:'17px 0', borderRadius:16, border:'none',
           background: (!valid || busy) ? 'rgba(255,255,255,0.08)' : 'linear-gradient(135deg,#1B4332,#2D6A4F,#52B788)',
@@ -11017,7 +11004,6 @@ function AuthShell({ children }) {
 ══════════════════════════════════════════════════════════════════ */
 const NAV=['home','saved','report','settings','cityHeat','speciesLib','speciesDetail','impact','notifications','tips'];
 export default function App(){
-  const { status } = useSession();
   const [me, setMe] = useState(null);
   const [meLoaded, setMeLoaded] = useState(false);
   const [projects, setProjects] = useState([]);
@@ -11202,10 +11188,9 @@ export default function App(){
     else navigate("measure");
   }, [navigate]);
 
-  // Load user profile (works for authenticated sessions; no-op otherwise)
+  // Load user profile — guest mode, no auth required
   useEffect(() => {
     let alive = true;
-    if (status !== "authenticated") return;
     (async () => {
       try {
         const res = await fetch("/api/user/me");
@@ -11217,7 +11202,7 @@ export default function App(){
       } catch { /* silent — app works without user profile */ }
     })();
     return () => { alive = false; };
-  }, [status]);
+  }, []);
 
   const persistPhotoSession = useCallback(async (snapshot) => {
     const ps = snapshot ?? photoSession;
@@ -11658,7 +11643,7 @@ export default function App(){
       <div style={{width:'100%',height:'100vh',overflow:'hidden',position:'relative',background:'transparent',display:'flex',flexDirection:'column'}}>
         <div className="hw-phone-bg" aria-hidden="true" />
         {/* Screen container — use scr-fixed for screens that manage their own internal scroll */}
-        <div className={`${screen==='home'?'scr-fixed':'scr'} ${anim}`} key={screen} style={{position:'absolute',top:0,bottom:showNav?'calc(56px + env(safe-area-inset-bottom, 0px))':0,left:0,right:0}}>
+        <div className={`${(screen==='home'||screen==='spaceDetails'||screen==='locationSpecies')?'scr-fixed':'scr'} ${anim}`} key={screen} style={{position:'absolute',top:0,bottom:showNav?'calc(56px + env(safe-area-inset-bottom, 0px))':0,left:0,right:0}}>
           {render()}
         </div>
         {/* Bottom nav */}
