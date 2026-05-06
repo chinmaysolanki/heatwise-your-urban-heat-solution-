@@ -109,8 +109,8 @@ function HeroSection() {
         <div>
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
             style={{ display: "inline-flex", alignItems: "center", gap: 8, background: C.MINT, border: `1px solid rgba(64,176,112,0.3)`, borderRadius: 999, padding: "6px 16px", fontSize: 13, fontWeight: 600, color: C.FOREST_MID, marginBottom: 24 }}>
-            <span style={{ width: 8, height: 8, borderRadius: "50%", background: C.HEAT_RED, animation: "pulse-glow 1.5s ease-in-out infinite" }} />
-            Live in 14 cities · 2,800+ rooftops greened
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: C.GREEN, animation: "pulse-glow 1.5s ease-in-out infinite" }} />
+            AI-Powered Urban Cooling · Now in Early Access
           </motion.div>
           <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(36px, 5vw, 60px)", fontWeight: 700, lineHeight: 1.1, marginBottom: 24, color: C.FOREST }}>
             {words.map((word, i) => (
@@ -130,18 +130,12 @@ function HeroSection() {
             <GhostBtn href="/how-it-works" size="lg">▶ Watch 90s Demo</GhostBtn>
           </motion.div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 0.5 }}
-            style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ display: "flex" }}>
-              {["AM", "RK", "PS", "+"].map((init, i) => (
-                <div key={init} style={{ width: 36, height: 36, borderRadius: "50%", background: i < 3 ? `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})` : C.MINT, border: `2px solid ${C.CREAM}`, marginLeft: i > 0 ? -10 : 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: i < 3 ? "#fff" : C.FOREST_MID, fontFamily: "'JetBrains Mono', monospace" }}>
-                  {init}
-                </div>
-              ))}
-            </div>
-            <div>
-              <div style={{ display: "flex", gap: 2, marginBottom: 2 }}>{[0,1,2,3,4].map(s => <span key={s} style={{ color: C.GOLD, fontSize: 14 }}>★</span>)}</div>
-              <p style={{ fontSize: 13, fontWeight: 600, color: C.FOREST, opacity: 0.8 }}>4.9/5 from 2,800+ households</p>
-            </div>
+            style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+            {["Free to start", "No credit card", "Works on any device"].map((badge) => (
+              <span key={badge} style={{ fontSize: 13, fontWeight: 600, color: C.FOREST_MID, opacity: 0.8, display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ color: C.GREEN }}>✓</span> {badge}
+              </span>
+            ))}
           </motion.div>
         </div>
         <motion.div className="hero-card-wrap" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.6 }} style={{ position: "relative" }}>
@@ -152,15 +146,15 @@ function HeroSection() {
               ))}
             </div>
             <div style={{ position: "absolute", top: 20, left: 20, background: "rgba(216,48,48,0.9)", color: "#fff", borderRadius: 999, padding: "6px 14px", fontSize: 12, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", backdropFilter: "blur(8px)" }}>
-              LIVE · MUMBAI · 42.7°C surface
+              URBAN HEAT · BEFORE
             </div>
             <div style={{ position: "absolute", bottom: 20, right: 20, background: "rgba(64,176,112,0.9)", color: "#fff", borderRadius: 999, padding: "6px 14px", fontSize: 12, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", backdropFilter: "blur(8px)" }}>
-              AFTER GREENING · −4.2°C avg drop
+              AFTER GREENING · COOLER
             </div>
           </div>
           <div style={{ position: "absolute", top: 40, right: -24, background: C.BG_DARK, color: C.GREEN_PALE, borderRadius: 16, padding: "12px 18px", fontSize: 20, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", boxShadow: "0 8px 32px rgba(0,0,0,0.2)", animation: "bob 4s ease-in-out infinite" }}>
-            −4.2°C
-            <p style={{ fontSize: 11, fontWeight: 400, opacity: 0.7, marginTop: 2 }}>avg cooling</p>
+            Cooler 🌿
+            <p style={{ fontSize: 11, fontWeight: 400, opacity: 0.7, marginTop: 2 }}>after greening</p>
           </div>
           <div style={{ position: "absolute", bottom: 60, left: -24, background: C.MINT, color: C.FOREST_MID, borderRadius: 16, padding: "12px 18px", fontSize: 13, fontWeight: 700, boxShadow: "0 8px 32px rgba(64,176,112,0.2)", animation: "bob 4s ease-in-out infinite", animationDelay: "0.5s", border: `1px solid rgba(64,176,112,0.2)` }}>
             🤖 AI in minutes
@@ -172,7 +166,7 @@ function HeroSection() {
 }
 
 function MarqueeSection() {
-  const items = ["Times of India","YourStory","Smart Cities India","NDTV","IIT Bombay","The Hindu","Inc42","Forbes India","Times of India","YourStory","Smart Cities India","NDTV","IIT Bombay","The Hindu","Inc42","Forbes India"];
+  const items = ["AR Space Scanning","AI Species Matching","Climate Data","Cooling Score","Plant Care Guides","Installer Network","Garden Layout AI","Urban Heat Maps","800+ Species","Rooftop Greening","AR Space Scanning","AI Species Matching","Climate Data","Cooling Score","Plant Care Guides","Installer Network"];
   return (
     <div style={{ borderTop: `1px solid rgba(26,56,40,0.1)`, borderBottom: `1px solid rgba(26,56,40,0.1)`, overflow: "hidden", padding: "16px 0", background: C.CREAM }}>
       <div style={{ display: "flex", gap: 0, animation: "marquee 32s linear infinite", width: "max-content" }}>
@@ -254,7 +248,7 @@ function HowItWorksSection() {
     },
     {
       num: "02", title: "Detect Your Climate",
-      desc: "We pull live weather, UV, humidity and wind data for your exact microclimate — then cross-reference against 14 years of historical patterns to build your plant compatibility profile.",
+      desc: "We pull live weather, UV, humidity and wind data for your exact microclimate — then cross-reference against historical climate patterns to build your plant compatibility profile.",
       visual: (
         <div style={{ background: C.BG_DARK, borderRadius: 24, padding: 32, minHeight: 280, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignContent: "center" }}>
           {[{ label: "Temp", val: "38.2°C", icon: "🌡️", color: C.HEAT_ORANGE }, { label: "UV Index", val: "9.4", icon: "☀️", color: C.GOLD }, { label: "Humidity", val: "58%", icon: "💧", color: C.SKY }, { label: "Wind", val: "12 km/h", icon: "💨", color: C.GREEN_PALE }].map((d, i) => (
@@ -324,7 +318,7 @@ function CapabilitiesSection() {
     { icon: "🤖", title: "AI Layout Engine", desc: "Proprietary model trained on 50,000+ rooftop configurations across Indian climates." },
     { icon: "❄️", title: "Cooling Impact Score", desc: "Precise before/after predictions — we're transparent about what each plant will do." },
     { icon: "🌿", title: "800+ Verified Species", desc: "Every plant tagged by climate zone, sun tolerance, water need and cooling efficiency." },
-    { icon: "🔨", title: "Installer Network", desc: "Vetted green-thumb pros in 14 cities who can execute your plan end-to-end." },
+    { icon: "🔨", title: "Installer Network", desc: "Vetted green-thumb pros across Indian cities who can execute your plan end-to-end." },
     { icon: "📱", title: "Works on Any Device", desc: "Browser-based AR scanner works on iOS, Android and desktop — no app required." },
   ];
   return (
@@ -388,11 +382,9 @@ function BeforeAfterSection() {
             <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 36, height: 36, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.3)", fontSize: 16 }}>⇔</div>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center", marginTop: 32 }}>
-          {[{ label: "−3.8°C surface temp", color: C.GREEN }, { label: "+42% humidity", color: C.SKY }, { label: "6 species installed", color: C.GOLD }, { label: "8-week growth", color: C.GREEN_PALE }].map((p) => (
-            <span key={p.label} style={{ background: `${p.color}18`, border: `1px solid ${p.color}44`, color: p.color === C.GREEN_PALE ? C.FOREST_MID : p.color, borderRadius: 999, padding: "8px 18px", fontSize: 13, fontWeight: 600 }}>{p.label}</span>
-          ))}
-        </div>
+        <p style={{ textAlign: "center", marginTop: 24, fontSize: 14, color: C.FOREST, opacity: 0.5, fontFamily: "'JetBrains Mono',monospace" }}>
+          Drag the slider to compare. Your results will depend on your space, species selection and local climate.
+        </p>
       </div>
     </section>
   );
@@ -451,38 +443,33 @@ function SpeciesSection() {
 }
 
 function TestimonialsSection() {
-  const testimonials = [
-    { quote: "Our terrace went from 44°C to 36°C in two months. We now sit outside in May — something unthinkable before HeatWise.", name: "Aanya Mehta", location: "Mumbai · Bandra", initials: "AM" },
-    { quote: "The AI plan picked native species I'd never have considered. The curry leaf and lemongrass combo works brilliantly for my microclimate.", name: "Ravi Krishnan", location: "Bengaluru · Indiranagar", initials: "RK" },
-    { quote: "Our society's electricity bill dropped 18% this summer. The investment paid back in one season. Every housing society needs this.", name: "Priya Shah", location: "Pune · Kothrud", initials: "PS" },
-  ];
   return (
     <section style={{ padding: "100px 24px", background: "#fff" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: "center", marginBottom: 64 }}>
-          <SectionLabel>06 — Voices</SectionLabel>
-          <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(28px,4vw,48px)", fontWeight: 700, color: C.FOREST }}>
-            Cooler homes,{" "}
-            <span style={{ background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>happier people</span>
+      <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ marginBottom: 48 }}>
+          <SectionLabel>06 — Early Access</SectionLabel>
+          <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(28px,4vw,48px)", fontWeight: 700, color: C.FOREST, marginBottom: 20 }}>
+            Be among the{" "}
+            <span style={{ background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>first to green</span>
           </h2>
+          <p style={{ fontSize: 17, lineHeight: 1.7, color: C.FOREST, opacity: 0.7, maxWidth: 560, margin: "0 auto 40px" }}>
+            HeatWise is launching in select Indian cities. Join early access and help us shape the product — your feedback directly influences what we build next.
+          </p>
         </motion.div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 28 }} className="testi-grid">
-          <style>{`@media (max-width: 900px) { .testi-grid { grid-template-columns: 1fr !important; } }`}</style>
-          {testimonials.map((t, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }}
-              style={{ background: "#fff", borderLeft: `4px solid ${C.GREEN}`, borderRadius: "0 20px 20px 0", padding: "32px 28px", boxShadow: "0 4px 24px rgba(26,56,40,0.07)", border: `1px solid rgba(64,176,112,0.15)`, borderLeft: `4px solid ${C.GREEN}` }}>
-              <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>{[0,1,2,3,4].map(s => <span key={s} style={{ color: C.GOLD, fontSize: 16 }}>★</span>)}</div>
-              <p style={{ fontSize: 15, lineHeight: 1.75, fontStyle: "italic", color: C.FOREST, opacity: 0.85, marginBottom: 24 }}>"{t.quote}"</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 14, fontFamily: "'JetBrains Mono',monospace", flexShrink: 0 }}>{t.initials}</div>
-                <div>
-                  <p style={{ fontWeight: 700, fontSize: 14, color: C.FOREST }}>{t.name}</p>
-                  <p style={{ fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: C.FOREST, opacity: 0.5 }}>{t.location}</p>
-                </div>
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.15, duration: 0.5 }}
+          style={{ background: `linear-gradient(135deg, ${C.MINT}, rgba(64,176,112,0.1))`, border: `1px solid rgba(64,176,112,0.25)`, borderRadius: 24, padding: "48px 40px" }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🌿</div>
+          <h3 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 22, fontWeight: 700, color: C.FOREST, marginBottom: 12 }}>Early Access Perks</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 400, margin: "0 auto 32px", textAlign: "left" }}>
+            {["Free scan & AI layout plan", "Priority onboarding support", "Shape the product roadmap", "Locked-in early adopter pricing"].map((perk) => (
+              <div key={perk} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 15, color: C.FOREST }}>
+                <span style={{ width: 22, height: 22, borderRadius: "50%", background: C.GREEN, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#fff", fontWeight: 700, flexShrink: 0 }}>✓</span>
+                {perk}
               </div>
-            </motion.div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <GreenBtn href="/?start=scan" size="lg">📷 Get Early Access</GreenBtn>
+        </motion.div>
       </div>
     </section>
   );
@@ -580,9 +567,9 @@ function HeatMapSection() {
             </div>
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24, marginTop: 32 }} className="stats-grid">
-          <style>{`@media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2,1fr) !important; } }`}</style>
-          {[{ val: "12", label: "Cities live" }, { val: "42.7°C", label: "Avg surface" }, { val: "3,250", label: "Rooftops greened" }, { val: "−4.2°C", label: "Avg cooling" }].map((s) => (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 24, marginTop: 32 }} className="stats-grid">
+          <style>{`@media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr !important; } }`}</style>
+          {[{ val: "800+", label: "Verified species" }, { val: "5°C", label: "Max urban heat gap" }, { val: "60s", label: "Time to scan" }].map((s) => (
             <div key={s.label} style={{ textAlign: "center", padding: 24, background: "rgba(255,255,255,0.04)", borderRadius: 16, border: "1px solid rgba(64,176,112,0.1)" }}>
               <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 28, fontWeight: 700, color: C.GREEN_PALE }}>{s.val}</div>
               <div style={{ fontSize: 13, opacity: 0.5, marginTop: 4 }}>{s.label}</div>
@@ -656,14 +643,14 @@ function PricingSection() {
 }
 
 const FAQ_ITEMS = [
-  { q: "How accurate is the AR scan?", a: "Our AR engine achieves ±8cm dimensional accuracy on most modern smartphones. We cross-validate with GPS microclimate data to ensure cooling predictions are within ±0.5°C of actual post-installation measurements." },
-  { q: "What if my plants die?", a: "Every HeatWise plan comes with a 90-day plant health guarantee. If any plant in your AI-selected plan doesn't thrive within 90 days when following our care schedule, we'll replace it for free — no questions asked." },
+  { q: "How accurate is the AR scan?", a: "Our AR engine uses your phone's camera and sensors to map dimensions and sunlight exposure. We cross-validate with live GPS microclimate data to build a plant compatibility profile specific to your space." },
   { q: "How does the AI pick species?", a: "Our model considers your exact GPS coordinates, current and historical temperature/humidity/UV, available sunlight hours, surface type, budget and maintenance preference. It runs 800+ species through a compatibility matrix and ranks by cooling efficiency × survival probability." },
-  { q: "Do you deliver plants?", a: "Yes — through our network of verified nursery partners in all 14 cities. Delivery typically takes 3–5 business days. All plants are acclimatised to your city's climate zone before dispatch." },
-  { q: "Can installers do everything?", a: "Our verified installers handle soil preparation, container selection, planting, irrigation setup and initial care training. They're background-checked, rated by past customers, and carry liability insurance." },
-  { q: "What's the actual cooling impact?", a: "Across our 3,250+ installed projects, we've measured an average surface temperature reduction of 4.2°C and a 38% improvement in perceived comfort. Results vary by species density, orientation and city — your Cooling Score report gives you a personalised estimate." },
-  { q: "Is there a refund policy?", a: "Starter is free. Green and Pro plans offer a 14-day full refund if you're not satisfied — just email us. Plant delivery refunds follow our nursery partner's standard policy (damage in transit is covered 100%)." },
-  { q: "Do you work with housing societies?", a: "Absolutely. Our Pro/Society plan handles multi-unit projects — we've done entire floors, podium gardens and society compounds. Contact our sales team for a customised quote and phased implementation plan." },
+  { q: "Do you deliver plants?", a: "We're building out our nursery partner network. During early access, our team will help coordinate sourcing through trusted local suppliers in your city." },
+  { q: "Can installers do everything?", a: "Our vetted installers handle soil preparation, container selection, planting, irrigation setup and initial care training. Availability varies by city — contact us to check coverage in your area." },
+  { q: "What's the actual cooling impact?", a: "Research shows urban greening can reduce surface temperatures by 3–5°C depending on species density, orientation and local climate. Your personalised Cooling Score report will give you an estimate specific to your space." },
+  { q: "Is there a refund policy?", a: "Starter is free — no commitment needed. For paid plans, we'll work with you directly during early access. Reach out to us and we'll make it right." },
+  { q: "Do you work with housing societies?", a: "Absolutely. Our Pro/Society plan handles multi-unit projects — entire floors, podium gardens and society compounds. Contact our team for a customised quote and phased implementation plan." },
+  { q: "Which cities are supported?", a: "We're in early access and expanding rapidly across Indian metros. Scan your space anywhere — our climate database covers all major Indian cities. Installer and delivery availability will be confirmed after your scan." },
 ];
 
 function FAQSection({ light }) {
@@ -727,7 +714,7 @@ function FinalCTA() {
           <GreenBtn href="/?start=scan" size="lg">📷 Start Free Scan →</GreenBtn>
         </motion.div>
         <div style={{ display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
-          {["No credit card", "2-min scan", "14 cities"].map((badge) => (
+          {["No credit card", "2-min scan", "Free to start"].map((badge) => (
             <span key={badge} style={{ fontSize: 13, fontWeight: 600, color: C.GREEN_PALE, opacity: 0.7, display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: C.GREEN }}>✓</span> {badge}
             </span>
