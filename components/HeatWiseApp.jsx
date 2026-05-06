@@ -7616,61 +7616,66 @@ const GardenLayoutScreen=({navigate,selectedRecommendation,photoSession})=>{
     south_face:'#F97316',full_cover:'#7DD3FC',container:'#D4A373',
   };
 
-  // CSS garden map — top-down zone view
+  // Top-view aerial garden photo + zone overlay
+  const AERIAL_PHOTOS = {
+    rooftop: 'https://images.unsplash.com/photo-1585320806297-9794b3e4aaae?w=900&q=85',
+    balcony: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=900&q=85',
+    terrace: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=85',
+    indoor:  'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?w=900&q=85',
+  };
+  const aerialSrc = AERIAL_PHOTOS[photoSession?.projectMeta?.surfaceType] || AERIAL_PHOTOS.rooftop;
+
   const ZoneMap=()=>{
-    const aspect=Math.min(Math.max(widthM/lengthM,0.5),2);
-    const mapH=Math.round(200/aspect);
-    const perimPct=16; // perimeter band %
+    const perimPct=16;
     const hasPerim=zones.perimeter||zones.north_wall||zones.south_face;
     const hasCent=zones.center||zones.full_cover;
     const hasCont=zones.container;
     return(
-      <div style={{position:'relative',width:'100%',height:Math.min(mapH,220),background:'#0b1f10',borderRadius:14,overflow:'hidden',border:'1px solid rgba(56,189,248,0.18)'}}>
-        {/* Dimension labels */}
-        <div style={{position:'absolute',top:8,left:'50%',transform:'translateX(-50%)',fontSize:9,color:'rgba(186,230,253,0.45)',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'1px',pointerEvents:'none'}}>
-          {widthM.toFixed(1)} m
-        </div>
-        <div style={{position:'absolute',top:'50%',left:8,transform:'translateY(-50%) rotate(-90deg)',fontSize:9,color:'rgba(186,230,253,0.45)',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'1px',pointerEvents:'none',transformOrigin:'center'}}>
-          {lengthM.toFixed(1)} m
-        </div>
-        {/* Outer boundary */}
-        <div style={{position:'absolute',inset:'20px 24px 12px 28px',border:'1.5px solid rgba(56,189,248,0.5)',borderRadius:8,overflow:'hidden'}}>
-          {/* Perimeter planting band */}
+      <div style={{position:'relative',width:'100%',height:240,borderRadius:18,overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,0.18)',border:'2px solid rgba(255,255,255,0.12)'}}>
+        {/* Aerial photo base */}
+        <img src={aerialSrc} alt="garden top view" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
+        {/* Dark tint so overlays are visible */}
+        <div style={{position:'absolute',inset:0,background:'rgba(10,30,15,0.45)'}}/>
+
+        {/* Zone overlays */}
+        <div style={{position:'absolute',inset:'16px 20px 32px 20px',borderRadius:10,overflow:'hidden'}}>
           {hasPerim&&(
-            <div style={{position:'absolute',inset:0,border:`${perimPct/2}px solid rgba(34,197,94,0.25)`,borderRadius:6,boxSizing:'border-box'}}>
-              {/* Perimeter label */}
-              <div style={{position:'absolute',top:4,right:8,fontSize:7,color:'rgba(34,197,94,0.7)',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'0.5px'}}>PERIMETER</div>
+            <div style={{position:'absolute',inset:0,border:`${perimPct/2}px solid rgba(74,222,128,0.45)`,borderRadius:8,boxSizing:'border-box',boxShadow:'inset 0 0 0 1px rgba(74,222,128,0.3)'}}>
+              <div style={{position:'absolute',top:5,left:8,fontSize:8,color:'#4ADE80',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'0.8px',fontWeight:700,textShadow:'0 1px 4px rgba(0,0,0,0.8)'}}>🌿 PERIMETER</div>
             </div>
           )}
-          {/* Center planting area */}
           {hasCent&&(
-            <div style={{position:'absolute',inset:`${perimPct+4}px`,background:'rgba(56,189,248,0.08)',borderRadius:4,border:'1px solid rgba(56,189,248,0.22)',display:'flex',alignItems:'center',justifyContent:'center'}}>
-              <span style={{fontSize:7,color:'rgba(56,189,248,0.55)',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'0.5px'}}>RAISED BEDS</span>
+            <div style={{position:'absolute',inset:`${perimPct+4}px`,background:'rgba(56,189,248,0.18)',borderRadius:6,border:'1.5px solid rgba(56,189,248,0.55)',display:'flex',alignItems:'center',justifyContent:'center',backdropFilter:'blur(1px)'}}>
+              <span style={{fontSize:9,color:'#7DD3FC',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'0.8px',fontWeight:700,textShadow:'0 1px 4px rgba(0,0,0,0.8)'}}>🌱 RAISED BEDS</span>
             </div>
           )}
-          {/* Container dots (corners) */}
           {hasCont&&[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sy],ci)=>(
             <div key={ci} style={{position:'absolute',
-              left:sx<0?6:undefined,right:sx>0?6:undefined,
-              top:sy<0?6:undefined,bottom:sy>0?6:undefined,
-              width:16,height:16,borderRadius:'50%',
-              background:'rgba(212,163,115,0.25)',border:'1.5px solid rgba(212,163,115,0.6)',
-              display:'flex',alignItems:'center',justifyContent:'center'}}>
-              <span style={{fontSize:8}}>🪴</span>
+              left:sx<0?8:undefined,right:sx>0?8:undefined,
+              top:sy<0?8:undefined,bottom:sy>0?8:undefined,
+              width:28,height:28,borderRadius:'50%',
+              background:'rgba(212,163,115,0.35)',border:'2px solid rgba(212,163,115,0.85)',
+              display:'flex',alignItems:'center',justifyContent:'center',
+              boxShadow:'0 2px 8px rgba(0,0,0,0.4)'}}>
+              <span style={{fontSize:13}}>🪴</span>
             </div>
           ))}
-          {/* Walkway centre lines */}
-          <div style={{position:'absolute',top:'50%',left:`${perimPct}%`,right:`${perimPct}%`,height:1,background:'rgba(56,189,248,0.12)',transform:'translateY(-50%)'}}/>
-          <div style={{position:'absolute',left:'50%',top:`${perimPct}%`,bottom:`${perimPct}%`,width:1,background:'rgba(56,189,248,0.12)',transform:'translateX(-50%)'}}/>
         </div>
-        {/* Compass */}
-        <div style={{position:'absolute',bottom:10,right:12,width:22,height:22,borderRadius:'50%',border:'1px solid rgba(56,189,248,0.3)',display:'flex',alignItems:'center',justifyContent:'center'}}>
-          <span style={{fontSize:8,fontWeight:700,color:'rgba(56,189,248,0.7)',fontFamily:"'JetBrains Mono',monospace"}}>N</span>
+
+        {/* Top label */}
+        <div style={{position:'absolute',top:12,left:'50%',transform:'translateX(-50%)',background:'rgba(0,0,0,0.55)',backdropFilter:'blur(6px)',borderRadius:20,padding:'3px 12px',border:'1px solid rgba(255,255,255,0.15)'}}>
+          <span style={{fontSize:9,color:'rgba(255,255,255,0.9)',fontFamily:"'JetBrains Mono',monospace",letterSpacing:'1.5px',fontWeight:700}}>AERIAL VIEW</span>
         </div>
-        {/* Scale bar */}
-        <div style={{position:'absolute',bottom:10,left:30,display:'flex',alignItems:'center',gap:4}}>
-          <div style={{width:24,height:2,background:'rgba(186,230,253,0.4)',borderRadius:1}}/>
-          <span style={{fontSize:7,color:'rgba(186,230,253,0.4)',fontFamily:"'JetBrains Mono',monospace"}}>2 m</span>
+
+        {/* Dimensions */}
+        <div style={{position:'absolute',bottom:8,left:0,right:0,display:'flex',justifyContent:'space-between',alignItems:'center',padding:'0 14px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:6}}>
+            <div style={{width:20,height:2,background:'rgba(255,255,255,0.5)',borderRadius:1}}/>
+            <span style={{fontSize:8,color:'rgba(255,255,255,0.7)',fontFamily:"'JetBrains Mono',monospace"}}>{widthM.toFixed(1)}m × {lengthM.toFixed(1)}m</span>
+          </div>
+          <div style={{background:'rgba(0,0,0,0.5)',borderRadius:12,padding:'2px 8px',border:'1px solid rgba(255,255,255,0.15)'}}>
+            <span style={{fontSize:9,fontWeight:700,color:'rgba(255,255,255,0.85)',fontFamily:"'JetBrains Mono',monospace"}}>N ↑</span>
+          </div>
         </div>
       </div>
     );
