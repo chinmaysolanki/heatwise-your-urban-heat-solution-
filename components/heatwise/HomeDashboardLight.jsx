@@ -298,7 +298,9 @@ const DailyChallenge = ({ navigate }) => {
 ════════════════════════════════════════════════════════════ */
 export const HomeDashboardLight = ({ navigate, me, projects, resumeProject, startFreshScan }) => {
   const scanNow = startFreshScan ?? (() => navigate?.("measure"));
-  const firstName = me?.name?.split(" ")[0] || "there";
+  // Prefer server me, fall back to locally-saved profile (set during onboarding)
+  const localName = (() => { try { return JSON.parse(localStorage.getItem("hw_profile") || "null")?.name; } catch { return null; } })();
+  const firstName = (me?.name || localName || "").split(" ")[0] || "there";
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
   const hasProjects = Array.isArray(projects) && projects.length > 0;

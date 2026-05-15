@@ -1212,9 +1212,21 @@ const GardenScene3D = ({ species = [], progress = 1, photoTexture = null, spatia
       const g = new THREE.Group();
       const rnd=(a,b)=>a+Math.random()*(b-a);
 
+      // ── Species-specific accent colours ──────────────────────────
+      const SPECIES_ACCENT = {
+        bougainvillea:0xe91e8c,  marigold:0xff8c00,     portulaca:0xff6b8a,
+        jasmine_mogra:0xfffde7,  coleus:0xab47bc,       adenium:0xe91e63,
+        sweet_potato_vine:0x8bc34a, tulsi_holy:0x81c784, lemongrass:0xb5d400,
+        vetiver:0x7cb342,        curry_leaf:0x43a047,   aloe_vera:0x4db6ac,
+        prickly_pear:0xa5d6a7,   snake_plant:0x558b2f,  pothos:0x66bb6a,
+        spider_plant:0x9ccc65,   malabar_spinach:0x2e7d32, dracaena_marginata:0xef5350,
+        sedum:0x80cbc4,          ficus_pumila:0x388e3c,
+      };
+      const accentHex = SPECIES_ACCENT[code] ?? null;
+
       if(type==='succulent'||type==='cactus'){
         // Dome rosette — sized up to read well in scene
-        const domeCol = code==='adenium'?new THREE.Color(.8,.3,.4):new THREE.Color(.18,.58,.22);
+        const domeCol = accentHex ? new THREE.Color(accentHex) : (code==='adenium'?new THREE.Color(.8,.3,.4):new THREE.Color(.18,.58,.22));
         const domeM = new THREE.MeshStandardMaterial({color:domeCol,emissive:domeCol,emissiveIntensity:.10,roughness:.62});
         const dome = new THREE.Mesh(new THREE.SphereGeometry(.30,12,8,0,Math.PI*2,0,Math.PI*.65),domeM);
         dome.position.y=.08; g.add(dome);
@@ -1228,7 +1240,7 @@ const GardenScene3D = ({ species = [], progress = 1, photoTexture = null, spatia
         }
       } else if(type==='grass'){
         // Dense tall grass tuft matching reference lemongrass/vetiver
-        const bladeCol=new THREE.Color(.48,.78,.20);
+        const bladeCol=accentHex ? new THREE.Color(accentHex) : new THREE.Color(.48,.78,.20);
         for(let i=0;i<24;i++){
           const bm=new THREE.MeshStandardMaterial({color:bladeCol,roughness:.55,side:THREE.DoubleSide});
           const bh=rnd(.55,.90);
@@ -1247,7 +1259,7 @@ const GardenScene3D = ({ species = [], progress = 1, photoTexture = null, spatia
         }
       } else if(type==='herb'){
         // Bushy herb cluster — matches aerial vegetable/herb bed photo
-        const leafCol=new THREE.Color(.22,.72,.28);
+        const leafCol=accentHex ? new THREE.Color(accentHex) : new THREE.Color(.22,.72,.28);
         const stem=new THREE.Mesh(new THREE.CylinderGeometry(.016,.022,.28,6),new THREE.MeshStandardMaterial({color:0x4e3308}));
         stem.position.y=.14; g.add(stem);
         for(let i=0;i<7;i++){
@@ -1283,7 +1295,7 @@ const GardenScene3D = ({ species = [], progress = 1, photoTexture = null, spatia
         const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.028,.040,.34,6),new THREE.MeshStandardMaterial({color:0x3e2008,roughness:.9}));
         trunk.position.y=.17; g.add(trunk);
         for(let tier=0;tier<4;tier++){
-          const col=new THREE.Color().setHSL(hue,0.68,.20+tier*.05);
+          const col=accentHex ? new THREE.Color(accentHex).offsetHSL(0,0,tier*.04) : new THREE.Color().setHSL(hue,0.68,.20+tier*.05);
           const m=new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:.06,roughness:.72});
           const r=.32-.055*tier;
           const s=new THREE.Mesh(new THREE.SphereGeometry(r,10,8),m);
@@ -1313,7 +1325,7 @@ const GardenScene3D = ({ species = [], progress = 1, photoTexture = null, spatia
         const base=new THREE.Mesh(new THREE.SphereGeometry(.20,9,7),stemM);
         base.position.y=.20; base.castShadow=true; g.add(base);
         const flowerCols=[0xff6b35,0xec407a,0xffd740,0xba68c8,0xf48fb1,0xff8f00,0xe040fb];
-        const fc=flowerCols[Math.floor(Math.random()*flowerCols.length)];
+        const fc=accentHex ?? flowerCols[Math.floor(Math.random()*flowerCols.length)];
         const fCol=new THREE.Color(fc);
         // Outer ring of blooms
         for(let i=0;i<10;i++){
@@ -1404,7 +1416,7 @@ const GardenScene3D = ({ species = [], progress = 1, photoTexture = null, spatia
         addZoneRing(grp.position.x, grp.position.z, i);
         worldGroup.add(grp);
         plantGroups.push({ grp, delay: i * 0.07, targetScale: 0.75 + Math.random() * 0.25, swayPhase: Math.random()*Math.PI*2, type: sp.type||'herb' });
-        labelData.push({ grp, name: anchor.label || sp.name || 'Plant', code: sp.speciesCatalogCode || '' });
+        labelData.push({ grp, name: anchor.label || sp.name || 'Plant', code: sp.speciesCatalogCode || '', type: sp.type||'herb' });
       });
     } else {
       // ── TIERED PROFESSIONAL GARDEN LAYOUT ─────────────────────────
@@ -1428,20 +1440,39 @@ const GardenScene3D = ({ species = [], progress = 1, photoTexture = null, spatia
         [ 0.00,  0.38, 'succulent',  0.72],
         [ 0.26,  0.36, 'ornamental', 0.78],
       ];
-      const available = specArr.length || 1;
+      // Smart species assignment — match each species to the zone that fits its type
+      const TALL_TYPES  = new Set(['tree','shrub','palm','bamboo']);
+      const MID_TYPES   = new Set(['herb','grass','vegetable','foliage','fern']);
+      const LOW_TYPES   = new Set(['succulent','perennial','ornamental','creeper','climber']);
+      const byZone = { tall:[], mid:[], low:[] };
+      specArr.forEach(sp => {
+        if(TALL_TYPES.has(sp.type)) byZone.tall.push(sp);
+        else if(MID_TYPES.has(sp.type)) byZone.mid.push(sp);
+        else byZone.low.push(sp);
+      });
+      // Pad each zone with full specArr so we never run dry
+      ['tall','mid','low'].forEach(z=>{ if(!byZone[z].length) byZone[z]=[...specArr]; });
+      const zoneIdx={tall:0,mid:0,low:0};
+      const pickSp = (defaultType) => {
+        const z = TALL_TYPES.has(defaultType)?'tall':MID_TYPES.has(defaultType)?'mid':'low';
+        const pool=byZone[z];
+        return pool[(zoneIdx[z]++)%pool.length] ?? {};
+      };
+
       GARDEN_SLOTS.forEach((slot, i) => {
-        const sp = specArr[i % available] ?? {};
-        const [xf, zf, forcedType, tgtScale] = slot;
+        const [xf, zf, defaultType, tgtScale] = slot;
+        const sp = specArr.length > 0 ? pickSp(defaultType) : {};
+        const plantType = sp.type || defaultType;
         const jx = xf * slabW * 0.5 + (Math.random()-.5)*.12;
         const jz = zf * slabD * 0.5 + (Math.random()-.5)*.12;
-        const grp = makePlant(forcedType, sp.speciesCatalogCode || '');
+        const grp = makePlant(plantType, sp.speciesCatalogCode || '');
         grp.position.set(jx, .07, jz);
         grp.scale.setScalar(0);
         grp.rotation.y = Math.random() * Math.PI * 2;
         addZoneRing(jx, jz, i);
         worldGroup.add(grp);
-        plantGroups.push({ grp, delay: i * 0.08, targetScale: tgtScale, swayPhase: Math.random()*Math.PI*2, type: forcedType });
-        labelData.push({ grp, name: sp.name || 'Plant', code: sp.speciesCatalogCode || '' });
+        plantGroups.push({ grp, delay: i * 0.08, targetScale: tgtScale, swayPhase: Math.random()*Math.PI*2, type: plantType });
+        labelData.push({ grp, name: sp.name || defaultType, code: sp.speciesCatalogCode || '', type: plantType });
       });
     }
 
@@ -1598,24 +1629,28 @@ const GardenScene3D = ({ species = [], progress = 1, photoTexture = null, spatia
       // Collect visible screen positions first to skip overlapping labels
       const placed = [];
 
-      labelData.forEach(({grp, name}, idx)=>{
+      const TYPE_EMOJI={tree:'🌳',shrub:'🌿',palm:'🌴',bamboo:'🎍',grass:'🌾',herb:'🌿',vegetable:'🥬',fern:'🪴',foliage:'🪴',climber:'🍃',creeper:'🍃',succulent:'🌵',perennial:'🌸',ornamental:'🌺'};
+
+      labelData.forEach(({grp, name, type: pType}, idx)=>{
         projVec.setFromMatrixPosition(grp.matrixWorld);
-        projVec.y += 0.75;
+        projVec.y += 0.85;
         projVec.project(camera);
         if(projVec.z > 1) return;
         const x = (projVec.x*.5+.5)*W;
         const y = (-.5*projVec.y+.5)*H;
 
         // Skip if out of bounds
-        if(x<10||x>W-10||y<10||y>H-30) return;
+        if(x<14||x>W-14||y<14||y>H-30) return;
 
         // Skip if too close to an already-placed label (avoid clutter)
-        const tooClose = placed.some(([px,py])=>Math.hypot(px-x,py-y)<42);
+        const tooClose = placed.some(([px,py])=>Math.hypot(px-x,py-y)<52);
         if(tooClose) return;
         placed.push([x,y]);
 
-        // Abbreviated name: first word, max 9 chars
-        const shortName = (name||'Plant').split(' ')[0].slice(0,9);
+        // Up to 2 words, max 14 chars total
+        const words = (name||'Plant').split(' ');
+        const shortName = (words.slice(0,2).join(' ')).slice(0,14);
+        const emoji = TYPE_EMOJI[pType] || '🌿';
         const zoneColor = ZONE_PILL_COLORS[idx % ZONE_PILL_COLORS.length];
 
         const tag = document.createElement('div');
@@ -1623,43 +1658,59 @@ const GardenScene3D = ({ species = [], progress = 1, photoTexture = null, spatia
 
         // Compact pill label
         const pill = document.createElement('div');
-        pill.style.cssText=`background:rgba(255,255,255,0.92);border:1.5px solid ${zoneColor};padding:2px 6px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18);display:flex;align-items:center;gap:3px;`;
+        pill.style.cssText=`background:rgba(5,20,10,0.88);border:1.5px solid ${zoneColor};padding:3px 7px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.40);display:flex;align-items:center;gap:4px;`;
 
-        // Coloured zone dot
-        const zoneDot = document.createElement('div');
-        zoneDot.style.cssText=`width:5px;height:5px;border-radius:50%;background:${zoneColor};flex-shrink:0;`;
-        pill.appendChild(zoneDot);
+        // Emoji icon
+        const emojiEl = document.createElement('span');
+        emojiEl.style.cssText=`font-size:9px;line-height:1;`;
+        emojiEl.textContent = emoji;
+        pill.appendChild(emojiEl);
 
-        // Short name text
+        // Species name text
         const namEl = document.createElement('span');
-        namEl.style.cssText=`font-family:'DM Sans',sans-serif;font-size:8px;font-weight:700;color:#1B4332;letter-spacing:.3px;`;
+        namEl.style.cssText=`font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;color:#e8f5e9;letter-spacing:.2px;`;
         namEl.textContent = shortName;
         pill.appendChild(namEl);
 
+        // Coloured zone dot
+        const zoneDot = document.createElement('div');
+        zoneDot.style.cssText=`width:5px;height:5px;border-radius:50%;background:${zoneColor};flex-shrink:0;box-shadow:0 0 4px ${zoneColor};`;
+        pill.appendChild(zoneDot);
+
         // Stem line
         const stem = document.createElement('div');
-        stem.style.cssText=`width:1px;height:6px;background:${zoneColor};opacity:0.7;`;
+        stem.style.cssText=`width:1.5px;height:8px;background:${zoneColor};opacity:0.8;box-shadow:0 0 3px ${zoneColor};`;
 
         tag.appendChild(pill);
         tag.appendChild(stem);
         overlay.appendChild(tag);
       });
 
-      // ── Bottom-left HUD: compact zone legend ─────────────────────
+      // ── Bottom-left HUD: species legend with emoji ───────────────
       if(placed.length>0){
         const hud = document.createElement('div');
-        hud.style.cssText=`position:absolute;bottom:10px;left:10px;display:flex;flex-direction:column;gap:3px;opacity:${alpha};`;
-        labelData.slice(0,6).forEach(({name},idx)=>{
-          const shortN=(name||'Plant').split(' ')[0].slice(0,9);
+        hud.style.cssText=`position:absolute;bottom:10px;left:10px;display:flex;flex-direction:column;gap:4px;opacity:${alpha};background:rgba(5,15,10,0.72);padding:6px 8px;border-radius:10px;backdrop-filter:blur(6px);`;
+        // Title row
+        const ttl=document.createElement('div');
+        ttl.style.cssText=`font-family:'DM Sans',sans-serif;font-size:8px;font-weight:800;color:#4ADE80;letter-spacing:.8px;text-transform:uppercase;margin-bottom:1px;`;
+        ttl.textContent='Garden Species';
+        hud.appendChild(ttl);
+        labelData.slice(0,8).forEach(({name, type: pType},idx)=>{
+          const words=(name||'Plant').split(' ');
+          const shortN=words.slice(0,2).join(' ').slice(0,14);
+          const emoji=TYPE_EMOJI[pType]||'🌿';
           const zc=ZONE_PILL_COLORS[idx%ZONE_PILL_COLORS.length];
           const row=document.createElement('div');
-          row.style.cssText=`display:flex;align-items:center;gap:4px;`;
+          row.style.cssText=`display:flex;align-items:center;gap:5px;`;
           const dot=document.createElement('div');
-          dot.style.cssText=`width:6px;height:6px;border-radius:50%;background:${zc};flex-shrink:0;`;
+          dot.style.cssText=`width:6px;height:6px;border-radius:50%;background:${zc};flex-shrink:0;box-shadow:0 0 4px ${zc};`;
+          const emojiEl=document.createElement('span');
+          emojiEl.style.cssText=`font-size:9px;line-height:1;`;
+          emojiEl.textContent=emoji;
           const lbl=document.createElement('span');
-          lbl.style.cssText=`font-family:'DM Sans',sans-serif;font-size:7px;font-weight:600;color:#fff;letter-spacing:.3px;text-shadow:0 1px 3px rgba(0,0,0,.6);`;
+          lbl.style.cssText=`font-family:'DM Sans',sans-serif;font-size:9px;font-weight:600;color:#e8f5e9;letter-spacing:.2px;`;
           lbl.textContent=shortN;
-          row.appendChild(dot);row.appendChild(lbl);hud.appendChild(row);
+          row.appendChild(dot);row.appendChild(emojiEl);row.appendChild(lbl);hud.appendChild(row);
         });
         overlay.appendChild(hud);
       }
@@ -2007,251 +2058,385 @@ const EXP_LEVELS = [
 ];
 
 const ProfileSetupScreen = ({ onDone }) => {
-  const [step, setStep] = useState(0);
+  // ── step: 'email' | 'otp' | 'profile' ──────────────────────────
+  const [step, setStep] = useState('email');
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState(['','','','','','']);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
-  const [city, setCity] = useState('');
-  const [exp, setExp] = useState('');
-  const [detectingCity, setDetectingCity] = useState(false);
-  const [detectErr, setDetectErr] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState('');
+  const [cooldown, setCooldown] = useState(0);
+  const otpRefs = useRef([]);
+  const cooldownRef = useRef(null);
+  // Restore-profile mode
+  const [restoreMode, setRestoreMode] = useState(false);
+  const [restoreEmail, setRestoreEmail] = useState('');
+  const [restoring, setRestoring] = useState(false);
+  const [restoreErr, setRestoreErr] = useState('');
 
-  const detectLocation = async () => {
-    setDetectingCity(true); setDetectErr('');
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailValid = EMAIL_RE.test(email.trim());
+
+  // ── Cooldown timer ───────────────────────────────────────────
+  const startCooldown = (secs = 60) => {
+    setCooldown(secs);
+    clearInterval(cooldownRef.current);
+    cooldownRef.current = setInterval(() => {
+      setCooldown(s => { if (s <= 1) { clearInterval(cooldownRef.current); return 0; } return s - 1; });
+    }, 1000);
+  };
+  useEffect(() => () => clearInterval(cooldownRef.current), []);
+
+  // ── Send OTP ─────────────────────────────────────────────────
+  const sendOtp = async () => {
+    if (!emailValid) { setErr('Enter a valid email address.'); return; }
+    setErr(''); setLoading(true);
     try {
-      let lat, lon;
-      try {
-        const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { timeout:6000 }));
-        lat = pos.coords.latitude; lon = pos.coords.longitude;
-      } catch {
-        const ip = await fetch('https://ipapi.co/json/').then(r => r.json());
-        if (!ip.latitude) throw new Error('Location unavailable');
-        lat = ip.latitude; lon = ip.longitude;
-      }
-      const d = await fetch('/api/env/detect', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ lat, lon }) }).then(r => r.json());
-      if (d.locationLabel) setCity(d.locationLabel); else throw new Error('Could not determine city');
-    } catch(e) { setDetectErr(e?.message || 'Could not detect location.'); }
-    setDetectingCity(false);
+      const res = await fetch('/api/auth/email/send-otp', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { setErr(data.message || 'Could not send code.'); if (res.status === 429) startCooldown(60); }
+      else { setStep('otp'); setOtp(['','','','','','']); startCooldown(60); setTimeout(() => otpRefs.current[0]?.focus(), 120); }
+    } catch { setErr('Network error. Check your connection.'); }
+    setLoading(false);
   };
 
-  const canProceed = step === 0 ? name.trim().length >= 2 : city.trim().length >= 2;
+  // ── Verify OTP ───────────────────────────────────────────────
+  const verifyOtp = async (codeOverride) => {
+    const code = codeOverride ?? otp.join('');
+    if (code.length !== 6) { setErr('Enter the 6-digit code.'); return; }
+    setErr(''); setLoading(true);
+    try {
+      const res = await fetch('/api/auth/email/verify', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ email: email.trim(), code }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { setErr(data.message || 'Incorrect code.'); }
+      else { setStep('profile'); setTimeout(() => document.getElementById('hw-name-input')?.focus(), 120); }
+    } catch { setErr('Network error. Check your connection.'); }
+    setLoading(false);
+  };
 
-  const save = () => {
-    const profile = { name:name.trim(), age:age?parseInt(age):null, city:city.trim(), exp:exp||'beginner', createdAt:new Date().toISOString() };
+  // ── OTP box helpers ──────────────────────────────────────────
+  const handleOtpChange = (i, val) => {
+    if (!/^\d*$/.test(val)) return;
+    const next = [...otp]; next[i] = val.slice(-1); setOtp(next);
+    if (val && i < 5) otpRefs.current[i+1]?.focus();
+    if (next.every(d => d) && next.join('').length === 6) setTimeout(() => verifyOtp(next.join('')), 80);
+  };
+  const handleOtpKey = (i, e) => { if (e.key === 'Backspace' && !otp[i] && i > 0) otpRefs.current[i-1]?.focus(); };
+  const handleOtpPaste = e => {
+    const p = e.clipboardData.getData('text').replace(/\D/g,'').slice(0,6);
+    if (!p) return; e.preventDefault();
+    const next = [...otp]; p.split('').forEach((d,i) => { if (i<6) next[i]=d; }); setOtp(next);
+    otpRefs.current[Math.min(p.length,5)]?.focus();
+  };
+
+  // ── Save profile & launch ────────────────────────────────────
+  const saveProfile = async () => {
+    if (name.trim().length < 2) { setErr('Enter your name.'); return; }
+    setErr(''); setLoading(true);
+    const profile = { name:name.trim(), email:email.trim(), age:age?parseInt(age):null, emailVerified:true, createdAt:new Date().toISOString() };
     try { localStorage.setItem('hw_profile', JSON.stringify(profile)); } catch {}
+    try {
+      await fetch('/api/guest-profile', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(profile) });
+    } catch {}
+    setLoading(false);
     onDone(profile);
   };
 
-  const expLevels = [
-    { id:'beginner',     e:'🌱', l:'Beginner',      s:'Just getting started',   c:'#52B788', bg:'rgba(82,183,136,0.15)',  bc:'rgba(82,183,136,0.5)' },
-    { id:'intermediate', e:'🌿', l:'Intermediate',   s:'Some experience',        c:'#38BDF8', bg:'rgba(56,189,248,0.15)',  bc:'rgba(56,189,248,0.5)' },
-    { id:'experienced',  e:'🌳', l:'Experienced',    s:'Regular gardener',       c:'#A78BFA', bg:'rgba(167,139,250,0.15)', bc:'rgba(167,139,250,0.5)' },
-    { id:'expert',       e:'🏆', l:'Expert',         s:'Professional level',     c:'#FBBF24', bg:'rgba(251,191,36,0.15)',  bc:'rgba(251,191,36,0.5)' },
-  ];
+  // ── Restore profile ──────────────────────────────────────────
+  const restoreProfile = async () => {
+    if (!EMAIL_RE.test(restoreEmail.trim())) return;
+    setRestoring(true); setRestoreErr('');
+    try {
+      const res = await fetch(`/api/guest-profile?email=${encodeURIComponent(restoreEmail.trim())}`);
+      if (res.status === 404) { setRestoreErr('No profile found for this email.'); setRestoring(false); return; }
+      if (!res.ok) { setRestoreErr('Could not restore profile. Try again.'); setRestoring(false); return; }
+      const p = await res.json();
+      const profile = { name:p.name, email:p.email, age:p.age, city:p.city, exp:p.exp, createdAt:p.createdAt };
+      try { localStorage.setItem('hw_profile', JSON.stringify(profile)); } catch {}
+      onDone(profile);
+    } catch { setRestoreErr('Network error. Check your connection.'); }
+    setRestoring(false);
+  };
+
+  // ── Restore-profile overlay ──────────────────────────────────
+  if (restoreMode) {
+    return (
+      <div style={{ height:'100%', display:'flex', flexDirection:'column', background:'linear-gradient(180deg,#040C18 0%,#071A10 55%,#040C18 100%)', fontFamily:"'DM Sans','Inter',sans-serif", padding:'calc(env(safe-area-inset-top,44px) + 24px) 20px 40px', justifyContent:'center' }}>
+        <button onClick={() => { setRestoreMode(false); setRestoreErr(''); }} style={{ position:'absolute', top:'calc(env(safe-area-inset-top,44px) + 12px)', left:16, background:'none', border:'none', color:'rgba(255,255,255,0.45)', fontSize:13, cursor:'pointer' }}>← Back</button>
+        <div style={{ fontSize:28, textAlign:'center', marginBottom:8 }}>🔑</div>
+        <div style={{ fontSize:22, fontWeight:900, color:'#fff', textAlign:'center', marginBottom:6 }}>Restore Your Profile</div>
+        <div style={{ fontSize:13, color:'rgba(255,255,255,0.45)', textAlign:'center', lineHeight:1.6, marginBottom:28 }}>Enter the email you used when you first set up HeatWise.</div>
+        <div style={{ position:'relative', marginBottom:14 }}>
+          <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', fontSize:18 }}>📧</span>
+          <input placeholder="your@email.com" type="email" inputMode="email" autoCapitalize="none" value={restoreEmail} onChange={e => setRestoreEmail(e.target.value)}
+            style={{ width:'100%', boxSizing:'border-box', background:'rgba(255,255,255,0.07)', border:'1.5px solid rgba(255,255,255,0.12)', borderRadius:14, padding:'14px 14px 14px 46px', fontSize:15, color:'#fff', fontFamily:"'DM Sans',sans-serif", outline:'none' }}
+          />
+        </div>
+        {restoreErr && <div style={{ background:'rgba(244,132,95,0.10)', border:'1px solid rgba(244,132,95,0.25)', borderRadius:12, padding:'10px 14px', fontSize:12, color:'#F4845F', marginBottom:14, display:'flex', alignItems:'center', gap:8 }}><span>⚠️</span>{restoreErr}</div>}
+        <button onClick={restoreProfile} disabled={!EMAIL_RE.test(restoreEmail.trim()) || restoring}
+          style={{ width:'100%', padding:'16px', borderRadius:16, border:'none', background: EMAIL_RE.test(restoreEmail.trim()) ? 'linear-gradient(135deg,#1B4332,#52B788)' : 'rgba(255,255,255,0.07)', cursor: EMAIL_RE.test(restoreEmail.trim()) ? 'pointer':'default', fontSize:15, fontWeight:800, color: EMAIL_RE.test(restoreEmail.trim()) ? '#fff':'rgba(255,255,255,0.25)', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}
+        >
+          {restoring ? <><div style={{ width:16,height:16,borderRadius:'50%',border:'2px solid rgba(255,255,255,0.3)',borderTopColor:'#fff',animation:'rotateSlow .8s linear infinite' }} /> Restoring…</> : <><span>🔍</span> Find My Profile</>}
+        </button>
+      </div>
+    );
+  }
+
+  // ── Step labels ──────────────────────────────────────────────
+  const STEPS = ['email','otp','profile'];
+  const STEP_LABELS = ['Verify Email','Confirm Code','Your Details'];
+  const stepIdx = STEPS.indexOf(step);
+
+  const Spinner = () => <div style={{ width:16,height:16,borderRadius:'50%',border:'2px solid rgba(255,255,255,0.3)',borderTopColor:'#fff',animation:'rotateSlow .8s linear infinite',flexShrink:0 }} />;
 
   return (
     <div style={{ height:'100%', display:'flex', flexDirection:'column', background:'linear-gradient(180deg,#040C18 0%,#071A10 55%,#040C18 100%)', fontFamily:"'DM Sans','Inter',sans-serif", overflow:'hidden' }}>
       <style>{`
-        @keyframes psFadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes psFadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
         @keyframes psLeafFloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
         @keyframes psShimmer{0%{left:-80%}100%{left:120%}}
-        .ps-in{animation:psFadeUp .4s ease forwards}
-        .ps-exp-card{transition:all .2s ease}
-        .ps-exp-card:active{transform:scale(0.97)}
+        .ps-in{animation:psFadeUp .38s ease forwards}
+        .ps-otp-box:focus{border-color:#52B788 !important; background:rgba(82,183,136,0.10) !important;}
       `}</style>
 
       {/* ── Hero header ─────────────────────────────────────────── */}
-      <div style={{ background:'linear-gradient(160deg,#0B2818 0%,#1B4332 60%,#2D6A4F 100%)', padding:'calc(env(safe-area-inset-top,44px) + 20px) 22px 24px', position:'relative', overflow:'hidden' }}>
-        {/* decorative orbs */}
+      <div style={{ background:'linear-gradient(160deg,#0B2818 0%,#1B4332 60%,#2D6A4F 100%)', padding:'calc(env(safe-area-inset-top,44px) + 20px) 22px 24px', position:'relative', overflow:'hidden', flexShrink:0 }}>
         <div style={{ position:'absolute', top:-40, right:-40, width:160, height:160, borderRadius:'50%', background:'rgba(82,183,136,0.12)', filter:'blur(30px)', pointerEvents:'none' }} />
-        <div style={{ position:'absolute', bottom:-20, left:-20, width:100, height:100, borderRadius:'50%', background:'rgba(56,189,248,0.07)', filter:'blur(20px)', pointerEvents:'none' }} />
-        {/* shimmer */}
         <div style={{ position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none' }}>
-          <div style={{ position:'absolute', top:0, bottom:0, width:'55%', background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent)', animation:'psShimmer 4s ease-in-out infinite' }} />
+          <div style={{ position:'absolute', top:0, bottom:0, width:'55%', background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent)', animation:'psShimmer 4s ease-in-out infinite' }} />
         </div>
 
-        {/* step indicators */}
-        <div style={{ display:'flex', gap:6, marginBottom:20, position:'relative', zIndex:2 }}>
-          {['About You','Your City'].map((lbl, i) => (
+        {/* step progress */}
+        <div style={{ display:'flex', gap:6, marginBottom:22, position:'relative', zIndex:2 }}>
+          {STEP_LABELS.map((lbl, i) => (
             <div key={lbl} style={{ flex:1 }}>
-              <div style={{ height:3, borderRadius:3, background: i<=step ? '#74C69D' : 'rgba(255,255,255,0.12)', marginBottom:4, boxShadow: i===step ? '0 0 8px rgba(116,198,157,0.6)' : 'none', transition:'all .4s' }} />
-              <div style={{ fontSize:9, fontWeight:700, color: i<=step ? '#74C69D' : 'rgba(255,255,255,0.30)', letterSpacing:1, textTransform:'uppercase' }}>{lbl}</div>
+              <div style={{ height:3, borderRadius:3, background: i<=stepIdx ? '#74C69D' : 'rgba(255,255,255,0.12)', marginBottom:4, boxShadow: i===stepIdx ? '0 0 8px rgba(116,198,157,0.6)' : 'none', transition:'all .4s' }} />
+              <div style={{ fontSize:9, fontWeight:700, color: i<=stepIdx ? '#74C69D' : 'rgba(255,255,255,0.28)', letterSpacing:1, textTransform:'uppercase' }}>{lbl}</div>
             </div>
           ))}
         </div>
 
-        {/* title */}
+        {/* title per step */}
         <div style={{ position:'relative', zIndex:2 }}>
-          {step === 0 ? (
+          {step === 'email' && (
             <>
-              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.50)', letterSpacing:2, textTransform:'uppercase', marginBottom:6 }}>Step 1 of 2</div>
+              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.45)', letterSpacing:2, textTransform:'uppercase', marginBottom:6 }}>Step 1 of 3</div>
               <div style={{ fontSize:26, fontWeight:900, color:'#fff', lineHeight:1.2, marginBottom:4 }}>
                 Welcome to <span style={{ color:'#74C69D' }}>HeatWise</span> <span style={{ display:'inline-block', animation:'psLeafFloat 3s ease-in-out infinite' }}>🌿</span>
               </div>
-              <div style={{ fontSize:13, color:'rgba(255,255,255,0.55)', lineHeight:1.55 }}>Tell us a bit about yourself so we can personalise your garden experience.</div>
+              <div style={{ fontSize:13, color:'rgba(255,255,255,0.52)', lineHeight:1.55 }}>Enter your email — we'll send a quick verification code to keep your account secure.</div>
             </>
-          ) : (
+          )}
+          {step === 'otp' && (
             <>
-              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.50)', letterSpacing:2, textTransform:'uppercase', marginBottom:6 }}>Step 2 of 2</div>
+              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.45)', letterSpacing:2, textTransform:'uppercase', marginBottom:6 }}>Step 2 of 3</div>
               <div style={{ fontSize:26, fontWeight:900, color:'#fff', lineHeight:1.2, marginBottom:4 }}>
-                Where are you <span style={{ color:'#38BDF8' }}>based?</span> 📍
+                Check your <span style={{ color:'#38BDF8' }}>inbox</span> 📬
               </div>
-              <div style={{ fontSize:13, color:'rgba(255,255,255,0.55)', lineHeight:1.55 }}>We fetch live climate data for your city to match the best plants.</div>
+              <div style={{ fontSize:13, color:'rgba(255,255,255,0.52)', lineHeight:1.55 }}>6-digit code sent to <strong style={{ color:'rgba(255,255,255,0.85)' }}>{email}</strong></div>
+            </>
+          )}
+          {step === 'profile' && (
+            <>
+              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.45)', letterSpacing:2, textTransform:'uppercase', marginBottom:6 }}>Step 3 of 3</div>
+              <div style={{ fontSize:26, fontWeight:900, color:'#fff', lineHeight:1.2, marginBottom:4 }}>
+                Almost <span style={{ color:'#74C69D' }}>there!</span> 🚀
+              </div>
+              <div style={{ fontSize:13, color:'rgba(255,255,255,0.52)', lineHeight:1.55 }}>Tell us your name so we can personalise your experience.</div>
             </>
           )}
         </div>
       </div>
 
-      {/* ── Scrollable content ───────────────────────────────────── */}
-      <div style={{ flex:1, overflowY:'auto', padding:'22px 18px 24px', WebkitOverflowScrolling:'touch' }}>
+      {/* ── Scrollable body ──────────────────────────────────────── */}
+      <div style={{ flex:1, overflowY:'auto', padding:'28px 20px 24px', WebkitOverflowScrolling:'touch' }}>
 
-        {step === 0 && (
-          <div className="ps-in" style={{ display:'flex', flexDirection:'column', gap:22 }}>
-            {/* Name */}
+        {/* ── STEP 0: Email ── */}
+        {step === 'email' && (
+          <div className="ps-in" style={{ display:'flex', flexDirection:'column', gap:20 }}>
             <div>
-              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.40)', letterSpacing:1.5, textTransform:'uppercase', marginBottom:8 }}>Your Name</div>
+              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.38)', letterSpacing:1.5, textTransform:'uppercase', marginBottom:9 }}>Email address</div>
               <div style={{ position:'relative' }}>
-                <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', fontSize:18 }}>👤</span>
+                <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', fontSize:18 }}>📧</span>
                 <input
-                  placeholder="e.g. Chinmay"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  style={{ width:'100%', boxSizing:'border-box', background:'rgba(255,255,255,0.07)', border:'1.5px solid rgba(255,255,255,0.12)', borderRadius:14, padding:'14px 14px 14px 46px', fontSize:15, fontWeight:600, color:'#fff', fontFamily:"'DM Sans',sans-serif", outline:'none' }}
+                  placeholder="you@example.com"
+                  type="email" inputMode="email" autoCapitalize="none" autoFocus
+                  value={email}
+                  onChange={e => { setEmail(e.target.value); setErr(''); }}
+                  onKeyDown={e => { if (e.key === 'Enter' && emailValid) sendOtp(); }}
+                  style={{ width:'100%', boxSizing:'border-box', background:'rgba(255,255,255,0.07)',
+                    border:`1.5px solid ${email && !emailValid ? 'rgba(244,132,95,0.55)' : emailValid ? 'rgba(82,183,136,0.55)' : 'rgba(255,255,255,0.12)'}`,
+                    borderRadius:14, padding:'14px 44px 14px 46px', fontSize:15, fontWeight:500, color:'#fff', fontFamily:"'DM Sans',sans-serif", outline:'none' }}
                 />
+                {emailValid && <span style={{ position:'absolute', right:14, top:'50%', transform:'translateY(-50%)', color:'#52B788', fontSize:16 }}>✓</span>}
               </div>
+              {err && <div style={{ marginTop:8, fontSize:12, color:'#F4845F', display:'flex', alignItems:'center', gap:6 }}><span>⚠️</span>{err}</div>}
             </div>
 
-            {/* Age */}
-            <div>
-              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.40)', letterSpacing:1.5, textTransform:'uppercase', marginBottom:8 }}>
-                Age <span style={{ fontWeight:400, color:'rgba(255,255,255,0.22)', textTransform:'none', letterSpacing:0, fontSize:10 }}>(optional)</span>
-              </div>
-              <div style={{ position:'relative' }}>
-                <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', fontSize:18 }}>🎂</span>
-                <input
-                  placeholder="e.g. 27"
-                  value={age}
-                  onChange={e => setAge(e.target.value.replace(/\D/g,''))}
-                  type="number" inputMode="numeric"
-                  style={{ width:'100%', boxSizing:'border-box', background:'rgba(255,255,255,0.07)', border:'1.5px solid rgba(255,255,255,0.12)', borderRadius:14, padding:'14px 14px 14px 46px', fontSize:15, color:'#fff', fontFamily:"'DM Sans',sans-serif", outline:'none' }}
-                />
-              </div>
-            </div>
-
-            {/* Experience */}
-            <div>
-              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.40)', letterSpacing:1.5, textTransform:'uppercase', marginBottom:10 }}>Gardening Experience</div>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-                {expLevels.map(lvl => {
-                  const on = exp === lvl.id;
-                  return (
-                    <div key={lvl.id} className="ps-exp-card" onClick={() => setExp(lvl.id)} style={{
-                      background: on ? lvl.bg : 'rgba(255,255,255,0.04)',
-                      border: `1.5px solid ${on ? lvl.bc : 'rgba(255,255,255,0.08)'}`,
-                      borderRadius:16, padding:'16px 12px',
-                      cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', gap:8,
-                      boxShadow: on ? `0 0 18px ${lvl.bc.replace('0.5','0.2')}` : 'none', position:'relative',
-                    }}>
-                      {on && <div style={{ position:'absolute', top:8, right:8, width:18, height:18, borderRadius:'50%', background:lvl.c, display:'flex', alignItems:'center', justifyContent:'center', fontSize:10 }}>✓</div>}
-                      <span style={{ fontSize:30 }}>{lvl.e}</span>
-                      <div style={{ textAlign:'center' }}>
-                        <div style={{ fontSize:13, fontWeight:800, color: on ? lvl.c : 'rgba(255,255,255,0.75)', marginBottom:2 }}>{lvl.l}</div>
-                        <div style={{ fontSize:10, color:'rgba(255,255,255,0.38)', lineHeight:1.4 }}>{lvl.s}</div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            {/* "Already set up" link */}
+            <div style={{ textAlign:'center' }}>
+              <button onClick={() => setRestoreMode(true)} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(255,255,255,0.28)', fontSize:12, padding:0 }}>
+                Already set up? Restore my profile →
+              </button>
             </div>
           </div>
         )}
 
-        {step === 1 && (
-          <div className="ps-in" style={{ display:'flex', flexDirection:'column', gap:20 }}>
-            {/* City input */}
-            <div>
-              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.40)', letterSpacing:1.5, textTransform:'uppercase', marginBottom:8 }}>City / Region</div>
-              <div style={{ position:'relative' }}>
-                <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', fontSize:18 }}>🌍</span>
+        {/* ── STEP 1: OTP ── */}
+        {step === 'otp' && (
+          <div className="ps-in" style={{ display:'flex', flexDirection:'column', gap:24, alignItems:'center' }}>
+            {/* 6-box OTP row */}
+            <div style={{ display:'flex', gap:10, justifyContent:'center' }} onPaste={handleOtpPaste}>
+              {otp.map((digit, i) => (
                 <input
-                  placeholder="e.g. Mumbai, India"
-                  value={city}
-                  onChange={e => setCity(e.target.value)}
+                  key={i}
+                  ref={el => (otpRefs.current[i] = el)}
+                  className="ps-otp-box"
+                  type="text" inputMode="numeric" maxLength={1}
+                  value={digit}
+                  onChange={e => handleOtpChange(i, e.target.value)}
+                  onKeyDown={e => handleOtpKey(i, e)}
+                  style={{
+                    width:46, height:56, textAlign:'center', fontSize:24, fontWeight:800,
+                    fontFamily:"'JetBrains Mono',monospace",
+                    background: digit ? 'rgba(82,183,136,0.14)' : 'rgba(255,255,255,0.06)',
+                    border:`1.5px solid ${digit ? 'rgba(82,183,136,0.5)' : 'rgba(255,255,255,0.15)'}`,
+                    borderRadius:14, color:'#fff', outline:'none',
+                    transition:'all .15s',
+                  }}
+                />
+              ))}
+            </div>
+
+            {err && (
+              <div style={{ width:'100%', background:'rgba(244,132,95,0.10)', border:'1px solid rgba(244,132,95,0.25)', borderRadius:12, padding:'10px 14px', fontSize:12, color:'#F4845F', display:'flex', alignItems:'center', gap:8 }}>
+                <span>⚠️</span>{err}
+              </div>
+            )}
+
+            {/* Resend row */}
+            <div style={{ display:'flex', justifyContent:'space-between', width:'100%', alignItems:'center' }}>
+              <button onClick={() => { setStep('email'); setErr(''); setOtp(['','','','','','']); }}
+                style={{ background:'none', border:'none', cursor:'pointer', fontSize:12, color:'rgba(255,255,255,0.35)', padding:0 }}>
+                ← Change email
+              </button>
+              <button onClick={sendOtp} disabled={cooldown > 0 || loading}
+                style={{ background:'none', border:'none', cursor: cooldown > 0 ? 'default' : 'pointer', fontSize:13, fontWeight:700,
+                  color: cooldown > 0 ? 'rgba(255,255,255,0.25)' : '#52B788', padding:0 }}>
+                {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
+              </button>
+            </div>
+
+            <div style={{ fontSize:12, color:'rgba(255,255,255,0.28)', textAlign:'center', lineHeight:1.6 }}>
+              The code expires in 10 minutes.<br/>Check spam if you don't see it.
+            </div>
+          </div>
+        )}
+
+        {/* ── STEP 2: Name + Age ── */}
+        {step === 'profile' && (
+          <div className="ps-in" style={{ display:'flex', flexDirection:'column', gap:22 }}>
+            {/* Verified badge */}
+            <div style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 16px', background:'rgba(82,183,136,0.12)', border:'1.5px solid rgba(82,183,136,0.30)', borderRadius:14 }}>
+              <span style={{ fontSize:20 }}>✅</span>
+              <div>
+                <div style={{ fontSize:12, fontWeight:700, color:'#74C69D' }}>Email verified</div>
+                <div style={{ fontSize:11, color:'rgba(255,255,255,0.45)', marginTop:1 }}>{email}</div>
+              </div>
+            </div>
+
+            {/* Name */}
+            <div>
+              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.38)', letterSpacing:1.5, textTransform:'uppercase', marginBottom:9 }}>Your Name</div>
+              <div style={{ position:'relative' }}>
+                <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', fontSize:18 }}>👤</span>
+                <input
+                  id="hw-name-input"
+                  placeholder="e.g. Chinmay"
+                  value={name}
+                  onChange={e => { setName(e.target.value); setErr(''); }}
+                  onKeyDown={e => { if (e.key === 'Enter' && name.trim().length >= 2) saveProfile(); }}
+                  style={{ width:'100%', boxSizing:'border-box', background:'rgba(255,255,255,0.07)',
+                    border:`1.5px solid ${name.trim().length >= 2 ? 'rgba(82,183,136,0.50)' : 'rgba(255,255,255,0.12)'}`,
+                    borderRadius:14, padding:'14px 14px 14px 46px', fontSize:15, fontWeight:700, color:'#fff', fontFamily:"'DM Sans',sans-serif", outline:'none' }}
+                />
+              </div>
+            </div>
+
+            {/* Age (optional) */}
+            <div>
+              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.38)', letterSpacing:1.5, textTransform:'uppercase', marginBottom:9 }}>
+                Age <span style={{ fontWeight:400, color:'rgba(255,255,255,0.20)', textTransform:'none', letterSpacing:0, fontSize:10 }}>(optional)</span>
+              </div>
+              <div style={{ position:'relative' }}>
+                <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', fontSize:18 }}>🎂</span>
+                <input
+                  placeholder="e.g. 24"
+                  value={age}
+                  onChange={e => setAge(e.target.value.replace(/\D/g,''))}
+                  inputMode="numeric"
                   style={{ width:'100%', boxSizing:'border-box', background:'rgba(255,255,255,0.07)', border:'1.5px solid rgba(255,255,255,0.12)', borderRadius:14, padding:'14px 14px 14px 46px', fontSize:15, color:'#fff', fontFamily:"'DM Sans',sans-serif", outline:'none' }}
                 />
               </div>
             </div>
 
-            {/* Auto-detect button */}
-            <button onClick={detectLocation} disabled={detectingCity} style={{
-              background:'rgba(56,189,248,0.10)', border:'1.5px solid rgba(56,189,248,0.30)',
-              borderRadius:14, padding:'14px', cursor:'pointer',
-              display:'flex', alignItems:'center', justifyContent:'center', gap:10,
-              fontSize:13, fontWeight:700, color:'#38BDF8', transition:'all .2s',
-            }}>
-              {detectingCity
-                ? <><div style={{ width:16,height:16,borderRadius:'50%',border:'2px solid rgba(56,189,248,0.3)',borderTopColor:'#38BDF8',animation:'rotateSlow .8s linear infinite' }} /> Detecting your location…</>
-                : <><span style={{ fontSize:18 }}>📡</span> Auto-detect my location</>
-              }
-            </button>
-
-            {detectErr && (
-              <div style={{ background:'rgba(244,132,95,0.10)', border:'1px solid rgba(244,132,95,0.25)', borderRadius:12, padding:'10px 14px', fontSize:12, color:'#F4845F', display:'flex', alignItems:'center', gap:8 }}>
-                <span>⚠️</span>{detectErr}
-              </div>
-            )}
-
-            {city && !detectErr && (
-              <div style={{ background:'rgba(82,183,136,0.12)', border:'1.5px solid rgba(82,183,136,0.35)', borderRadius:14, padding:'14px 16px', display:'flex', alignItems:'center', gap:12 }}>
-                <div style={{ width:36,height:36,borderRadius:'50%',background:'rgba(82,183,136,0.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0 }}>📍</div>
-                <div>
-                  <div style={{ fontSize:11, color:'rgba(255,255,255,0.45)', marginBottom:2 }}>Detected location</div>
-                  <div style={{ fontSize:14, fontWeight:800, color:'#fff' }}>{city}</div>
-                </div>
-              </div>
-            )}
-
-            {/* climate preview hint */}
-            <div style={{ background:'rgba(45,106,79,0.12)', border:'1px solid rgba(82,183,136,0.15)', borderRadius:14, padding:'14px 16px', display:'flex', gap:12, alignItems:'flex-start' }}>
-              <span style={{ fontSize:20 }}>🌿</span>
-              <div style={{ fontSize:12, color:'rgba(255,255,255,0.50)', lineHeight:1.6 }}>
-                <strong style={{ color:'rgba(255,255,255,0.70)' }}>Why we need this:</strong> Local temperature, UV and humidity data powers our plant recommendations — so every suggestion fits <em>your</em> climate.
-              </div>
-            </div>
+            {err && <div style={{ fontSize:12, color:'#F4845F', display:'flex', alignItems:'center', gap:6 }}><span>⚠️</span>{err}</div>}
           </div>
         )}
       </div>
 
       {/* ── Bottom CTA ──────────────────────────────────────────── */}
-      <div style={{ background:'rgba(4,12,24,0.95)', backdropFilter:'blur(20px)', padding:'14px 18px calc(env(safe-area-inset-bottom,20px) + 14px)', borderTop:'1px solid rgba(255,255,255,0.07)' }}>
-        <button
-          onClick={step < 1 ? () => setStep(s => s+1) : save}
-          disabled={!canProceed}
-          style={{
-            width:'100%', padding:'16px 0', borderRadius:16, border:'none',
-            background: canProceed
-              ? (step < 1 ? 'linear-gradient(135deg,#1B4332,#52B788)' : 'linear-gradient(135deg,#0C4A6E,#38BDF8)')
-              : 'rgba(255,255,255,0.07)',
-            cursor: canProceed ? 'pointer':'default',
-            fontSize:15, fontWeight:800, color: canProceed ? '#fff' : 'rgba(255,255,255,0.25)',
-            letterSpacing:0.3, display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-            boxShadow: canProceed ? (step < 1 ? '0 6px 24px rgba(45,106,79,0.4)' : '0 6px 24px rgba(56,189,248,0.35)') : 'none',
-            transition:'all .3s ease',
-          }}
-        >
-          {step < 1
-            ? <><span style={{ fontSize:18 }}>🌿</span> Continue →</>
-            : <><span style={{ fontSize:18 }}>🚀</span> Launch My Dashboard</>
-          }
-        </button>
-        {step > 0 && (
-          <button onClick={() => setStep(s => s-1)} style={{ width:'100%', marginTop:10, padding:'8px', background:'none', border:'none', cursor:'pointer', color:'rgba(255,255,255,0.30)', fontSize:12 }}>
-            ← Back
+      <div style={{ background:'rgba(4,12,24,0.97)', backdropFilter:'blur(20px)', padding:'14px 20px calc(env(safe-area-inset-bottom,20px) + 14px)', borderTop:'1px solid rgba(255,255,255,0.07)', flexShrink:0 }}>
+        {step === 'email' && (
+          <button
+            onClick={sendOtp}
+            disabled={!emailValid || loading || cooldown > 0}
+            style={{ width:'100%', padding:'16px 0', borderRadius:16, border:'none',
+              background: emailValid && !loading ? 'linear-gradient(135deg,#1B4332,#52B788)' : 'rgba(255,255,255,0.07)',
+              cursor: emailValid && !loading ? 'pointer' : 'default',
+              fontSize:15, fontWeight:800, color: emailValid ? '#fff' : 'rgba(255,255,255,0.25)',
+              display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+              boxShadow: emailValid ? '0 6px 24px rgba(45,106,79,0.40)' : 'none', transition:'all .3s ease' }}
+          >
+            {loading ? <><Spinner /> Sending code…</> : <><span style={{ fontSize:18 }}>📨</span> Send Verification Code</>}
           </button>
         )}
-        {!canProceed && (
-          <div style={{ fontSize:11, color:'rgba(255,255,255,0.25)', textAlign:'center', marginTop:8 }}>
-            {step === 0 ? 'Enter your name to continue' : 'Enter your city to continue'}
-          </div>
+
+        {step === 'otp' && (
+          <button
+            onClick={() => verifyOtp()}
+            disabled={otp.join('').length !== 6 || loading}
+            style={{ width:'100%', padding:'16px 0', borderRadius:16, border:'none',
+              background: otp.join('').length === 6 && !loading ? 'linear-gradient(135deg,#0C4A6E,#38BDF8)' : 'rgba(255,255,255,0.07)',
+              cursor: otp.join('').length === 6 && !loading ? 'pointer' : 'default',
+              fontSize:15, fontWeight:800, color: otp.join('').length === 6 ? '#fff' : 'rgba(255,255,255,0.25)',
+              display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+              boxShadow: otp.join('').length === 6 ? '0 6px 24px rgba(56,189,248,0.35)' : 'none', transition:'all .3s ease' }}
+          >
+            {loading ? <><Spinner /> Verifying…</> : <><span style={{ fontSize:18 }}>🔐</span> Verify Email</>}
+          </button>
+        )}
+
+        {step === 'profile' && (
+          <button
+            onClick={saveProfile}
+            disabled={name.trim().length < 2 || loading}
+            style={{ width:'100%', padding:'16px 0', borderRadius:16, border:'none',
+              background: name.trim().length >= 2 && !loading ? 'linear-gradient(135deg,#1B4332,#52B788)' : 'rgba(255,255,255,0.07)',
+              cursor: name.trim().length >= 2 && !loading ? 'pointer' : 'default',
+              fontSize:15, fontWeight:800, color: name.trim().length >= 2 ? '#fff' : 'rgba(255,255,255,0.25)',
+              display:'flex', alignItems:'center', justifyContent:'center', gap:8,
+              boxShadow: name.trim().length >= 2 ? '0 6px 24px rgba(45,106,79,0.40)' : 'none', transition:'all .3s ease' }}
+          >
+            {loading ? <><Spinner /> Saving…</> : <><span style={{ fontSize:18 }}>🚀</span> Launch My Dashboard</>}
+          </button>
         )}
       </div>
     </div>
@@ -2911,22 +3096,22 @@ const ProjectCreation = ({ navigate, setPhotoSession }) => {
   /* ── Shared header ── */
   const Header = () => (
     <>
-      <div className="navbar" style={{borderBottom:'1px solid rgba(56,189,248,.08)'}}>
+      <div className="navbar" style={{borderBottom:'1px solid rgba(255,255,255,0.10)',background:'rgba(4,9,26,0.98)'}}>
         <button onClick={()=>{ if(step===0) navigate('home'); else setStep(s=>s-1); }}
           style={{background:'none',border:'none',cursor:'pointer',display:'flex',padding:8}}>
-          <Ic n="back" s={22} c={T.green}/>
+          <Ic n="back" s={22} c='#4ADE80'/>
         </button>
         <div style={{position:'absolute',left:'50%',transform:'translateX(-50%)',textAlign:'center'}}>
-          <div className="mono" style={{fontSize:13,fontWeight:700,color:T.textBright,letterSpacing:'2px'}}>NEW SCAN</div>
-          <div className="mono" style={{fontSize:9,color:'rgba(56,189,248,.4)',letterSpacing:'1px'}}>{String(step+1).padStart(2,'0')} / 04</div>
+          <div className="mono" style={{fontSize:13,fontWeight:700,color:'#FFFFFF',letterSpacing:'2px'}}>NEW SCAN</div>
+          <div className="mono" style={{fontSize:9,color:'rgba(74,222,128,0.7)',letterSpacing:'1px'}}>{String(step+1).padStart(2,'0')} / 04</div>
         </div>
       </div>
       {/* Step-dot progress */}
-      <div style={{display:'flex',gap:6,padding:'12px 20px 0'}}>
+      <div style={{display:'flex',gap:6,padding:'12px 20px 0',background:'#04091A'}}>
         {PC_STEPS.map((label,i)=>(
           <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
-            <div style={{height:3,width:'100%',borderRadius:2,background:i<=step?T.green:'rgba(56,189,248,.15)',boxShadow:i===step?`0 0 8px ${T.green}`:'',transition:'all .3s'}}/>
-            <div className="mono" style={{fontSize:8,letterSpacing:'1px',color:i<=step?T.green:'rgba(56,189,248,.3)',fontWeight:i===step?700:400}}>{label.toUpperCase()}</div>
+            <div style={{height:3,width:'100%',borderRadius:2,background:i<=step?'#4ADE80':'rgba(255,255,255,0.12)',boxShadow:i===step?'0 0 8px #4ADE80':'',transition:'all .3s'}}/>
+            <div className="mono" style={{fontSize:8,letterSpacing:'1px',color:i<=step?'#4ADE80':'rgba(255,255,255,0.30)',fontWeight:i===step?700:400}}>{label.toUpperCase()}</div>
           </div>
         ))}
       </div>
@@ -2945,14 +3130,14 @@ const ProjectCreation = ({ navigate, setPhotoSession }) => {
 
   /* ══ STEP 0 — Name + Location ══ */
   if (step === 0) return (
-    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto'}}>
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto',background:'#04091A'}}>
       <Header/>
       <div style={{padding:'28px 20px 120px',flex:1}}>
         {/* Hero hint */}
         <div style={{marginBottom:28,textAlign:'center'}}>
           <div style={{fontSize:32,marginBottom:8}}>🌿</div>
-          <div style={{fontSize:20,fontWeight:700,color:T.textBright,letterSpacing:'.5px'}}>Name your project</div>
-          <div style={{fontSize:13,color:T.textDim,marginTop:6,lineHeight:1.5}}>Give it a unique label so you can find it later</div>
+          <div style={{fontSize:20,fontWeight:700,color:'#FFFFFF',letterSpacing:'.5px'}}>Name your project</div>
+          <div style={{fontSize:13,color:'rgba(255,255,255,0.65)',marginTop:6,lineHeight:1.5}}>Give it a unique label so you can find it later</div>
         </div>
         <div style={{marginBottom:20}}>
           <div className="slabel">PROJECT DESIGNATION</div>
@@ -2978,13 +3163,13 @@ const ProjectCreation = ({ navigate, setPhotoSession }) => {
 
   /* ══ STEP 1 — Surface Type ══ */
   if (step === 1) return (
-    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto'}}>
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto',background:'#04091A'}}>
       <Header/>
       <div style={{padding:'28px 20px 120px',flex:1}}>
         <div style={{marginBottom:24,textAlign:'center'}}>
           <div style={{fontSize:32,marginBottom:8}}>🏗️</div>
-          <div style={{fontSize:20,fontWeight:700,color:T.textBright}}>Select surface type</div>
-          <div style={{fontSize:13,color:T.textDim,marginTop:6}}>Where will the garden be installed?</div>
+          <div style={{fontSize:20,fontWeight:700,color:'#FFFFFF'}}>Select surface type</div>
+          <div style={{fontSize:13,color:'rgba(255,255,255,0.65)',marginTop:6}}>Where will the garden be installed?</div>
         </div>
         {surfs.map((s,i)=>{
           const sel=surf===s.id;
@@ -3017,13 +3202,13 @@ const ProjectCreation = ({ navigate, setPhotoSession }) => {
 
   /* ══ STEP 2 — Primary Goal ══ */
   if (step === 2) return (
-    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto'}}>
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto',background:'#04091A'}}>
       <Header/>
       <div style={{padding:'28px 20px 120px',flex:1}}>
         <div style={{marginBottom:24,textAlign:'center'}}>
           <div style={{fontSize:32,marginBottom:8}}>🎯</div>
-          <div style={{fontSize:20,fontWeight:700,color:T.textBright}}>What's your main goal?</div>
-          <div style={{fontSize:13,color:T.textDim,marginTop:6}}>We'll tailor species and layouts to match</div>
+          <div style={{fontSize:20,fontWeight:700,color:'#FFFFFF'}}>What's your main goal?</div>
+          <div style={{fontSize:13,color:'rgba(255,255,255,0.65)',marginTop:6}}>We'll tailor species and layouts to match</div>
         </div>
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
           {goals.map((g,i)=>{
@@ -3056,13 +3241,13 @@ const ProjectCreation = ({ navigate, setPhotoSession }) => {
 
   /* ══ STEP 3 — Safety Filters + Create ══ */
   return (
-    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto'}}>
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflowY:'auto',background:'#04091A'}}>
       <Header/>
       <div style={{padding:'28px 20px 120px',flex:1}}>
         <div style={{marginBottom:28,textAlign:'center'}}>
           <div style={{fontSize:32,marginBottom:8}}>🛡️</div>
-          <div style={{fontSize:20,fontWeight:700,color:T.textBright}}>Safety preferences</div>
-          <div style={{fontSize:13,color:T.textDim,marginTop:6,lineHeight:1.5}}>Optional — we'll filter species to match</div>
+          <div style={{fontSize:20,fontWeight:700,color:'#FFFFFF',letterSpacing:'.2px'}}>Safety preferences</div>
+          <div style={{fontSize:13,color:'rgba(255,255,255,0.65)',marginTop:6,lineHeight:1.5}}>Optional — we'll filter species to match</div>
         </div>
         <div style={{display:'flex',gap:12,marginBottom:20}}>
           {[
@@ -3071,15 +3256,15 @@ const ProjectCreation = ({ navigate, setPhotoSession }) => {
           ].map(({key,label,icon,desc,active,set})=>(
             <div key={key} onClick={()=>set(v=>!v)} style={{
               flex:1,padding:'20px 14px',borderRadius:18,cursor:'pointer',
-              border:`2px solid ${active?T.green:'rgba(56,189,248,.15)'}`,
-              background:active?'rgba(45,106,79,.12)':'rgba(6,14,34,.6)',
+              border:`2px solid ${active?'#4ADE80':'rgba(255,255,255,0.18)'}`,
+              background:active?'rgba(74,222,128,0.12)':'rgba(255,255,255,0.07)',
               transition:'all .2s',display:'flex',flexDirection:'column',alignItems:'center',gap:8,
-              boxShadow:active?`0 0 0 1px ${T.green},0 4px 18px rgba(45,106,79,.18)`:'none',
+              boxShadow:active?'0 0 0 1px #4ADE80,0 4px 20px rgba(74,222,128,0.22)':'none',
             }}>
               <div style={{fontSize:34}}>{icon}</div>
-              <div style={{fontSize:13,fontWeight:700,color:active?T.green:T.textBright,letterSpacing:'.3px',textAlign:'center'}}>{label}</div>
-              <div style={{fontSize:10,color:T.textDim,textAlign:'center',lineHeight:1.4}}>{desc}</div>
-              <div style={{width:24,height:24,borderRadius:'50%',border:`2px solid ${active?T.green:'rgba(56,189,248,.3)'}`,background:active?T.green:'transparent',display:'flex',alignItems:'center',justifyContent:'center',transition:'all .2s'}}>
+              <div style={{fontSize:14,fontWeight:700,color:active?'#4ADE80':'#FFFFFF',letterSpacing:'.3px',textAlign:'center'}}>{label}</div>
+              <div style={{fontSize:11,color:'rgba(255,255,255,0.65)',textAlign:'center',lineHeight:1.4}}>{desc}</div>
+              <div style={{width:24,height:24,borderRadius:'50%',border:`2px solid ${active?'#4ADE80':'rgba(255,255,255,0.35)'}`,background:active?'#4ADE80':'transparent',display:'flex',alignItems:'center',justifyContent:'center',transition:'all .2s'}}>
                 {active&&<Ic n="check" s={12} c="#fff"/>}
               </div>
             </div>
@@ -3087,21 +3272,21 @@ const ProjectCreation = ({ navigate, setPhotoSession }) => {
         </div>
 
         {/* Summary card */}
-        <div style={{padding:'16px',borderRadius:16,background:'rgba(56,189,248,.05)',border:'1px solid rgba(56,189,248,.12)',marginBottom:16}}>
-          <div className="mono" style={{fontSize:10,color:T.textDim,letterSpacing:'1px',marginBottom:10}}>SUMMARY</div>
+        <div style={{padding:'18px',borderRadius:16,background:'rgba(255,255,255,0.08)',border:'1px solid rgba(255,255,255,0.14)',marginBottom:16,backdropFilter:'blur(8px)'}}>
+          <div className="mono" style={{fontSize:10,color:'#4ADE80',letterSpacing:'1.5px',marginBottom:12,fontWeight:700}}>SUMMARY</div>
           {[
             {label:'Project', value:name},
             {label:'Surface', value:surfs.find(s=>s.id===surf)?.l || surf},
             {label:'Goal',    value:goals.find(g=>g.id===goal)?.l || goal},
             {label:'Safety',  value:[petSafe&&'Pet Safe',childSafe&&'Child Safe'].filter(Boolean).join(', ')||'None'},
           ].map(({label,value})=>(
-            <div key={label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-              <span className="mono" style={{fontSize:10,color:T.textDim,letterSpacing:'.5px'}}>{label.toUpperCase()}</span>
-              <span style={{fontSize:12,fontWeight:600,color:T.textBright}}>{value}</span>
+            <div key={label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8,paddingBottom:8,borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+              <span className="mono" style={{fontSize:10,color:'rgba(255,255,255,0.55)',letterSpacing:'.8px'}}>{label.toUpperCase()}</span>
+              <span style={{fontSize:13,fontWeight:600,color:'#FFFFFF'}}>{value}</span>
             </div>
           ))}
         </div>
-        {createErr && <div className="mono" style={{fontSize:10,color:T.orange,letterSpacing:'1px',marginBottom:8}}>{createErr}</div>}
+        {createErr && <div className="mono" style={{fontSize:10,color:'#FF6B6B',letterSpacing:'1px',marginBottom:8}}>{createErr}</div>}
       </div>
       <NextBtn
         label={creating ? 'Creating project…' : 'Create Project →'}
@@ -3610,7 +3795,7 @@ const FrameSelectModal = ({
             Generate AI Garden →
           </button>
           <div style={{textAlign:'center',marginTop:10,fontSize:11,color:T.textDim}}>
-            Powered by Runware AI · photorealistic result
+            Powered by OpenAI DALL·E · top-down aerial view
           </div>
         </div>
       )}
@@ -3980,7 +4165,7 @@ const ResultScreen = ({ navigate, selectedRecommendation, photoSession, setActiv
                 )}
               </div>
               <div style={{position:'absolute',bottom:0,left:0,right:0,padding:'10px 14px',background:'linear-gradient(transparent,rgba(4,9,26,0.92))',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <span style={{fontSize:9,letterSpacing:'1.5px',color:'rgba(186,230,253,0.55)',fontFamily:"'JetBrains Mono',monospace"}}>PHOTOREALISTIC · RUNWARE AI</span>
+                <span style={{fontSize:9,letterSpacing:'1.5px',color:'rgba(186,230,253,0.55)',fontFamily:"'JetBrains Mono',monospace"}}>TOP-DOWN AERIAL · OPENAI DALL·E</span>
                 <button onClick={async()=>{setRunwareLoading(true);const to=setTimeout(()=>setRunwareLoading(false),45000);await generateRunwareVisualization?.({}).catch(()=>{});clearTimeout(to);setRunwareLoading(false);}}
                   style={{background:'rgba(212,175,55,0.12)',border:'1px solid rgba(212,175,55,0.35)',borderRadius:8,padding:'4px 10px',cursor:'pointer',fontSize:10,color:'#e8c14e',fontFamily:"'DM Sans',sans-serif",fontWeight:700}}>
                   ↺ Regenerate
@@ -5783,6 +5968,34 @@ const SettingsScreen = () => {
           >
             {savingProfile ? "SAVING…" : "SAVE PROFILE"}
           </button>
+
+          {/* Email verification nudge */}
+          {profile?.email && (
+            profile?.emailVerified
+              ? (
+                <div style={{display:'flex',alignItems:'center',gap:8,marginTop:10,padding:'9px 12px',background:'rgba(64,176,112,0.12)',border:'1px solid rgba(64,176,112,0.35)',borderRadius:10}}>
+                  <span style={{fontSize:14}}>✅</span>
+                  <span style={{fontSize:12,color:'#2D6A4F',fontWeight:600}}>Email verified</span>
+                </div>
+              )
+              : (
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,marginTop:10,padding:'9px 12px',background:'rgba(245,158,11,0.10)',border:'1px solid rgba(245,158,11,0.40)',borderRadius:10}}>
+                  <div>
+                    <div style={{fontSize:12,fontWeight:700,color:'#92400e'}}>Email not verified</div>
+                    <div style={{fontSize:10,color:'#92400e',opacity:0.75,marginTop:1}}>{profile.email}</div>
+                  </div>
+                  <button
+                    onClick={()=>{
+                      const url=`/verify-email?email=${encodeURIComponent(profile.email)}&redirect=${encodeURIComponent('/')}`;
+                      window.open(url,'_blank','width=520,height=620,noopener');
+                    }}
+                    style={{padding:'7px 14px',fontSize:12,fontWeight:700,background:'#f59e0b',color:'#fff',border:'none',borderRadius:8,cursor:'pointer',flexShrink:0,fontFamily:'inherit'}}
+                  >
+                    Verify →
+                  </button>
+                </div>
+              )
+          )}
         </div>
 
         <Sec t="PREFERENCES">
@@ -5987,18 +6200,17 @@ const ClimateSpeciesScreen = ({ navigate }) => {
         {/* Results */}
         {phase==='loaded' && (
           <>
-            <div style={{color:'rgba(255,255,255,0.35)',fontSize:11,letterSpacing:'1.5px',fontWeight:700,padding:'16px 0 10px'}}>
+            <div style={{color:'rgba(255,255,255,0.35)',fontSize:11,letterSpacing:'1.5px',fontWeight:700,padding:'16px 0 6px'}}>
               TOP MATCHES FOR YOUR CLIMATE
             </div>
+            <div style={{fontSize:10,color:'rgba(255,255,255,0.25)',marginBottom:12,letterSpacing:.3}}>Based on your live location data — start a scan to get full recommendations</div>
             {plants.map((plant,i)=>{
-              const isOpen = expanded === plant.id;
               const matchPct = plant.score;
               const matchColor = matchPct>=80?'#52E8A0':matchPct>=60?'#FBBF24':'#F87171';
               return (
-                <div key={plant.id} style={{background:'rgba(255,255,255,0.05)',border:`1px solid ${isOpen?'rgba(82,232,160,0.3)':'rgba(255,255,255,0.06)'}`,borderRadius:16,marginBottom:10,overflow:'hidden',transition:'border-color .25s'}}
-                  onClick={()=>setExpanded(isOpen?null:plant.id)}>
-                  {/* Card row */}
-                  <div style={{display:'flex',alignItems:'center',gap:12,padding:'13px 14px'}}>
+                <div key={plant.id} style={{background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:16,marginBottom:10,overflow:'hidden',opacity: 0.92}}>
+                  {/* Card row — display only, not tappable */}
+                  <div style={{display:'flex',alignItems:'center',gap:12,padding:'13px 14px',cursor:'default',userSelect:'none'}}>
                     {/* Rank badge */}
                     <div style={{width:28,height:28,borderRadius:'50%',background:i<3?'rgba(82,232,160,0.15)':'rgba(255,255,255,0.06)',border:`1px solid ${i<3?'rgba(82,232,160,0.35)':'rgba(255,255,255,0.1)'}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                       <span style={{fontSize:11,fontWeight:800,color:i<3?'#52E8A0':'rgba(255,255,255,0.4)'}}>{i+1}</span>
@@ -6017,46 +6229,9 @@ const ClimateSpeciesScreen = ({ navigate }) => {
                     </div>
                   </div>
                   {/* Match bar */}
-                  <div style={{height:2,background:'rgba(255,255,255,0.06)',margin:'0 14px'}}>
-                    <div style={{height:'100%',width:`${matchPct}%`,background:`linear-gradient(to right,${matchColor}88,${matchColor})`,borderRadius:2,transition:'width .5s'}}/>
+                  <div style={{height:2,background:'rgba(255,255,255,0.06)',margin:'0 14px 10px'}}>
+                    <div style={{height:'100%',width:`${matchPct}%`,background:`linear-gradient(to right,${matchColor}88,${matchColor})`,borderRadius:2}}/>
                   </div>
-                  {/* Expanded detail */}
-                  {isOpen && (
-                    <div style={{padding:'12px 14px 14px',borderTop:'1px solid rgba(255,255,255,0.06)',marginTop:0}}>
-                      {/* Why it fits */}
-                      <div style={{background:'rgba(82,232,160,0.06)',border:'1px solid rgba(82,232,160,0.15)',borderRadius:10,padding:'9px 12px',marginBottom:10}}>
-                        <div style={{fontSize:9,color:'#52E8A0',fontWeight:700,letterSpacing:'1px',marginBottom:4}}>WHY IT SUITS YOUR CLIMATE</div>
-                        <div style={{fontSize:12,color:'rgba(255,255,255,0.65)',lineHeight:1.5}}>
-                          {plant.score>=80
-                            ? `This plant is ideally suited to ${climate?.annualAvg}°C annual average and ${climate?.annualHumidity}% humidity. Expect excellent performance year-round.`
-                            : plant.score>=60
-                              ? `A good match for your ${climate?.annualAvg}°C climate with minor care adjustments during extreme peaks.`
-                              : `Possible with extra care — protect from temperature extremes outside this plant's comfort zone.`
-                          }
-                        </div>
-                      </div>
-                      {/* Stats row */}
-                      <div style={{display:'flex',gap:7,marginBottom:10}}>
-                        {[
-                          {l:'WATER',v:plant.water,c:WATER_COLOR[plant.water]||'#94A3B8'},
-                          {l:'SUNLIGHT',v:plant.sun,c:SUN_COLOR[plant.sun]||'#FBBF24'},
-                        ].map(s=>(
-                          <div key={s.l} style={{flex:1,background:'rgba(255,255,255,0.05)',borderRadius:9,padding:'8px 10px',border:'1px solid rgba(255,255,255,0.07)'}}>
-                            <div style={{fontSize:8,color:'rgba(255,255,255,0.3)',letterSpacing:'1px',marginBottom:4}}>{s.l}</div>
-                            <div style={{fontSize:12,fontWeight:700,color:s.c}}>{s.v}</div>
-                          </div>
-                        ))}
-                      </div>
-                      {/* Traits */}
-                      <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
-                        {plant.traits.map(tr=>(
-                          <span key={tr} style={{fontSize:10,fontWeight:600,color:'rgba(255,255,255,0.55)',background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:20,padding:'3px 9px'}}>
-                            {tr}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -6451,7 +6626,7 @@ const CityHeatScreen=({navigate})=>{
           {climateTab==='today'&&(
             <>
               {/* ── Hero weather card ── */}
-              <div style={{margin:'12px 16px 0',borderRadius:28,overflow:'hidden',position:'relative',animation:'cardEntrance .5s ease'}}>
+              <div onClick={()=>navigate('climateHistory')} style={{margin:'12px 16px 0',borderRadius:28,overflow:'hidden',position:'relative',animation:'cardEntrance .5s ease',cursor:'pointer'}}>
                 {/* Layered gradient bg */}
                 <div style={{position:'absolute',inset:0,background:`linear-gradient(160deg,${hl.bg.replace('.18','.92')},rgba(4,9,22,.97))`}}/>
                 <div style={{position:'absolute',inset:0,border:`1.5px solid ${hl.br}`,borderRadius:28,pointerEvents:'none'}}/>
@@ -6509,6 +6684,11 @@ const CityHeatScreen=({navigate})=>{
                         <div style={{fontSize:8,color:'rgba(255,255,255,.3)',fontFamily:"'DM Sans',sans-serif",marginTop:4,letterSpacing:'.3px'}}>{s.l}</div>
                       </div>
                     ))}
+                  </div>
+                  {/* Tap hint */}
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:6,marginTop:14,paddingTop:12,borderTop:'1px solid rgba(255,255,255,.08)'}}>
+                    <span style={{fontSize:11,color:'rgba(255,255,255,.4)',fontFamily:"'DM Sans',sans-serif",letterSpacing:'.5px'}}>Tap for 10-year climate analysis</span>
+                    <span style={{fontSize:11,color:'rgba(56,189,248,.7)'}}>→</span>
                   </div>
                 </div>
               </div>
@@ -6922,21 +7102,9 @@ const CityHeatScreen=({navigate})=>{
             );
           })()}
 
-          {/* Scan CTA */}
-          <div style={{padding:'20px 16px 0',display:'flex',flexDirection:'column',gap:10}}>
-            <button onClick={()=>navigate('create')}
-              style={{width:'100%',padding:'20px 24px',borderRadius:20,border:'none',cursor:'pointer',background:'linear-gradient(135deg,#0A2E4A,#0369A1,#38BDF8)',boxShadow:'0 10px 36px rgba(56,189,248,.38)',display:'flex',alignItems:'center',gap:14,position:'relative',overflow:'hidden',textAlign:'left'}}>
-              <div style={{position:'absolute',inset:0,background:'radial-gradient(ellipse at 25% 50%,rgba(255,255,255,.14),transparent 55%)',pointerEvents:'none'}}/>
-              <div style={{width:46,height:46,borderRadius:14,background:'rgba(255,255,255,.12)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                <Ic n="scan" s={24} c="#E0F2FE"/>
-              </div>
-              <div style={{flex:1,position:'relative',zIndex:1}}>
-                <div style={{fontSize:17,fontWeight:700,color:'#E0F2FE',fontFamily:"'Space Grotesk',sans-serif",letterSpacing:'.2px'}}>Scan With Us</div>
-                <div style={{fontSize:11,color:'rgba(224,242,254,.65)',fontFamily:"'DM Sans',sans-serif",marginTop:2}}>Open AR measurement · analyse your space</div>
-              </div>
-              <div style={{fontSize:20,color:'rgba(224,242,254,.7)',position:'relative',zIndex:1}}>→</div>
-            </button>
-            <button className="gbtn" onClick={()=>navigate('speciesLib')} style={{borderRadius:16}}>Browse All Cooling Plants</button>
+          {/* Browse CTA */}
+          <div style={{padding:'20px 16px 0'}}>
+            <button className="gbtn" onClick={()=>navigate('speciesLib')} style={{borderRadius:16,width:'100%'}}>Browse All Cooling Plants</button>
           </div>
           </>
         );
@@ -7053,6 +7221,257 @@ const SPECIES_CATALOG=[
   {code:'zinnia',name:'Zinnia',sci:'Zinnia elegans',emoji:'🌸',type:'ornamental',cooling:5,sun:'full',water:'moderate',petSafe:true,drought:false,desc:'Fast-growing annual with vivid blooms. Attracts pollinators and butterflies.'},
 ];
 const TYPE_FILTERS=['all','herb','ornamental','succulent','foliage','grass','vegetable'];
+
+/* ── ClimateHistoryScreen ── 10-year climate analysis for user's location ── */
+const ClimateHistoryScreen=({navigate})=>{
+  const [phase,setPhase]=useState('loading'); // loading | loaded | error
+  const [data,setData]=useState(null);        // { years, annualTemps, maxTemps, minTemps, rainfall, heatDays, hottest, coldest, loc }
+  const [errMsg,setErrMsg]=useState('');
+
+  useEffect(()=>{
+    const raw=localStorage.getItem('hw_city_loc');
+    let lat,lon,city='your area';
+    if(raw){try{const p=JSON.parse(raw);lat=p.lat;lon=p.lon;city=p.city||city;}catch(e){}}
+    if(!lat||!lon){
+      // fallback: try hw_loc
+      const raw2=localStorage.getItem('hw_loc');
+      if(raw2){try{const p=JSON.parse(raw2);lat=p.lat;lon=p.lon;city=p.city||city;}catch(e){}}
+    }
+    if(!lat||!lon){setPhase('error');setErrMsg('Location not found. Open the climate screen first.');return;}
+
+    const endYear=new Date().getFullYear()-1;
+    const startYear=endYear-9; // 10 years
+    const url=`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}`
+      +`&start_date=${startYear}-01-01&end_date=${endYear}-12-31`
+      +`&daily=temperature_2m_max,temperature_2m_min,precipitation_sum`
+      +`&timezone=auto`;
+
+    fetch(url)
+      .then(r=>r.json())
+      .then(json=>{
+        if(!json.daily){throw new Error('No data');}
+        const {time,temperature_2m_max:tmax,temperature_2m_min:tmin,precipitation_sum:prec}=json.daily;
+        // Aggregate per year
+        const yearMap={};
+        time.forEach((d,i)=>{
+          const yr=d.slice(0,4);
+          if(!yearMap[yr]) yearMap[yr]={tmax:[],tmin:[],prec:[],heatDays:0};
+          if(tmax[i]!=null) yearMap[yr].tmax.push(tmax[i]);
+          if(tmin[i]!=null) yearMap[yr].tmin.push(tmin[i]);
+          if(prec[i]!=null) yearMap[yr].prec.push(prec[i]);
+          if(tmax[i]!=null&&tmax[i]>=35) yearMap[yr].heatDays++;
+        });
+        const years=Object.keys(yearMap).sort();
+        const avg=arr=>arr.length?+(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1):null;
+        const sum=arr=>arr.length?+arr.reduce((a,b)=>a+b,0).toFixed(0):null;
+        const annualTemps=years.map(yr=>avg([...yearMap[yr].tmax,...yearMap[yr].tmin]));
+        const maxTemps=years.map(yr=>avg(yearMap[yr].tmax));
+        const minTemps=years.map(yr=>avg(yearMap[yr].tmin));
+        const rainfall=years.map(yr=>sum(yearMap[yr].prec));
+        const heatDays=years.map(yr=>yearMap[yr].heatDays);
+        // hottest / coldest year by avg max
+        const hottestIdx=maxTemps.indexOf(Math.max(...maxTemps.filter(v=>v!=null)));
+        const coldestIdx=minTemps.indexOf(Math.min(...minTemps.filter(v=>v!=null)));
+        setData({years,annualTemps,maxTemps,minTemps,rainfall,heatDays,hottest:years[hottestIdx],coldest:years[coldestIdx],city,lat,lon});
+        setPhase('loaded');
+      })
+      .catch(e=>{setPhase('error');setErrMsg('Failed to load climate data. Check your connection.');});
+  },[]);
+
+  const BAR_MAX_H=80; // px
+
+  return(
+    <div style={{minHeight:'100vh',background:'#04091A',paddingBottom:80,fontFamily:"'DM Sans',sans-serif",color:'#fff'}}>
+      {/* Header */}
+      <div style={{position:'sticky',top:0,zIndex:50,background:'rgba(4,9,26,0.97)',backdropFilter:'blur(12px)',borderBottom:'1px solid rgba(56,189,248,.12)',padding:'14px 16px 12px',display:'flex',alignItems:'center',gap:12}}>
+        <button onClick={()=>navigate('cityHeat')} style={{background:'rgba(255,255,255,.07)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'8px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#BAE6FD" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div>
+          <div style={{fontSize:16,fontWeight:800,color:'#fff',letterSpacing:'.3px'}}>10-Year Climate Analysis</div>
+          <div style={{fontSize:11,color:'rgba(186,230,253,0.5)',marginTop:1}}>Historical data · archive-api.open-meteo.com</div>
+        </div>
+      </div>
+
+      {phase==='loading'&&(
+        <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 24px',gap:16}}>
+          <div style={{width:44,height:44,borderRadius:'50%',border:'3px solid rgba(56,189,248,.2)',borderTopColor:'#38BDF8',animation:'rotateSlow .8s linear infinite'}}/>
+          <div style={{fontSize:14,color:'rgba(255,255,255,.5)'}}>Fetching 10 years of climate data…</div>
+        </div>
+      )}
+
+      {phase==='error'&&(
+        <div style={{margin:'40px 24px',textAlign:'center',background:'rgba(239,68,68,.1)',border:'1px solid rgba(239,68,68,.3)',borderRadius:20,padding:'28px 20px'}}>
+          <div style={{fontSize:32,marginBottom:12}}>⚠️</div>
+          <div style={{fontSize:15,color:'#FCA5A5',fontWeight:700,marginBottom:8}}>Couldn't Load Data</div>
+          <div style={{fontSize:13,color:'rgba(255,255,255,.55)'}}>{errMsg}</div>
+          <button onClick={()=>navigate('cityHeat')} style={{marginTop:20,padding:'10px 24px',background:'rgba(239,68,68,.2)',border:'1px solid rgba(239,68,68,.4)',borderRadius:12,color:'#FCA5A5',fontSize:13,fontWeight:700,cursor:'pointer'}}>← Go Back</button>
+        </div>
+      )}
+
+      {phase==='loaded'&&data&&(()=>{
+        const {years,annualTemps,maxTemps,minTemps,rainfall,heatDays,hottest,coldest,city}=data;
+        const maxHeat=Math.max(...heatDays.filter(v=>v!=null),1);
+        const maxRain=Math.max(...rainfall.filter(v=>v!=null),1);
+        const allMaxT=maxTemps.filter(v=>v!=null);
+        const tempMin=Math.min(...allMaxT)-2;
+        const tempRange=Math.max(...allMaxT)+2-tempMin||1;
+
+        return(
+          <div style={{padding:'16px'}}>
+            {/* Location pill */}
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:16,padding:'10px 14px',background:'rgba(56,189,248,.08)',border:'1px solid rgba(56,189,248,.2)',borderRadius:16}}>
+              <span style={{fontSize:15}}>📍</span>
+              <div>
+                <div style={{fontSize:13,color:'#BAE6FD',fontWeight:700}}>{city}</div>
+                <div style={{fontSize:10,color:'rgba(186,230,253,.45)'}}>Archive · {years[0]}–{years[years.length-1]} · {years.length} years</div>
+              </div>
+              {hottest&&<div style={{marginLeft:'auto',textAlign:'center',background:'rgba(251,191,36,.1)',border:'1px solid rgba(251,191,36,.25)',borderRadius:12,padding:'5px 10px'}}>
+                <div style={{fontSize:9,color:'rgba(251,191,36,.7)',letterSpacing:'.5px',fontWeight:700}}>HOTTEST</div>
+                <div style={{fontSize:14,color:'#FBBF24',fontWeight:800}}>{hottest}</div>
+              </div>}
+              {coldest&&<div style={{textAlign:'center',background:'rgba(96,165,250,.1)',border:'1px solid rgba(96,165,250,.25)',borderRadius:12,padding:'5px 10px'}}>
+                <div style={{fontSize:9,color:'rgba(96,165,250,.7)',letterSpacing:'.5px',fontWeight:700}}>COOLEST</div>
+                <div style={{fontSize:14,color:'#60A5FA',fontWeight:800}}>{coldest}</div>
+              </div>}
+            </div>
+
+            {/* ── Avg Temperature Trend ── */}
+            <div style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.09)',borderRadius:20,padding:'18px 16px',marginBottom:14}}>
+              <div style={{fontSize:12,fontWeight:700,color:'rgba(255,255,255,.55)',letterSpacing:'1px',marginBottom:4}}>AVG TEMPERATURE TREND (°C)</div>
+              <div style={{fontSize:10,color:'rgba(255,255,255,.3)',marginBottom:14}}>Daily max avg per year</div>
+              <div style={{display:'flex',alignItems:'flex-end',gap:5,height:BAR_MAX_H+24}}>
+                {years.map((yr,i)=>{
+                  const val=maxTemps[i];
+                  if(val==null) return null;
+                  const h=Math.max(8,Math.round(((val-tempMin)/tempRange)*BAR_MAX_H));
+                  const hot=yr===hottest;
+                  const col=hot?'#FBBF24':val>=38?'#F87171':val>=35?'#FB923C':val>=32?'#FCD34D':'#34D399';
+                  return(
+                    <div key={yr} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+                      <div style={{fontSize:9,color:hot?'#FBBF24':'rgba(255,255,255,.45)',fontWeight:hot?800:400}}>{val}°</div>
+                      <div style={{width:'100%',height:h,borderRadius:'6px 6px 2px 2px',background:hot?`linear-gradient(180deg,#FBBF24,#F59E0B)`:`linear-gradient(180deg,${col}cc,${col}88)`,border:hot?'1px solid #FBBF2455':'none',transition:'height .4s ease'}}/>
+                      <div style={{fontSize:8,color:hot?'#FBBF24':'rgba(255,255,255,.3)',fontWeight:hot?700:400,transform:'rotate(-30deg)',transformOrigin:'center',whiteSpace:'nowrap'}}>{yr.slice(2)}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ── Heat Wave Days ── */}
+            <div style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.09)',borderRadius:20,padding:'18px 16px',marginBottom:14}}>
+              <div style={{fontSize:12,fontWeight:700,color:'rgba(255,255,255,.55)',letterSpacing:'1px',marginBottom:4}}>HEAT WAVE DAYS (≥35°C)</div>
+              <div style={{fontSize:10,color:'rgba(255,255,255,.3)',marginBottom:14}}>Days per year exceeding 35°C threshold</div>
+              <div style={{display:'flex',alignItems:'flex-end',gap:5,height:BAR_MAX_H+24}}>
+                {years.map((yr,i)=>{
+                  const val=heatDays[i]||0;
+                  const h=Math.max(4,Math.round((val/maxHeat)*BAR_MAX_H));
+                  const severe=val>120;
+                  const col=val>120?'#EF4444':val>90?'#F97316':val>60?'#FBBF24':'#FB923C';
+                  return(
+                    <div key={yr} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+                      <div style={{fontSize:9,color:'rgba(255,255,255,.5)',fontWeight:severe?800:400}}>{val}</div>
+                      <div style={{width:'100%',height:h,borderRadius:'6px 6px 2px 2px',background:`linear-gradient(180deg,${col}cc,${col}66)`}}/>
+                      <div style={{fontSize:8,color:'rgba(255,255,255,.3)',transform:'rotate(-30deg)',transformOrigin:'center',whiteSpace:'nowrap'}}>{yr.slice(2)}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Total + avg */}
+              <div style={{display:'flex',gap:10,marginTop:14}}>
+                <div style={{flex:1,background:'rgba(239,68,68,.08)',border:'1px solid rgba(239,68,68,.2)',borderRadius:12,padding:'10px 12px',textAlign:'center'}}>
+                  <div style={{fontSize:20,fontWeight:800,color:'#F87171'}}>{heatDays.reduce((a,b)=>a+b,0)}</div>
+                  <div style={{fontSize:9,color:'rgba(255,255,255,.4)',marginTop:3,letterSpacing:'.4px'}}>TOTAL HEAT DAYS</div>
+                </div>
+                <div style={{flex:1,background:'rgba(251,191,36,.08)',border:'1px solid rgba(251,191,36,.2)',borderRadius:12,padding:'10px 12px',textAlign:'center'}}>
+                  <div style={{fontSize:20,fontWeight:800,color:'#FBBF24'}}>{(heatDays.reduce((a,b)=>a+b,0)/years.length).toFixed(0)}</div>
+                  <div style={{fontSize:9,color:'rgba(255,255,255,.4)',marginTop:3,letterSpacing:'.4px'}}>AVG / YEAR</div>
+                </div>
+                <div style={{flex:1,background:'rgba(52,211,153,.08)',border:'1px solid rgba(52,211,153,.2)',borderRadius:12,padding:'10px 12px',textAlign:'center'}}>
+                  <div style={{fontSize:20,fontWeight:800,color:'#34D399'}}>{Math.min(...heatDays)}</div>
+                  <div style={{fontSize:9,color:'rgba(255,255,255,.4)',marginTop:3,letterSpacing:'.4px'}}>BEST YEAR</div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Annual Rainfall ── */}
+            <div style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.09)',borderRadius:20,padding:'18px 16px',marginBottom:14}}>
+              <div style={{fontSize:12,fontWeight:700,color:'rgba(255,255,255,.55)',letterSpacing:'1px',marginBottom:4}}>ANNUAL RAINFALL (mm)</div>
+              <div style={{fontSize:10,color:'rgba(255,255,255,.3)',marginBottom:14}}>Total precipitation per year</div>
+              <div style={{display:'flex',alignItems:'flex-end',gap:5,height:BAR_MAX_H+24}}>
+                {years.map((yr,i)=>{
+                  const val=rainfall[i]||0;
+                  const h=Math.max(4,Math.round((val/maxRain)*BAR_MAX_H));
+                  const col=val>1200?'#60A5FA':val>800?'#38BDF8':val>400?'#7DD3FC':'#94A3B8';
+                  return(
+                    <div key={yr} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+                      <div style={{fontSize:8,color:'rgba(255,255,255,.45)'}}>{val>999?`${(val/1000).toFixed(1)}k`:val}</div>
+                      <div style={{width:'100%',height:h,borderRadius:'6px 6px 2px 2px',background:`linear-gradient(180deg,${col}cc,${col}55)`}}/>
+                      <div style={{fontSize:8,color:'rgba(255,255,255,.3)',transform:'rotate(-30deg)',transformOrigin:'center',whiteSpace:'nowrap'}}>{yr.slice(2)}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{display:'flex',gap:10,marginTop:14}}>
+                <div style={{flex:1,background:'rgba(96,165,250,.08)',border:'1px solid rgba(96,165,250,.2)',borderRadius:12,padding:'10px 12px',textAlign:'center'}}>
+                  <div style={{fontSize:20,fontWeight:800,color:'#60A5FA'}}>{(rainfall.reduce((a,b)=>a+b,0)/years.length).toFixed(0)}</div>
+                  <div style={{fontSize:9,color:'rgba(255,255,255,.4)',marginTop:3,letterSpacing:'.4px'}}>AVG mm/YEAR</div>
+                </div>
+                <div style={{flex:1,background:'rgba(96,165,250,.08)',border:'1px solid rgba(96,165,250,.2)',borderRadius:12,padding:'10px 12px',textAlign:'center'}}>
+                  <div style={{fontSize:20,fontWeight:800,color:'#38BDF8'}}>{Math.max(...rainfall.filter(v=>v!=null)).toFixed(0)}</div>
+                  <div style={{fontSize:9,color:'rgba(255,255,255,.4)',marginTop:3,letterSpacing:'.4px'}}>WETTEST YEAR</div>
+                </div>
+                <div style={{flex:1,background:'rgba(148,163,184,.08)',border:'1px solid rgba(148,163,184,.2)',borderRadius:12,padding:'10px 12px',textAlign:'center'}}>
+                  <div style={{fontSize:20,fontWeight:800,color:'#94A3B8'}}>{Math.min(...rainfall.filter(v=>v!=null)).toFixed(0)}</div>
+                  <div style={{fontSize:9,color:'rgba(255,255,255,.4)',marginTop:3,letterSpacing:'.4px'}}>DRIEST YEAR</div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Min/Max range strip ── */}
+            <div style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.09)',borderRadius:20,padding:'18px 16px',marginBottom:14}}>
+              <div style={{fontSize:12,fontWeight:700,color:'rgba(255,255,255,.55)',letterSpacing:'1px',marginBottom:14}}>TEMPERATURE RANGE PER YEAR</div>
+              {years.map((yr,i)=>{
+                const hi=maxTemps[i], lo=minTemps[i];
+                if(hi==null||lo==null) return null;
+                const span=hi-lo||1;
+                const hc=hi>=38?'#EF4444':hi>=35?'#F97316':'#FBBF24';
+                const lc=lo<=15?'#60A5FA':lo<=20?'#7DD3FC':'#34D399';
+                return(
+                  <div key={yr} style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
+                    <div style={{fontSize:11,color:'rgba(255,255,255,.45)',width:32,flexShrink:0}}>{yr.slice(2)}</div>
+                    <div style={{flex:1,height:8,borderRadius:6,background:'rgba(255,255,255,.07)',overflow:'hidden',position:'relative'}}>
+                      <div style={{position:'absolute',left:`${((lo-tempMin)/(tempRange))*100}%`,width:`${(span/tempRange)*100}%`,height:'100%',background:`linear-gradient(90deg,${lc}99,${hc}bb)`,borderRadius:6}}/>
+                    </div>
+                    <div style={{fontSize:11,color:lc,width:32,textAlign:'right',fontWeight:600,flexShrink:0}}>{lo}°</div>
+                    <div style={{fontSize:11,color:hc,width:32,fontWeight:600,flexShrink:0}}>{hi}°</div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Insight card */}
+            <div style={{background:'linear-gradient(135deg,rgba(45,106,79,.25),rgba(4,9,26,.9))',border:'1px solid rgba(74,222,128,.25)',borderRadius:20,padding:'18px 16px',marginBottom:8}}>
+              <div style={{display:'flex',gap:12,alignItems:'flex-start'}}>
+                <div style={{fontSize:28,flexShrink:0}}>🌿</div>
+                <div>
+                  <div style={{fontSize:13,fontWeight:800,color:'#4ADE80',marginBottom:6}}>Why This Matters for Your Garden</div>
+                  <div style={{fontSize:12,color:'rgba(255,255,255,.7)',lineHeight:1.7}}>
+                    With {heatDays.reduce((a,b)=>a+b,0)} heat days over {years.length} years ({(heatDays.reduce((a,b)=>a+b,0)/years.length).toFixed(0)} per year average), your area experiences significant heat stress. HeatWise recommends drought-tolerant, high-cooling-score species like Vetiver, Aloe Vera, and Snake Plant that can survive and cool your space even during peak summers.
+                  </div>
+                  <button onClick={()=>navigate('climateSpecies')} style={{marginTop:12,padding:'8px 18px',background:'linear-gradient(135deg,#2D6A4F,#4ADE80)',border:'none',borderRadius:10,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',letterSpacing:'.3px'}}>
+                    See Plant Recommendations →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+    </div>
+  );
+};
+
 const SpeciesLibraryScreen=({navigate,setSelectedSpecies})=>{
   const [filter,setFilter]=useState('all');
   const [search,setSearch]=useState('');
@@ -11553,7 +11972,9 @@ export default function App(){
             onDone={() => {
               try { localStorage.setItem("hw_intro_done", "1"); } catch {}
               setIntroDone(true);
-              navigate("home");
+              // Route to profile setup if no profile saved yet; otherwise go home
+              const hasProfile = (() => { try { return !!localStorage.getItem("hw_profile"); } catch { return false; } })();
+              navigate(hasProfile ? "home" : "profileSetup");
             }}
           />
         </div>
@@ -11588,7 +12009,7 @@ export default function App(){
         const hasProfile = (() => { try { return !!localStorage.getItem('hw_profile'); } catch { return false; } })();
         navigate(hasProfile ? 'home' : 'profileSetup');
       }}/>;
-      case 'profileSetup': return <ProfileSetupScreen onDone={()=>navigate('home')}/>;
+      case 'profileSetup': return <ProfileSetupScreen onDone={(profile)=>{ if (profile?.name) setMe(m => m ? {...m, name:profile.name} : { name:profile.name }); navigate('home'); }}/>;
       case 'home':         return <HomeDashboardLight {...p}/>;
       case 'create':      return <ProjectCreation {...p}/>;
       case 'measure':     return <MeasureScreen {...p}/>;
@@ -11620,6 +12041,7 @@ export default function App(){
       case 'photoMeasureAR': return <PhotoARMeasurementScreen {...p}/>;
       case 'environment': return <EnvironmentScreen {...p}/>;
       case 'climateSpecies': return <ClimateSpeciesScreen {...p}/>;
+      case 'climateHistory': return <ClimateHistoryScreen {...p}/>;
       case 'analysis':    return <AnalysisScreen {...p}/>;
       case 'gardenLayout':return <GardenLayoutScreen {...p}/>;
       case 'result':      return <ResultScreen {...p}/>;

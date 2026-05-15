@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import MarketingLayout from "@/components/marketing/MarketingLayout";
+import InteractiveDemo from "@/components/marketing/InteractiveDemo";
 
 const C = {
   CREAM: "#fafaf6",
@@ -144,26 +145,86 @@ function HeroSection() {
             </div>
           </motion.div>
         </div>
-        <motion.div className="hero-card-wrap" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, duration: 0.6 }} style={{ position: "relative" }}>
-          <div style={{ aspectRatio: "4/5", borderRadius: 32, background: `linear-gradient(160deg, ${C.MINT} 0%, rgba(64,176,112,0.2) 50%, rgba(42,92,62,0.3) 100%)`, border: `1px solid rgba(64,176,112,0.2)`, overflow: "hidden", position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontSize: 40, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, padding: 32, opacity: 0.7 }}>
-              {["🌿","🪴","🌱","🍃","🌾","🌻","🌵","🪴","🌿","🍃","🌱","🌾"].map((e, i) => (
-                <span key={i} style={{ animation: `bob ${3 + (i % 3) * 0.5}s ease-in-out infinite`, animationDelay: `${i * 0.1}s` }}>{e}</span>
-              ))}
+        {/* Phone mockup */}
+        <motion.div className="hero-card-wrap" initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.7 }} style={{ position: "relative", display: "flex", justifyContent: "center" }}>
+          {/* Phone frame */}
+          <div style={{ width: 280, background: C.BG_DARK, borderRadius: 40, padding: "12px 12px", boxShadow: `0 40px 80px rgba(0,0,0,0.25), 0 0 0 1px rgba(64,176,112,0.15), inset 0 0 0 1px rgba(255,255,255,0.05)`, position: "relative" }}>
+            {/* Camera notch */}
+            <div style={{ height: 28, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 4 }}>
+              <div style={{ width: 80, height: 20, background: "rgba(0,0,0,0.6)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(255,255,255,0.15)" }} />
+                <div style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(255,255,255,0.08)", border: "2px solid rgba(255,255,255,0.12)" }} />
+              </div>
             </div>
-            <div style={{ position: "absolute", top: 20, left: 20, background: "rgba(216,48,48,0.9)", color: "#fff", borderRadius: 999, padding: "6px 14px", fontSize: 12, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", backdropFilter: "blur(8px)" }}>
-              LIVE · MUMBAI · 42.7°C surface
+            {/* Screen content */}
+            <div style={{ borderRadius: 28, overflow: "hidden", background: "#0f1a12" }}>
+              {/* App top bar */}
+              <div style={{ background: "rgba(64,176,112,0.08)", borderBottom: "1px solid rgba(64,176,112,0.15)", padding: "10px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 14, color: C.GREEN_PALE }}>HeatWise</span>
+                <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, color: C.HEAT_RED, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.HEAT_RED, animation: "pulse-glow 1.5s ease-in-out infinite" }} />LIVE
+                </span>
+              </div>
+              {/* Heat map visual */}
+              <div style={{ position: "relative", padding: "16px 14px 10px", background: "linear-gradient(180deg, #0f1a12 0%, #182a20 100%)" }}>
+                <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: "0.1em", marginBottom: 8 }}>ROOFTOP SCAN · AR MODE</p>
+                <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", height: 120, background: "linear-gradient(135deg, rgba(216,112,64,0.6) 0%, rgba(216,48,48,0.4) 40%, rgba(26,56,40,0.3) 100%)" }}>
+                  {/* Scan line animation */}
+                  <div style={{ position: "absolute", left: 0, right: 0, height: 1.5, background: `linear-gradient(90deg, transparent, ${C.GREEN}, transparent)`, animation: "scanLine 2.5s ease-in-out infinite", boxShadow: `0 0 8px ${C.GREEN}` }} />
+                  {/* Temperature zones */}
+                  <div style={{ position: "absolute", inset: 0, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gridTemplateRows: "1fr 1fr" }}>
+                    {[["#d83030","44°C"],["#d87040","41°C"],["#c8a440","38°C"],["#c8a440","40°C"],["#40b070","35°C"],["#3d8a58","33°C"]].map(([c,t],i) => (
+                      <div key={i} style={{ background: c+"30", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 700, color: c, fontFamily: "'JetBrains Mono', monospace", border: "1px solid rgba(255,255,255,0.04)" }}>{t}</div>
+                    ))}
+                  </div>
+                  <div style={{ position: "absolute", top: 6, left: 8, background: "rgba(216,48,48,0.9)", color: "#fff", borderRadius: 6, padding: "2px 7px", fontSize: 8, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }}>BEFORE</div>
+                </div>
+                {/* After tag */}
+                <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+                  {[["−4.2°C",C.GREEN],["18 plants",C.SKY],["2 min plan",C.GOLD]].map(([l,c]) => (
+                    <span key={l} style={{ background: c+"18", border: `1px solid ${c}44`, color: c, borderRadius: 999, padding: "2px 8px", fontSize: 9, fontWeight: 700 }}>{l}</span>
+                  ))}
+                </div>
+              </div>
+              {/* AI recommendation cards */}
+              <div style={{ padding: "10px 14px 14px", display: "flex", flexDirection: "column", gap: 7 }}>
+                <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: "0.1em" }}>AI RECOMMENDATIONS</p>
+                {[
+                  { emoji: "🌿", name: "Snake Plant", score: 96, tag: "Shade ✓" },
+                  { emoji: "🪴", name: "Neem Tree", score: 92, tag: "Cooling ✓" },
+                  { emoji: "🌾", name: "Lemongrass", score: 88, tag: "Native ✓" },
+                ].map((p, i) => (
+                  <motion.div key={i} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 + i * 0.15, duration: 0.4 }}
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(64,176,112,0.15)", borderRadius: 10, padding: "7px 10px", display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 18 }}>{p.emoji}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 11, fontWeight: 600, color: "#e0f5e8", marginBottom: 2 }}>{p.name}</p>
+                      <div style={{ height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 3 }}>
+                        <div style={{ height: "100%", width: `${p.score}%`, background: `linear-gradient(90deg, ${C.GREEN}, ${C.FOREST_LT})`, borderRadius: 3 }} />
+                      </div>
+                    </div>
+                    <span style={{ fontSize: 9, color: C.GREEN_PALE, fontWeight: 600, whiteSpace: "nowrap" }}>{p.tag}</span>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-            <div style={{ position: "absolute", bottom: 20, right: 20, background: "rgba(64,176,112,0.9)", color: "#fff", borderRadius: 999, padding: "6px 14px", fontSize: 12, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", backdropFilter: "blur(8px)" }}>
-              AFTER GREENING · −4.2°C avg drop
+            {/* Home bar */}
+            <div style={{ height: 20, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 4 }}>
+              <div style={{ width: 80, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 2 }} />
             </div>
           </div>
-          <div style={{ position: "absolute", top: 40, right: -24, background: C.BG_DARK, color: C.GREEN_PALE, borderRadius: 16, padding: "12px 18px", fontSize: 20, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif", boxShadow: "0 8px 32px rgba(0,0,0,0.2)", animation: "bob 4s ease-in-out infinite" }}>
+
+          {/* Floating badges */}
+          <div style={{ position: "absolute", top: 60, right: -28, background: C.BG_DARK, border: `1px solid rgba(64,176,112,0.2)`, color: C.GREEN_PALE, borderRadius: 16, padding: "12px 16px", fontSize: 22, fontWeight: 800, fontFamily: "'Space Grotesk', sans-serif", boxShadow: "0 8px 32px rgba(0,0,0,0.25)", animation: "bob 4s ease-in-out infinite", zIndex: 2 }}>
             −4.2°C
-            <p style={{ fontSize: 11, fontWeight: 400, opacity: 0.7, marginTop: 2 }}>avg cooling</p>
+            <p style={{ fontSize: 10, fontWeight: 400, opacity: 0.6, marginTop: 2 }}>avg surface cooling</p>
           </div>
-          <div style={{ position: "absolute", bottom: 60, left: -24, background: C.MINT, color: C.FOREST_MID, borderRadius: 16, padding: "12px 18px", fontSize: 13, fontWeight: 700, boxShadow: "0 8px 32px rgba(64,176,112,0.2)", animation: "bob 4s ease-in-out infinite", animationDelay: "0.5s", border: `1px solid rgba(64,176,112,0.2)` }}>
-            🤖 AI in minutes
+          <div style={{ position: "absolute", bottom: 100, left: -28, background: C.MINT, border: `1px solid rgba(64,176,112,0.25)`, color: C.FOREST_MID, borderRadius: 16, padding: "10px 14px", fontSize: 13, fontWeight: 700, boxShadow: "0 8px 32px rgba(64,176,112,0.15)", animation: "bob 4s ease-in-out infinite", animationDelay: "0.7s", zIndex: 2 }}>
+            🤖 Plan ready in 2 min
+          </div>
+          <div style={{ position: "absolute", top: 200, left: -24, background: "#fff", border: `1px solid rgba(200,164,64,0.3)`, borderRadius: 12, padding: "8px 12px", boxShadow: "0 4px 16px rgba(0,0,0,0.10)", animation: "bob 5s ease-in-out infinite", animationDelay: "1s", zIndex: 2 }}>
+            <div style={{ display: "flex", gap: 2 }}>{[0,1,2,3,4].map(s=><span key={s} style={{ color: C.GOLD, fontSize: 10 }}>★</span>)}</div>
+            <p style={{ fontSize: 10, fontWeight: 600, color: C.FOREST, marginTop: 2 }}>4.9 · 2,800+ users</p>
           </div>
         </motion.div>
       </div>
@@ -706,7 +767,87 @@ function FAQSection({ light }) {
   );
 }
 
+function AppDownloadSection() {
+  return (
+    <section style={{ padding: "80px 24px", background: C.BG_MID }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "center" }} className="download-grid">
+        <style>{`@media (max-width: 768px) { .download-grid { grid-template-columns: 1fr !important; gap: 40px !important; } }`}</style>
+        <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+          <SectionLabel light>10 — Get the App</SectionLabel>
+          <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(28px,4vw,44px)", fontWeight: 700, color: "#fff", marginBottom: 16, lineHeight: 1.2 }}>
+            Your garden plan,<br/>
+            <span style={{ background: `linear-gradient(135deg, ${C.GREEN_PALE}, ${C.GREEN})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>in your pocket</span>
+          </h2>
+          <p style={{ fontSize: 16, lineHeight: 1.75, color: C.GREEN_PALE, opacity: 0.75, marginBottom: 36, maxWidth: 440 }}>
+            Scan your space, get an AI plan, track your cooling impact. HeatWise works on any Android device — no app store required.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <a href="/HeatWise.apk" download style={{ display: "inline-flex", alignItems: "center", gap: 14, background: "linear-gradient(135deg, #40b070, #2a5c3e)", color: "#fff", padding: "14px 24px", borderRadius: 16, textDecoration: "none", fontWeight: 700, fontSize: 15, boxShadow: "0 4px 24px rgba(64,176,112,0.3)", maxWidth: 280 }}>
+              <span style={{ fontSize: 28 }}>🤖</span>
+              <div>
+                <p style={{ fontSize: 10, opacity: 0.75, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.08em", marginBottom: 2 }}>DOWNLOAD FOR</p>
+                <p style={{ fontSize: 16, fontWeight: 800 }}>Android APK</p>
+              </div>
+            </a>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 14, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.5)", padding: "14px 24px", borderRadius: 16, fontWeight: 600, fontSize: 15, maxWidth: 280 }}>
+              <span style={{ fontSize: 28 }}>🍎</span>
+              <div>
+                <p style={{ fontSize: 10, opacity: 0.75, fontFamily: "'JetBrains Mono', monospace", letterSpacing: "0.08em", marginBottom: 2 }}>COMING SOON</p>
+                <p style={{ fontSize: 16, fontWeight: 800, color: "rgba(255,255,255,0.4)" }}>iOS App Store</p>
+              </div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 24, marginTop: 28, flexWrap: "wrap" }}>
+            {[["v2.4.1","Latest Version"],["18 MB","App Size"],["Android 8+","Minimum OS"]].map(([val,lbl]) => (
+              <div key={lbl} style={{ textAlign: "center" }}>
+                <p style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: 15, color: C.GREEN_PALE }}>{val}</p>
+                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{lbl}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
+          style={{ display: "flex", justifyContent: "center", gap: 16, position: "relative" }}>
+          {/* Two staggered phone screens */}
+          {[
+            { offset: "-30px", rotate: "-6deg", delay: 0, content: ["🌡️ Scanning…","Surface: 41.8°C","AR mode active"] },
+            { offset: "30px",  rotate: "4deg",  delay: 0.1, content: ["✅ Plan Ready","18 species matched","−3.9°C expected"] },
+          ].map(({ offset, rotate, delay, content }, i) => (
+            <motion.div key={i} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay, duration: 0.5 }}
+              style={{ width: 160, background: C.BG_DARK, borderRadius: 28, padding: "10px 10px", boxShadow: "0 20px 60px rgba(0,0,0,0.3)", transform: `translateY(${offset}) rotate(${rotate})`, border: "1px solid rgba(64,176,112,0.15)", flexShrink: 0 }}>
+              <div style={{ height: 18, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 3 }}>
+                <div style={{ width: 50, height: 12, background: "rgba(0,0,0,0.5)", borderRadius: 6 }} />
+              </div>
+              <div style={{ borderRadius: 20, overflow: "hidden", background: i === 0 ? `linear-gradient(135deg, rgba(216,112,64,0.4), rgba(26,56,40,0.8))` : `linear-gradient(135deg, rgba(64,176,112,0.2), rgba(26,56,40,0.9))`, padding: "16px 12px", minHeight: 180 }}>
+                <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, color: "rgba(255,255,255,0.45)", marginBottom: 12 }}>{content[0]}</p>
+                {i === 0 ? (
+                  <div>
+                    <div style={{ width: "100%", height: 80, background: `radial-gradient(ellipse, rgba(216,48,48,0.5), transparent)`, borderRadius: 12, marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>🔍</div>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: C.HEAT_ORANGE }}>{content[1]}</p>
+                    <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>{content[2]}</p>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ fontSize: 24, marginBottom: 8 }}>🌿🪴🌱</div>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: C.GREEN_PALE }}>{content[1]}</p>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: C.GREEN, marginTop: 4 }}>{content[2]}</p>
+                  </div>
+                )}
+              </div>
+              <div style={{ height: 14, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 3 }}>
+                <div style={{ width: 45, height: 3, background: "rgba(255,255,255,0.12)", borderRadius: 2 }} />
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 function FinalCTA() {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
   const particles = Array.from({ length: 40 });
   return (
     <section style={{ position: "relative", padding: "120px 24px", background: C.BG_DARK, overflow: "hidden", textAlign: "center" }}>
@@ -723,12 +864,35 @@ function FinalCTA() {
           style={{ fontSize: 18, color: C.GREEN_PALE, opacity: 0.85, marginBottom: 48 }}>
           Scan once. Get a plan. Watch your city breathe.
         </motion.p>
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.5 }} style={{ marginBottom: 32 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.5 }} style={{ marginBottom: 40 }}>
           <GreenBtn href="/?start=scan" size="lg">📷 Start Free Scan →</GreenBtn>
         </motion.div>
+        {/* Email waitlist */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3, duration: 0.5 }} style={{ maxWidth: 480, margin: "0 auto 36px" }}>
+          {submitted ? (
+            <div style={{ background: "rgba(64,176,112,0.12)", border: `1px solid rgba(64,176,112,0.3)`, borderRadius: 16, padding: "16px 24px", color: C.GREEN_PALE, fontWeight: 600, fontSize: 15 }}>
+              🌿 You're on the list! We'll notify you on launch.
+            </div>
+          ) : (
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                type="email" placeholder="your@email.com" value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{ flex: 1, padding: "13px 18px", borderRadius: 999, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", fontSize: 15, outline: "none", fontFamily: "'DM Sans', sans-serif" }}
+                onFocus={(e) => { e.target.style.borderColor = C.GREEN; }}
+                onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.15)"; }}
+              />
+              <button onClick={() => { if (email.includes("@")) setSubmitted(true); }}
+                style={{ padding: "13px 24px", background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, color: "#fff", fontWeight: 700, fontSize: 14, borderRadius: 999, border: "none", cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'DM Sans', sans-serif" }}>
+                Join Waitlist
+              </button>
+            </div>
+          )}
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 10 }}>Get early access + 3 months free Green plan</p>
+        </motion.div>
         <div style={{ display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
-          {["No credit card", "2-min scan", "14 cities"].map((badge) => (
-            <span key={badge} style={{ fontSize: 13, fontWeight: 600, color: C.GREEN_PALE, opacity: 0.7, display: "flex", alignItems: "center", gap: 6 }}>
+          {["No credit card", "2-min scan", "14 cities", "Free plan forever"].map((badge) => (
+            <span key={badge} style={{ fontSize: 13, fontWeight: 600, color: C.GREEN_PALE, opacity: 0.65, display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: C.GREEN }}>✓</span> {badge}
             </span>
           ))}
@@ -745,11 +909,13 @@ export default function HomePage() {
       <MarqueeSection />
       <ProblemSection />
       <HowItWorksSection />
+      <InteractiveDemo />
       <CapabilitiesSection />
       <BeforeAfterSection />
       <SpeciesSection />
       <TestimonialsSection />
       <HeatMapSection />
+      <AppDownloadSection />
       <PricingSection />
       <FAQSection light />
       <FinalCTA />

@@ -38,10 +38,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    // If the email is changing, reset emailVerified so re-verification is required
+    const current = await db.user.findUnique({ where: { id: session.user.id }, select: { email: true } });
+    const emailChanged = current?.email !== email;
+
     const updated = await db.user.update({
       where: { id: session.user.id },
       data: {
         email,
+        ...(emailChanged ? { emailVerified: false } : {}),
         city,
         state,
         country,
@@ -52,6 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       select: {
         id: true,
         email: true,
+        emailVerified: true,
         profileCompleted: true,
         city: true,
         state: true,

@@ -101,7 +101,14 @@ DATABASE_URL="file:./dev.db"
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=...
 OPENAI_API_KEY=...
-HEATWISE_DEV_OTP=false           # Set true to log OTP codes to console instead of SMS
+HEATWISE_DEV_OTP=false           # Set true to log OTP codes to console instead of SMS/email
+# Email OTP (SMTP) — only needed in production; dev mode logs OTPs to console
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=hello@heatwise.in
+SMTP_PASS=...
+SMTP_FROM=hello@heatwise.in
 HEATWISE_ADMIN_EMAILS=           # Comma-separated admin emails
 CAP_SERVER_URL=http://localhost:3000   # Android WebView target
 HEATWISE_DEV_EXTRA_ORIGINS=      # Extra allowed dev origins (comma-separated)

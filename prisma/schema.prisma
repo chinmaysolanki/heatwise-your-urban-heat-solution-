@@ -16,6 +16,7 @@ model User {
   password               String?
   phoneNumber            String?  @unique
   phoneVerified          Boolean  @default(false)
+  emailVerified          Boolean  @default(false)
   profileCompleted       Boolean  @default(false)
   city                   String?
   state                  String?
@@ -37,6 +38,29 @@ model User {
   consentRecords                 UserConsentRecord[]
   governancePolicyFlags          GovernancePolicyFlag[]
   governanceReviewsRelated       GovernanceReviewRecord[] @relation("GovernanceReviewRelatedUser")
+}
+
+// Email-keyed guest profile — no auth required. Created when user completes
+// ProfileSetupScreen. Allows profile restore across devices via email lookup.
+model GuestProfile {
+  email     String   @id
+  name      String
+  age       Int?
+  city      String
+  exp       String   @default("beginner")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EmailOtp {
+  id         String    @id @default(cuid())
+  email      String    @unique
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model PhoneOtp {

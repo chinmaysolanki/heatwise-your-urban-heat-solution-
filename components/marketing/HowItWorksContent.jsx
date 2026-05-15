@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import MarketingLayout from "@/components/marketing/MarketingLayout";
+import InteractiveDemo from "@/components/marketing/InteractiveDemo";
 
 const C = {
   CREAM: "#fafaf6",
@@ -88,6 +89,89 @@ const CLIMATE_POINTS = [
   { icon: "📍", label: "Microclimate", val: "Building shadows, rooftop albedo, surface type" },
   { icon: "📅", label: "Seasonal Rhythm", val: "Growing season start/end, frost risk, dry spells" },
 ];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 👇 PASTE YOUR VIDEO URL HERE WHEN READY
+//    Supported: YouTube, Loom, Vimeo, or a direct .mp4 path like "/demo.mp4"
+//    Leave as null to keep the interactive demo shown instead.
+const DEMO_VIDEO_URL = null;
+// Examples:
+//   const DEMO_VIDEO_URL = "https://www.youtube.com/watch?v=YOUR_VIDEO_ID";
+//   const DEMO_VIDEO_URL = "https://www.loom.com/share/YOUR_LOOM_ID";
+//   const DEMO_VIDEO_URL = "https://vimeo.com/YOUR_VIMEO_ID";
+//   const DEMO_VIDEO_URL = "/demo.mp4";   ← drop file in /public/demo.mp4
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getEmbedUrl(url) {
+  if (!url) return null;
+  // YouTube
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}?autoplay=1&rel=0&modestbranding=1`;
+  // Loom
+  const loom = url.match(/loom\.com\/share\/([a-zA-Z0-9]+)/);
+  if (loom) return `https://www.loom.com/embed/${loom[1]}?autoplay=1`;
+  // Vimeo
+  const vimeo = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}?autoplay=1`;
+  // Direct MP4 — handled separately
+  return url;
+}
+
+function DemoVideoSection() {
+  const [playing, setPlaying] = useState(false);
+  const embedUrl = getEmbedUrl(DEMO_VIDEO_URL);
+  const isDirectVideo = DEMO_VIDEO_URL && (DEMO_VIDEO_URL.endsWith(".mp4") || DEMO_VIDEO_URL.endsWith(".webm"));
+
+  return (
+    <section style={{ padding: "0 24px 80px", background: C.CREAM }}>
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+          style={{ borderRadius: 24, aspectRatio: "16/9", position: "relative", overflow: "hidden", boxShadow: "0 16px 64px rgba(0,0,0,0.2)", background: C.BG_DARK }}>
+
+          {/* ── Video playing ─────────────────────────────────────────────── */}
+          {playing && embedUrl && !isDirectVideo && (
+            <iframe src={embedUrl} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
+              allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
+          )}
+          {playing && isDirectVideo && (
+            <video src={DEMO_VIDEO_URL} autoPlay controls playsInline
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+          )}
+
+          {/* ── Thumbnail / play button ────────────────────────────────────── */}
+          {!playing && (
+            <>
+              <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 40% 40%, rgba(64,176,112,0.15) 0%, transparent 70%)` }} />
+              <button onClick={() => setPlaying(true)}
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, cursor: "pointer", border: "none", background: "transparent" }}>
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.97 }}
+                  style={{ width: 80, height: 80, borderRadius: "50%", background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 0 12px rgba(64,176,112,0.15), 0 0 40px rgba(64,176,112,0.3)` }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" style={{ marginLeft: 3 }}>
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </motion.div>
+                <div style={{ textAlign: "center" }}>
+                  <p style={{ color: "#fff", fontWeight: 700, fontSize: 17, fontFamily: "'Space Grotesk', sans-serif" }}>Watch 90s Demo</p>
+                  <p style={{ color: C.GREEN_PALE, opacity: 0.6, fontSize: 13, marginTop: 4, fontFamily: "'DM Sans', sans-serif" }}>See a full rooftop scan → AI plan in real time</p>
+                </div>
+              </button>
+              <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(216,48,48,0.85)", color: "#fff", borderRadius: 999, padding: "5px 14px", fontSize: 11, fontWeight: 700, fontFamily: "monospace", display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: "hwBlink 1s ease-in-out infinite" }} />
+                DEMO · 1:32
+              </div>
+              <style>{`@keyframes hwBlink{0%,100%{opacity:1}50%{opacity:.2}}`}</style>
+            </>
+          )}
+        </motion.div>
+
+        {/* Caption */}
+        <p style={{ textAlign: "center", fontSize: 13, color: C.FOREST, opacity: 0.45, marginTop: 14, fontFamily: "'JetBrains Mono', monospace" }}>
+          No sign-up needed · Recorded on a real balcony in Delhi
+        </p>
+      </div>
+    </section>
+  );
+}
 
 export default function HowItWorksPage() {
   const [playDemo, setPlayDemo] = useState(false);
@@ -184,30 +268,8 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* Demo Video Placeholder */}
-      <section style={{ padding: "0 24px 80px", background: C.CREAM }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            onClick={() => setPlayDemo(true)}
-            style={{ background: C.BG_DARK, borderRadius: 24, aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden", cursor: "pointer", boxShadow: "0 16px 64px rgba(0,0,0,0.3)" }}>
-            <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 40% 40%, rgba(64,176,112,0.15) 0%, transparent 70%)` }} />
-            {!playDemo ? (
-              <div style={{ textAlign: "center", position: "relative", zIndex: 1 }}>
-                <motion.div whileHover={{ scale: 1.1 }} style={{ width: 80, height: 80, borderRadius: "50%", background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", boxShadow: `0 0 40px rgba(64,176,112,0.4)` }}>
-                  <span style={{ fontSize: 28, marginLeft: 4 }}>▶</span>
-                </motion.div>
-                <p style={{ color: C.GREEN_PALE, fontWeight: 600, fontSize: 16 }}>Watch 90s Demo</p>
-                <p style={{ color: C.GREEN_PALE, opacity: 0.5, fontSize: 13, marginTop: 6 }}>See a full rooftop scan → plan in real time</p>
-              </div>
-            ) : (
-              <div style={{ color: C.GREEN_PALE, fontSize: 16, opacity: 0.7 }}>Demo video would play here</div>
-            )}
-            <div style={{ position: "absolute", top: 16, right: 16, background: "rgba(216,48,48,0.8)", color: "#fff", borderRadius: 999, padding: "4px 12px", fontSize: 11, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace" }}>
-              ● DEMO · 1:32
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      {/* Demo video (or interactive demo when no video URL is set) */}
+      {DEMO_VIDEO_URL ? <DemoVideoSection /> : <InteractiveDemo />}
 
       {/* 3-Step Process */}
       <section style={{ padding: "80px 24px", background: "#fff" }}>

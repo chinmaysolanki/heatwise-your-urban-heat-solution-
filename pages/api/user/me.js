@@ -14,6 +14,7 @@ export default async function handler(req, res) {
       email: true,
       phoneNumber: true,
       phoneVerified: true,
+      emailVerified: true,
       profileCompleted: true,
       city: true,
       state: true,

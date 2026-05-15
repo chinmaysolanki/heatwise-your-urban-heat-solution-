@@ -290,9 +290,26 @@ function NavCTA() {
 
 function Footer() {
   const footerLinks = {
-    Product: ["AR Scanner", "Species Catalog", "AI Planner", "Cooling Score", "Installer Network"],
-    Company: ["About Us", "Science", "Blog", "Careers", "Press Kit"],
-    Connect: ["Twitter / X", "Instagram", "LinkedIn", "GitHub", "contact@heatwise.in"],
+    Product: [
+      { label: "AR Scanner",       href: "/?start=scan" },
+      { label: "Species Catalog",  href: "/species" },
+      { label: "How It Works",     href: "/how-it-works" },
+      { label: "Pricing",          href: "/#pricing" },
+      { label: "Download Android", href: "/HeatWise.apk" },
+    ],
+    Company: [
+      { label: "Science",     href: "/science" },
+      { label: "Blog",        href: "/blog" },
+      { label: "Contact",     href: "/contact" },
+      { label: "Privacy",     href: "/privacy" },
+      { label: "Terms",       href: "/terms" },
+    ],
+    Connect: [
+      { label: "Twitter / X",         href: "https://twitter.com/heatwise_in" },
+      { label: "Instagram",           href: "https://instagram.com/heatwise.in" },
+      { label: "LinkedIn",            href: "https://linkedin.com/company/heatwise" },
+      { label: "contact@heatwise.in", href: "mailto:contact@heatwise.in" },
+    ],
   };
 
   return (
@@ -376,14 +393,14 @@ function Footer() {
               </h4>
               <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 10 }}>
                 {links.map((l) => (
-                  <li key={l}>
+                  <li key={l.label}>
                     <a
-                      href="#"
+                      href={l.href}
                       style={{ fontSize: 14, opacity: 0.65, transition: "opacity 0.2s" }}
                       onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
                       onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.65")}
                     >
-                      {l}
+                      {l.label}
                     </a>
                   </li>
                 ))}
