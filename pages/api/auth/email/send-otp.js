@@ -1,10 +1,44 @@
 import crypto from "crypto";
+import dns from "dns/promises";
 import { Resend } from "resend";
 import { db } from "@/lib/db";
 
 const OTP_EXPIRY_MINUTES = 10;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const lastSentAt = new Map();
+
+// Known disposable/throwaway email domains — reject these
+const BLOCKED_DOMAINS = new Set([
+  "mailinator.com","guerrillamail.com","10minutemail.com","tempmail.com",
+  "throwam.com","trashmail.com","yopmail.com","fakeinbox.com","sharklasers.com",
+  "guerrillamailblock.com","grr.la","guerrillamail.info","guerrillamail.biz",
+  "guerrillamail.de","guerrillamail.net","guerrillamail.org","spam4.me",
+  "dispostable.com","maildrop.cc","discard.email","spamgourmet.com",
+  "trashmail.at","trashmail.io","trashmail.me","trashmail.net","trashmail.org",
+]);
+
+// Validates email format + checks MX records to confirm domain can receive email
+async function validateEmail(email) {
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!EMAIL_RE.test(email)) return { valid: false, reason: "Invalid email format." };
+
+  const domain = email.split("@")[1].toLowerCase();
+
+  if (BLOCKED_DOMAINS.has(domain)) {
+    return { valid: false, reason: "Disposable email addresses are not allowed." };
+  }
+
+  try {
+    const records = await dns.resolveMx(domain);
+    if (!records || records.length === 0) {
+      return { valid: false, reason: "This email domain cannot receive emails." };
+    }
+  } catch {
+    return { valid: false, reason: "Email domain does not exist. Please check and try again." };
+  }
+
+  return { valid: true };
+}
 
 function generateOtp() {
   return String(Math.floor(100000 + Math.random() * 900000));
@@ -98,11 +132,15 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ message: "Method not allowed" });
 
   const { email } = req.body ?? {};
-  if (!email || typeof email !== "string" || !email.includes("@")) {
-    return res.status(400).json({ message: "Valid email required" });
+  if (!email || typeof email !== "string") {
+    return res.status(400).json({ message: "Email is required." });
   }
 
   const normalizedEmail = email.trim().toLowerCase();
+
+  // Validate format + MX records
+  const { valid, reason } = await validateEmail(normalizedEmail);
+  if (!valid) return res.status(400).json({ message: reason });
 
   // Rate limit
   const lastSent = lastSentAt.get(normalizedEmail);
