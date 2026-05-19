@@ -104,16 +104,37 @@ export function mergeMlIntoLayoutRecommendations(
     used.add(best.candidateId);
 
     const p = best.candidatePayload as Record<string, unknown>;
-    const species = String(p.species_primary ?? "").trim();
+    const mlSpeciesLabel = String(p.species_primary ?? "").trim();
     const dt = p.expected_temp_reduction_c;
     const surf = p.expected_surface_temp_reduction_c;
     const blend = best.scores?.blended;
 
+    let candidate = rec.candidate;
+    const topPlant = candidate.scoredPlants?.[0]?.plant;
+
+    // Resolve species identity — validate that ML label maps to a known catalog code.
+    // If resolution is "label_only" (no catalog match), keep the engine plant name to
+    // avoid broken telemetry joins; only overwrite name when catalog confirms the species.
+    const idRef = resolveSpeciesIdentity({
+      enginePlantId: topPlant?.id ?? null,
+      mlSpeciesLabel: mlSpeciesLabel || null,
+    });
+    const mlLabelResolved = idRef.resolution !== "unresolved";
+    const effectiveSpeciesName = mlLabelResolved && mlSpeciesLabel
+      ? mlSpeciesLabel
+      : (topPlant?.name ?? mlSpeciesLabel);
+
+    if (idRef.resolution === "unresolved" && mlSpeciesLabel) {
+      console.warn(
+        `[mergeMlIntoLayoutRecommendations] ML species_primary "${mlSpeciesLabel}" not found in SpeciesCatalog. Keeping engine plant name.`,
+      );
+    }
+
     const mlLine =
-      species || dt != null || blend != null
+      effectiveSpeciesName || dt != null || blend != null
         ? [
             "Model-ranked mix:",
-            species || "species TBD",
+            effectiveSpeciesName || "species TBD",
             dt != null ? `~${Number(dt).toFixed(1)}°C air Δ` : null,
             surf != null ? `~${Number(surf).toFixed(1)}°C surface Δ` : null,
             blend != null ? `score ${Number(blend).toFixed(2)}` : null,
@@ -122,12 +143,6 @@ export function mergeMlIntoLayoutRecommendations(
             .join(" · ")
         : "";
 
-    let candidate = rec.candidate;
-    const topPlant = candidate.scoredPlants?.[0]?.plant;
-    const idRef = resolveSpeciesIdentity({
-      enginePlantId: topPlant?.id ?? null,
-      mlSpeciesLabel: species || null,
-    });
     if (candidate.scoredPlants?.[0]) {
       candidate = {
         ...candidate,
@@ -137,7 +152,8 @@ export function mergeMlIntoLayoutRecommendations(
                 ...sp,
                 plant: {
                   ...sp.plant,
-                  ...(species ? { name: species } : {}),
+                  // Only overwrite name when ML label resolved to a catalog entry
+                  ...(mlLabelResolved && effectiveSpeciesName ? { name: effectiveSpeciesName } : {}),
                   speciesCatalogCode: idRef.catalogCode,
                   speciesIdentityResolution: idRef.resolution,
                 },

@@ -554,16 +554,79 @@ function waterStress(species: TraitRow, waterAccess: boolean): number {
   return 0.92;
 }
 
-function normalizeBlendWeights(raw: BlendWeightsInput | undefined): {
+/**
+ * Derive context-sensitive default blend weights when the caller hasn't supplied them.
+ * These are evidence-informed priors for Indian urban heat conditions:
+ *  - Extreme/high heat → heatMl weighted heavily (cooling effectiveness matters most)
+ *  - Food/edible goal  → rankingMl up (species variety + edible fit)
+ *  - Scarce water      → feasibilityMl up (container + drought resilience)
+ *  - Default cooling   → balanced heat + rules
+ */
+function deriveContextualBlendWeights(
+  environment: Record<string, unknown>,
+  preferences: Record<string, unknown>,
+): { rules: number; feasibilityMl: number; heatMl: number; rankingMl: number } {
+  const heatExp = String(environment.heat_exposure ?? "").toLowerCase();
+  const maxT = Number(environment.daily_max_temp_c ?? environment.summerTempC ?? NaN);
+  const isExtremeHeat =
+    heatExp === "extreme" || (Number.isFinite(maxT) && maxT >= 38);
+  const isHighHeat =
+    !isExtremeHeat && (heatExp === "high" || (Number.isFinite(maxT) && maxT >= 33));
+
+  const purpose = String(preferences.purpose_primary ?? "").toLowerCase();
+  const isFood =
+    purpose.includes("food") || purpose.includes("edible") ||
+    purpose.includes("herb") || purpose.includes("kitchen");
+
+  const waterAvail = String(environment.water_availability ?? environment.waterAvailability ?? "").toLowerCase();
+  const isScarce = waterAvail === "scarce";
+
+  if (isExtremeHeat) {
+    // Heat resilience + feasibility dominate; ranking matters less
+    return { rules: 0.22, feasibilityMl: 0.23, heatMl: 0.40, rankingMl: 0.15 };
+  }
+  if (isHighHeat && isScarce) {
+    return { rules: 0.20, feasibilityMl: 0.30, heatMl: 0.35, rankingMl: 0.15 };
+  }
+  if (isHighHeat) {
+    return { rules: 0.25, feasibilityMl: 0.22, heatMl: 0.35, rankingMl: 0.18 };
+  }
+  if (isFood) {
+    // Species variety + edible fit are most important; heat less critical
+    return { rules: 0.28, feasibilityMl: 0.17, heatMl: 0.15, rankingMl: 0.40 };
+  }
+  if (isScarce) {
+    // Drought/container resilience (feasibility) and rules dominate
+    return { rules: 0.30, feasibilityMl: 0.35, heatMl: 0.25, rankingMl: 0.10 };
+  }
+  // Default: cooling-first balanced (heat + rules equally weighted)
+  return { rules: 0.30, feasibilityMl: 0.20, heatMl: 0.30, rankingMl: 0.20 };
+}
+
+function normalizeBlendWeights(
+  raw: BlendWeightsInput | undefined,
+  environment?: Record<string, unknown>,
+  preferences?: Record<string, unknown>,
+): {
   rules: number;
   feasibilityMl: number;
   heatMl: number;
   rankingMl: number;
 } {
-  const rules = Number(raw?.rules ?? 0.25);
-  const feasibilityMl = Number(raw?.feasibilityMl ?? 0.25);
-  const heatMl = Number(raw?.heatMl ?? 0.25);
-  const rankingMl = Number(raw?.rankingMl ?? 0.25);
+  // When caller supplies explicit weights, use them directly
+  const hasExplicit =
+    raw != null &&
+    (raw.rules != null || raw.feasibilityMl != null || raw.heatMl != null || raw.rankingMl != null);
+
+  const defaults =
+    hasExplicit || !environment
+      ? { rules: 0.25, feasibilityMl: 0.25, heatMl: 0.25, rankingMl: 0.25 }
+      : deriveContextualBlendWeights(environment, preferences ?? {});
+
+  const rules = Number(raw?.rules ?? defaults.rules);
+  const feasibilityMl = Number(raw?.feasibilityMl ?? defaults.feasibilityMl);
+  const heatMl = Number(raw?.heatMl ?? defaults.heatMl);
+  const rankingMl = Number(raw?.rankingMl ?? defaults.rankingMl);
   const s = rules + feasibilityMl + heatMl + rankingMl;
   if (s <= 0) return { rules: 1, feasibilityMl: 0, heatMl: 0, rankingMl: 0 };
   return {
@@ -580,8 +643,10 @@ function blendScores(
   heat: number | null,
   ranking: number | null,
   weights: BlendWeightsInput | undefined,
+  environment?: Record<string, unknown>,
+  preferences?: Record<string, unknown>,
 ): { blended: number; parts: Record<string, number> } {
-  const w = normalizeBlendWeights(weights);
+  const w = normalizeBlendWeights(weights, environment, preferences);
   const f = feasibility ?? ruleScore;
   const h = heat ?? ruleScore;
   const r = Math.max(0, Math.min(1, ranking ?? ruleScore));
@@ -761,59 +826,146 @@ type TemplateDef = {
   rule_template_score: number;
 };
 
-function templateForIndex(i: number, budget: number, species: TraitRow): TemplateDef {
-  const coolingBoost = Math.min(0.8, species.coolingContribution * 0.22);
-  const bases: TemplateDef[] = [
-    {
-      recommendation_type: "planter",
-      greenery_density: "medium",
-      planter_type: "raised",
-      irrigation_type: "drip",
-      shade_solution: "pergola",
-      cooling_strategy: "evapotranspiration",
-      maintenance_level_pred: "low",
-      species_mix_type: "duo",
-      species_count_estimate: 2,
-      estimated_install_cost_inr: Math.min(52_000, budget * 1.08),
-      estimated_annual_maintenance_inr: 6200,
-      expected_temp_reduction_c: 1.6 + coolingBoost,
-      expected_surface_temp_reduction_c: 3.4 + coolingBoost,
-      rule_template_score: 0.72,
-    },
-    {
-      recommendation_type: "shade_first",
-      greenery_density: "low",
-      planter_type: "container",
-      irrigation_type: "manual",
-      shade_solution: "shade_sail",
-      cooling_strategy: "shading",
-      maintenance_level_pred: "minimal",
-      species_mix_type: "mono",
-      species_count_estimate: 1,
-      estimated_install_cost_inr: Math.min(34_000, budget * 0.95),
-      estimated_annual_maintenance_inr: 4200,
-      expected_temp_reduction_c: 1.1 + coolingBoost * 0.7,
-      expected_surface_temp_reduction_c: 2.8 + coolingBoost,
-      rule_template_score: 0.66,
-    },
-    {
-      recommendation_type: "planter",
-      greenery_density: "high",
-      planter_type: "raised",
-      irrigation_type: "drip",
-      shade_solution: "green_wall_segment",
-      cooling_strategy: "evapotranspiration",
-      maintenance_level_pred: "medium",
-      species_mix_type: "polyculture_lite",
-      species_count_estimate: 4,
-      estimated_install_cost_inr: Math.min(68_000, budget * 1.12),
-      estimated_annual_maintenance_inr: 8800,
-      expected_temp_reduction_c: 2.2 + coolingBoost,
-      expected_surface_temp_reduction_c: 4.8 + coolingBoost,
-      rule_template_score: 0.76,
-    },
-  ];
-  return bases[i % bases.length]!;
+/**
+ * Pick the best-fit template for a species based on its traits and the site context.
+ *
+ * Mapping rationale (Indian rooftop / balcony conditions):
+ *  - Shade-tolerant (SHADE pref or minSunHours ≤ 3) → shade_sail + container (shading strategy)
+ *  - Edible / food → raised planter + pergola (food garden)
+ *  - High cooling (≥ 3.5) + drought-tolerant → high-density green wall (max evapotranspiration)
+ *  - Low-maintenance + compact → medium raised planter (drip)
+ *  - Subsequent candidates (i > 0) rotate through complementary templates
+ */
+function templateForSpecies(
+  i: number,
+  budget: number,
+  species: TraitRow,
+  project: Record<string, unknown>,
+  environment: Record<string, unknown>,
+  preferences: Record<string, unknown>,
+): TemplateDef {
+  // Calibrated cooling boost: empirical factor for Indian species (0.25°C per unit, capped at 1.2°C)
+  const coolingBoost = Math.min(1.2, species.coolingContribution * 0.25);
+
+  const sunPref = effectiveSunlightPrefNorm(species);
+  const isShadeSpecies = sunPref === "SHADE" || (species.minSunHours != null && species.minSunHours <= 3);
+  const isEdible = !!(species.edible || species.dbEdible);
+  const isHighCooling = species.coolingContribution >= 3.5;
+  const isDrought = species.dbDroughtTolerant === true;
+  const isLowMaint = species.dbLowMaintenance === true || maintenanceTier(species.maintenanceNeed) === 0;
+  const isIndoorSpace = String(project.space_type ?? project.spaceType ?? "").toLowerCase().includes("indoor");
+
+  const purposeStr = String(preferences.purpose_primary ?? "").toLowerCase();
+  const isFoodGoal =
+    purposeStr.includes("food") || purposeStr.includes("edible") ||
+    purposeStr.includes("herb") || purposeStr.includes("kitchen");
+
+  const heatExp = envHeatExposure(environment);
+  const isHighHeat = heatExp === "extreme" || heatExp === "high";
+
+  // Budget tiers (INR): low < 40k, medium 40–90k, high > 90k
+  const budgetTier = budget < 40_000 ? "low" : budget < 90_000 ? "medium" : "high";
+
+  // ── Template pool (5 types) ──────────────────────────────────────────────
+  // All costs capped at budget × 1.15 at call site; these are base estimates.
+  const shadeSailContainer: TemplateDef = {
+    recommendation_type: "shade_first",
+    greenery_density: "low",
+    planter_type: "container",
+    irrigation_type: isIndoorSpace ? "manual" : isDrought ? "manual" : "drip",
+    shade_solution: "shade_sail",
+    cooling_strategy: "shading",
+    maintenance_level_pred: "minimal",
+    species_mix_type: "mono",
+    species_count_estimate: 1,
+    estimated_install_cost_inr: budgetTier === "low" ? 22_000 : 30_000,
+    estimated_annual_maintenance_inr: 3600,
+    expected_temp_reduction_c: +(1.0 + coolingBoost * 0.7).toFixed(1),
+    expected_surface_temp_reduction_c: +(2.6 + coolingBoost).toFixed(1),
+    rule_template_score: 0.64,
+  };
+
+  const raisedPlanterDrip: TemplateDef = {
+    recommendation_type: "planter",
+    greenery_density: "medium",
+    planter_type: "raised",
+    irrigation_type: isDrought && budgetTier === "low" ? "manual" : "drip",
+    shade_solution: "pergola",
+    cooling_strategy: "evapotranspiration",
+    maintenance_level_pred: isLowMaint ? "low" : "medium",
+    species_mix_type: "duo",
+    species_count_estimate: 2,
+    estimated_install_cost_inr: budgetTier === "low" ? 32_000 : budgetTier === "high" ? 58_000 : 44_000,
+    estimated_annual_maintenance_inr: isLowMaint ? 5200 : 6800,
+    expected_temp_reduction_c: +(1.6 + coolingBoost).toFixed(1),
+    expected_surface_temp_reduction_c: +(3.4 + coolingBoost).toFixed(1),
+    rule_template_score: 0.72,
+  };
+
+  const foodGardenRaised: TemplateDef = {
+    recommendation_type: "planter",
+    greenery_density: "medium",
+    planter_type: "raised",
+    irrigation_type: "drip",
+    shade_solution: "pergola",
+    cooling_strategy: "evapotranspiration",
+    maintenance_level_pred: "medium",
+    species_mix_type: "polyculture_lite",
+    species_count_estimate: 3,
+    estimated_install_cost_inr: budgetTier === "low" ? 30_000 : 40_000,
+    estimated_annual_maintenance_inr: 6200,
+    expected_temp_reduction_c: +(1.5 + coolingBoost).toFixed(1),
+    expected_surface_temp_reduction_c: +(3.0 + coolingBoost).toFixed(1),
+    rule_template_score: 0.70,
+  };
+
+  const greenWallHigh: TemplateDef = {
+    recommendation_type: "planter",
+    greenery_density: "high",
+    planter_type: "raised",
+    irrigation_type: "drip",
+    shade_solution: "green_wall_segment",
+    cooling_strategy: "evapotranspiration",
+    maintenance_level_pred: "medium",
+    species_mix_type: "polyculture_lite",
+    species_count_estimate: 4,
+    estimated_install_cost_inr: budgetTier === "high" ? 75_000 : 62_000,
+    estimated_annual_maintenance_inr: 8800,
+    expected_temp_reduction_c: +(2.2 + coolingBoost).toFixed(1),
+    expected_surface_temp_reduction_c: +(4.6 + coolingBoost).toFixed(1),
+    rule_template_score: 0.78,
+  };
+
+  const indoorContainer: TemplateDef = {
+    recommendation_type: "planter",
+    greenery_density: "low",
+    planter_type: "container",
+    irrigation_type: "manual",
+    shade_solution: "none",
+    cooling_strategy: "evapotranspiration",
+    maintenance_level_pred: "low",
+    species_mix_type: "duo",
+    species_count_estimate: 2,
+    estimated_install_cost_inr: 18_000,
+    estimated_annual_maintenance_inr: 2400,
+    expected_temp_reduction_c: +(0.7 + coolingBoost * 0.5).toFixed(1),
+    expected_surface_temp_reduction_c: +(1.5 + coolingBoost * 0.5).toFixed(1),
+    rule_template_score: 0.60,
+  };
+
+  // ── Ordered preference for rank-0 (best species) ──────────────────────
+  const ordered: TemplateDef[] = (() => {
+    if (isIndoorSpace) return [indoorContainer, shadeSailContainer];
+    if (isFoodGoal && isEdible) return [foodGardenRaised, raisedPlanterDrip, shadeSailContainer];
+    if (isHighCooling && !isShadeSpecies && budgetTier !== "low") {
+      return [greenWallHigh, raisedPlanterDrip, shadeSailContainer];
+    }
+    if (isShadeSpecies) return [shadeSailContainer, raisedPlanterDrip, indoorContainer];
+    if (isHighHeat && isDrought) return [raisedPlanterDrip, shadeSailContainer, greenWallHigh];
+    return [raisedPlanterDrip, shadeSailContainer, greenWallHigh];
+  })();
+
+  return ordered[i % ordered.length]!;
 }
 
 function heuristicRankScore(
@@ -1024,7 +1176,7 @@ export async function buildCatalogHybridFallback(
     const pre = speciesHardExcluded(species, project, environment, preferences);
     if (pre.length) continue;
     const h = heuristicRankScore(species, project, environment, preferences);
-    const { blended } = blendScores(h.rulePrior, h.feasibility, h.heat, h.ranking, req.blendWeights);
+    const { blended } = blendScores(h.rulePrior, h.feasibility, h.heat, h.ranking, req.blendWeights, environment, preferences);
     scored.push({ species, ...h, blended });
   }
 
@@ -1047,8 +1199,13 @@ export async function buildCatalogHybridFallback(
   let rank = 1;
   for (let i = 0; i < topSpecies.length; i++) {
     const { species, rulePrior, feasibility, heat, ranking } = topSpecies[i]!;
-    const tmpl = templateForIndex(i, budget, species);
-    tmpl.estimated_install_cost_inr = Math.min(tmpl.estimated_install_cost_inr, budget * 1.1);
+    const tmpl = templateForSpecies(i, budget, species, project, environment, preferences);
+    tmpl.estimated_install_cost_inr = Math.min(tmpl.estimated_install_cost_inr, budget * 1.15);
+
+    // Companion planting: fill secondary/tertiary from the next-ranked scored species
+    // (different species each slot where available; fall back to primary only as last resort)
+    const secondarySpecies = topSpecies[i + 1]?.species ?? topSpecies[Math.max(0, i - 1)]?.species ?? species;
+    const tertiarySpecies = topSpecies[i + 2]?.species ?? secondarySpecies;
 
     const rawPayload: Record<string, unknown> = {
       candidate_id: `cand_cat_${species.code}_${Math.random().toString(36).slice(2, 10)}`,
@@ -1061,14 +1218,19 @@ export async function buildCatalogHybridFallback(
       maintenance_level_pred: tmpl.maintenance_level_pred,
       species_mix_type: tmpl.species_mix_type,
       species_count_estimate: tmpl.species_count_estimate,
-      estimated_install_cost_inr: tmpl.estimated_install_cost_inr,
+      estimated_install_cost_inr: Math.round(tmpl.estimated_install_cost_inr),
       estimated_annual_maintenance_inr: tmpl.estimated_annual_maintenance_inr,
       expected_temp_reduction_c: tmpl.expected_temp_reduction_c,
       expected_surface_temp_reduction_c: tmpl.expected_surface_temp_reduction_c,
       species_primary: species.displayName,
-      species_secondary: species.displayName,
-      species_tertiary: species.displayName,
+      species_secondary: secondarySpecies.displayName,
+      species_tertiary: tertiarySpecies.displayName,
       species_catalog_code: species.code,
+      species_secondary_code: secondarySpecies.code !== species.code ? secondarySpecies.code : null,
+      species_tertiary_code:
+        tertiarySpecies.code !== species.code && tertiarySpecies.code !== secondarySpecies.code
+          ? tertiarySpecies.code
+          : null,
     };
 
     const blockReasons = evaluateCandidateHardConstraints(project, environment, preferences, rawPayload);
@@ -1079,9 +1241,16 @@ export async function buildCatalogHybridFallback(
       heat,
       ranking,
       req.blendWeights,
+      environment,
+      preferences,
     );
 
     const displayBlended = blocked ? 0 : blendedFinal;
+
+    const companionNote =
+      secondarySpecies.code !== species.code
+        ? `Companion: ${secondarySpecies.displayName}${tertiarySpecies.code !== secondarySpecies.code ? ` + ${tertiarySpecies.displayName}` : ""}.`
+        : null;
 
     candidates.push({
       candidateId: String(rawPayload.candidate_id),
@@ -1101,8 +1270,9 @@ export async function buildCatalogHybridFallback(
         summaryBullets: blocked
           ? [`Blocked: ${blockReasons.join(", ")}`]
           : [
-              `Catalog hybrid rank for ${species.displayName} (${species.code}).`,
-              "Scores use species_features + SpeciesCatalog with blend weights matching serving.",
+              `${species.displayName} (${species.code}) — blended score ${displayBlended.toFixed(3)}.`,
+              `Expected ${tmpl.expected_temp_reduction_c}°C air · ${tmpl.expected_surface_temp_reduction_c}°C surface reduction.`,
+              ...(companionNote ? [companionNote] : []),
             ],
         componentScores: { ...parts, trait_rule_prior: rulePrior },
         finalBlendedScore: displayBlended,

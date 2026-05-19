@@ -1,12 +1,54 @@
 import { spawn } from "child_process";
 import path from "path";
 import fs from "fs";
+import crypto from "crypto";
 
 import type { RecommendationGenerateRequest, RecommendationGenerateResponse } from "@/lib/ml/recommendationRuntimeTypes";
 import {
   buildCatalogHybridFallback,
   type CatalogHybridFallbackOpts,
 } from "@/lib/recommendation/catalogHybridFallback";
+
+// ── In-process ML response cache ─────────────────────────────────────────────
+// Keyed on a stable SHA-256 fingerprint of the request body (excluding session/user IDs).
+// Prevents duplicate Python spawns for the same geometry/budget on client retries.
+
+const ML_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const ML_CACHE_MAX_ENTRIES = 60;
+
+type CacheEntry = {
+  result: RecommendationGenerateResponse;
+  expiresAt: number;
+};
+
+const mlResponseCache = new Map<string, CacheEntry>();
+
+function stableRequestFingerprint(req: RecommendationGenerateRequest): string {
+  // Exclude volatile / session-specific fields that shouldn't bust cache
+  const { projectId: _p, userId: _u, photoSessionId: _ps, evaluationContext: _ec, ...stable } = req as Record<string, unknown>;
+  void _p; void _u; void _ps; void _ec;
+  const json = JSON.stringify(stable, Object.keys(stable).sort());
+  return crypto.createHash("sha256").update(json).digest("hex").slice(0, 24);
+}
+
+function getCached(key: string): RecommendationGenerateResponse | null {
+  const entry = mlResponseCache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    mlResponseCache.delete(key);
+    return null;
+  }
+  return entry.result;
+}
+
+function setCached(key: string, result: RecommendationGenerateResponse): void {
+  // Evict oldest entries if at capacity (simple LRU approximation via insertion order)
+  if (mlResponseCache.size >= ML_CACHE_MAX_ENTRIES) {
+    const oldest = mlResponseCache.keys().next().value;
+    if (oldest) mlResponseCache.delete(oldest);
+  }
+  mlResponseCache.set(key, { result, expiresAt: Date.now() + ML_CACHE_TTL_MS });
+}
 
 /** Resolve env paths relative to the Next.js app root (`heatwise/`) when not absolute. */
 function resolveOptionalPath(raw: string | undefined, baseDir: string): string | undefined {
@@ -63,6 +105,14 @@ function isUsablePythonRecommendationPayload(parsed: unknown): parsed is Recomme
 export async function generateRecommendationsRuntime(
   body: RecommendationGenerateRequest,
 ): Promise<RecommendationGenerateResponse> {
+  // Check cache before spawning Python
+  const cacheKey = stableRequestFingerprint(body);
+  const cached = getCached(cacheKey);
+  if (cached) {
+    console.info(`[mlRecommendationService] Cache hit for key ${cacheKey}`);
+    return cached;
+  }
+
   const appRoot = process.cwd();
   const cwd = mlWorkingDirectory(appRoot);
 
@@ -174,7 +224,9 @@ export async function generateRecommendationsRuntime(
           return;
         }
 
-        resolve(parsed as RecommendationGenerateResponse);
+        const response = parsed as RecommendationGenerateResponse;
+        setCached(cacheKey, response);
+        resolve(response);
       })();
     });
 
