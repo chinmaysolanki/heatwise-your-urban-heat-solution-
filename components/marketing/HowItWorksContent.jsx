@@ -176,56 +176,157 @@ function DemoVideoSection() {
 export default function HowItWorksPage() {
   const [playDemo, setPlayDemo] = useState(false);
 
+  // Reusable phone shell
+  const PhoneShell = ({ children, badge }) => (
+    <div style={{ display: "flex", justifyContent: "center", position: "relative" }}>
+      <div style={{ width: 220, background: "#0a0f0a", borderRadius: 36, padding: "10px 10px", boxShadow: "0 32px 64px rgba(0,0,0,0.35), 0 0 0 1.5px rgba(64,176,112,0.2), inset 0 0 0 1px rgba(255,255,255,0.04)" }}>
+        {/* notch */}
+        <div style={{ height: 22, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 3 }}>
+          <div style={{ width: 64, height: 16, background: "#000", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: "rgba(255,255,255,0.12)" }} />
+            <div style={{ width: 10, height: 10, borderRadius: "50%", background: "rgba(255,255,255,0.07)", border: "1.5px solid rgba(255,255,255,0.1)" }} />
+          </div>
+        </div>
+        {/* screen */}
+        <div style={{ borderRadius: 24, overflow: "hidden", background: "#04091a" }}>{children}</div>
+        {/* home bar */}
+        <div style={{ height: 18, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 3 }}>
+          <div style={{ width: 60, height: 3, background: "rgba(255,255,255,0.18)", borderRadius: 2 }} />
+        </div>
+      </div>
+      {badge && <div style={{ position: "absolute", top: 24, right: -20, background: `${C.GREEN}22`, border: `1px solid ${C.GREEN}55`, color: C.GREEN_PALE, borderRadius: 8, padding: "4px 10px", fontSize: 10, fontFamily: "'JetBrains Mono',monospace", whiteSpace: "nowrap" }}>{badge}</div>}
+    </div>
+  );
+
   const steps = [
     {
       num: "01", title: "Scan & Measure",
       desc: "Point your phone camera at any rooftop, balcony or terrace. Our AR engine maps dimensions, sunlight exposure and surface materials in under 60 seconds. Works in browser — no app download needed.",
       visual: (
-        <div style={{ background: C.BG_DARK, borderRadius: 24, padding: 32, position: "relative", overflow: "hidden", minHeight: 280, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ width: 140, height: 260, border: `3px solid ${C.GREEN_PALE}40`, borderRadius: 24, background: "rgba(64,176,112,0.08)", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontSize: 40 }}>📷</div>
-            <div style={{ position: "absolute", left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${C.GREEN}, transparent)`, animation: "scanLine 2s ease-in-out infinite", boxShadow: `0 0 8px ${C.GREEN}` }} />
-            <style>{`@keyframes scanLine { 0% { top: 0; opacity: 1; } 95% { opacity: 1; } 100% { top: 100%; opacity: 0; } }`}</style>
+        <PhoneShell badge="AR · ACTIVE">
+          {/* status bar */}
+          <div style={{ background: "#0a1a0f", padding: "6px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 9, color: "rgba(255,255,255,0.5)", fontFamily: "monospace" }}>9:41</span>
+            <span style={{ fontSize: 9, color: C.GREEN, fontFamily: "'JetBrains Mono',monospace", fontWeight: 700 }}>● SCANNING</span>
           </div>
-          <div style={{ position: "absolute", top: 16, right: 16, background: `${C.GREEN}22`, border: `1px solid ${C.GREEN}44`, color: C.GREEN_PALE, borderRadius: 8, padding: "4px 10px", fontSize: 11, fontFamily: "'JetBrains Mono',monospace" }}>AR · ACTIVE</div>
-          <div style={{ position: "absolute", bottom: 16, left: 16, color: C.GREEN_PALE, fontSize: 11, fontFamily: "'JetBrains Mono',monospace", opacity: 0.7 }}>2.4m × 3.8m · 9.1m²</div>
-        </div>
+          {/* camera viewfinder */}
+          <div style={{ position: "relative", height: 180, background: "linear-gradient(160deg, #1a2e1a 0%, #0d1f0d 100%)", overflow: "hidden" }}>
+            {/* grid overlay */}
+            <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(64,176,112,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(64,176,112,0.08) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
+            {/* scan line */}
+            <div style={{ position: "absolute", left: 0, right: 0, height: 1.5, background: `linear-gradient(90deg, transparent, ${C.GREEN}, transparent)`, animation: "scanLine 2s ease-in-out infinite", boxShadow: `0 0 10px ${C.GREEN}` }} />
+            {/* corner brackets */}
+            {[["0","0","right","bottom"],["0","auto","right","auto"],["auto","0","auto","bottom"],["auto","auto","auto","auto"]].map(([t,r,b,l], i) => (
+              <div key={i} style={{ position: "absolute", top: t==="0"?12:"auto", right: r==="0"?12:"auto", bottom: b==="0"?12:"auto", left: l==="0"?12:"auto", width: 16, height: 16,
+                borderTop: (i<2) ? `2px solid ${C.GREEN}` : "none", borderBottom: (i>=2) ? `2px solid ${C.GREEN}` : "none",
+                borderLeft: (i===0||i===2) ? `2px solid ${C.GREEN}` : "none", borderRight: (i===1||i===3) ? `2px solid ${C.GREEN}` : "none" }} />
+            ))}
+            {/* dimension overlay */}
+            <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
+              <div style={{ background: "rgba(0,0,0,0.7)", border: `1px solid ${C.GREEN}44`, borderRadius: 6, padding: "3px 10px", fontSize: 10, color: C.GREEN, fontFamily: "'JetBrains Mono',monospace", fontWeight: 700 }}>
+                2.4m × 3.8m · 9.1 m²
+              </div>
+            </div>
+            {/* heat zones */}
+            <div style={{ position: "absolute", top: 20, left: 20, display: "flex", gap: 5 }}>
+              {[["#d83030","44°C"],["#d87040","41°C"],["#40b070","35°C"]].map(([c,t]) => (
+                <div key={t} style={{ background: c+"33", border: `1px solid ${c}66`, borderRadius: 5, padding: "2px 6px", fontSize: 8, color: c, fontFamily: "'JetBrains Mono',monospace", fontWeight: 700 }}>{t}</div>
+              ))}
+            </div>
+          </div>
+          {/* bottom info bar */}
+          <div style={{ padding: "10px 14px", background: "#0a1a0f", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", fontFamily: "'JetBrains Mono',monospace" }}>SURFACE</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#fff", marginTop: 1 }}>Concrete Rooftop</div>
+            </div>
+            <div style={{ background: C.GREEN, borderRadius: 8, padding: "6px 12px", fontSize: 10, fontWeight: 800, color: "#fff" }}>Analyse →</div>
+          </div>
+        </PhoneShell>
       ),
     },
     {
       num: "02", title: "Detect Your Climate",
       desc: "We pull live weather, UV, humidity and wind data for your exact microclimate — then cross-reference against 14 years of historical patterns to build a comprehensive plant compatibility profile specific to your space.",
       visual: (
-        <div style={{ background: C.BG_DARK, borderRadius: 24, padding: 32, minHeight: 280, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignContent: "center" }}>
-          {[{ label: "Temp", val: "38.2°C", icon: "🌡️", color: C.HEAT_ORANGE }, { label: "UV Index", val: "9.4", icon: "☀️", color: C.GOLD }, { label: "Humidity", val: "58%", icon: "💧", color: C.SKY }, { label: "Wind", val: "12 km/h", icon: "💨", color: C.GREEN_PALE }].map((d, i) => (
-            <motion.div key={i} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.4 }}
-              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 16, color: "#fff" }}>
-              <div style={{ fontSize: 20, marginBottom: 6 }}>{d.icon}</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: d.color, fontFamily: "'Space Grotesk',sans-serif" }}>{d.val}</div>
-              <div style={{ fontSize: 11, opacity: 0.5, marginTop: 2 }}>{d.label}</div>
-            </motion.div>
-          ))}
-        </div>
+        <PhoneShell badge="LIVE DATA">
+          {/* header */}
+          <div style={{ background: "linear-gradient(135deg,#0d1f0d,#1a3828)", padding: "12px 14px 10px" }}>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontFamily: "'JetBrains Mono',monospace", letterSpacing: 1 }}>YOUR MICROCLIMATE</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", marginTop: 2 }}>Bengaluru, KA</div>
+            <div style={{ fontSize: 9, color: C.GREEN, fontFamily: "'JetBrains Mono',monospace", marginTop: 1 }}>● Updated 2 min ago</div>
+          </div>
+          {/* climate grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: "rgba(255,255,255,0.04)" }}>
+            {[
+              { icon: "🌡️", label: "Temperature", val: "38.2°C", color: "#d87040", bg: "rgba(216,112,64,0.10)" },
+              { icon: "☀️", label: "UV Index",    val: "9.4 / 11", color: "#f5c518", bg: "rgba(245,197,24,0.10)" },
+              { icon: "💧", label: "Humidity",    val: "62%",    color: "#38bdf8", bg: "rgba(56,189,248,0.10)" },
+              { icon: "💨", label: "Wind Speed",  val: "12 km/h",color: C.GREEN,   bg: "rgba(64,176,112,0.10)" },
+            ].map((d, i) => (
+              <div key={i} style={{ background: d.bg, padding: "12px 14px", borderBottom: "1px solid rgba(255,255,255,0.04)", borderRight: i%2===0 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                <div style={{ fontSize: 16, marginBottom: 4 }}>{d.icon}</div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: d.color, fontFamily: "'Space Grotesk',sans-serif" }}>{d.val}</div>
+                <div style={{ fontSize: 9, color: "rgba(255,255,255,0.38)", marginTop: 2 }}>{d.label}</div>
+              </div>
+            ))}
+          </div>
+          {/* compatibility bar */}
+          <div style={{ padding: "10px 14px", background: "#0a1a0f" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+              <span style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontFamily: "'JetBrains Mono',monospace" }}>PLANT COMPATIBILITY</span>
+              <span style={{ fontSize: 9, color: C.GREEN, fontWeight: 700 }}>847 species match</span>
+            </div>
+            <div style={{ height: 4, background: "rgba(255,255,255,0.08)", borderRadius: 4 }}>
+              <motion.div initial={{ width: 0 }} whileInView={{ width: "92%" }} viewport={{ once: true }} transition={{ duration: 1.2, delay: 0.3 }}
+                style={{ height: "100%", background: `linear-gradient(90deg,${C.GREEN},#74c69d)`, borderRadius: 4 }} />
+            </div>
+          </div>
+        </PhoneShell>
       ),
     },
     {
       num: "03", title: "Get Your AI Garden Plan",
       desc: "Our recommendation engine matches 800+ verified species to your climate profile. You receive a printable layout with exact plant positions, container specs, watering schedules, maintenance calendar and expected cooling impact — personalised to your space.",
       visual: (
-        <div style={{ background: "#fff", borderRadius: 24, padding: 32, minHeight: 280, display: "flex", flexDirection: "column", gap: 16, boxShadow: "0 4px 32px rgba(26,56,40,0.08)", border: `1px solid rgba(64,176,112,0.15)` }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-            {["🌿","🪴","🌱","🍃","🌾","🌻","🌵","🪴","🌿"].map((e, i) => (
-              <motion.div key={i} initial={{ opacity: 0, scale: 0 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.05, duration: 0.3 }}
-                style={{ aspectRatio: "1", background: C.MINT, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>
-                {e}
+        <PhoneShell badge="AI PLAN READY">
+          {/* header */}
+          <div style={{ background: "linear-gradient(135deg,#1b4332,#2d6a4f)", padding: "12px 14px 10px" }}>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.5)", fontFamily: "'JetBrains Mono',monospace" }}>YOUR GARDEN PLAN</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#fff" }}>9.1 m² Rooftop</div>
+              <div style={{ background: "rgba(64,176,112,0.25)", border: "1px solid rgba(116,198,157,0.4)", borderRadius: 6, padding: "2px 8px", fontSize: 9, color: "#74c69d", fontWeight: 700 }}>−4.2°C</div>
+            </div>
+          </div>
+          {/* plant cards */}
+          <div style={{ padding: "10px 12px", display: "flex", flexDirection: "column", gap: 6, background: "#04091a" }}>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", fontFamily: "'JetBrains Mono',monospace", marginBottom: 2 }}>TOP RECOMMENDATIONS</div>
+            {[
+              { e: "🌿", name: "Snake Plant",   score: 96, tag: "Low water",  c: C.GREEN },
+              { e: "🪴", name: "Neem Tree",     score: 92, tag: "Max cooling", c: "#38bdf8" },
+              { e: "🌾", name: "Vetiver Grass", score: 89, tag: "Native",     c: "#f5c518" },
+              { e: "🍃", name: "Areca Palm",    score: 85, tag: "Air purify", c: "#a78bfa" },
+            ].map((p, i) => (
+              <motion.div key={i} initial={{ opacity: 0, x: 16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.35 }}
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "7px 10px", display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 16 }}>{p.e}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: "#e0f5e8", marginBottom: 3 }}>{p.name}</div>
+                  <div style={{ height: 3, background: "rgba(255,255,255,0.07)", borderRadius: 3 }}>
+                    <div style={{ height: "100%", width: `${p.score}%`, background: `linear-gradient(90deg,${p.c},${p.c}88)`, borderRadius: 3 }} />
+                  </div>
+                </div>
+                <span style={{ fontSize: 8, color: p.c, fontWeight: 700, background: p.c+"18", border: `1px solid ${p.c}33`, borderRadius: 4, padding: "2px 5px", whiteSpace: "nowrap" }}>{p.tag}</span>
               </motion.div>
             ))}
           </div>
-          <div style={{ background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, color: "#fff", borderRadius: 12, padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontWeight: 700, fontSize: 15 }}>Expected cooling</span>
-            <span style={{ fontWeight: 800, fontSize: 20, fontFamily: "'Space Grotesk',sans-serif" }}>−3.8°C</span>
+          {/* CTA */}
+          <div style={{ padding: "8px 12px 10px", background: "#04091a" }}>
+            <div style={{ background: `linear-gradient(135deg,${C.GREEN},#52b788)`, borderRadius: 10, padding: "9px", textAlign: "center", fontSize: 11, fontWeight: 800, color: "#fff" }}>
+              Download PDF Plan 📥
+            </div>
           </div>
-        </div>
+        </PhoneShell>
       ),
     },
   ];
