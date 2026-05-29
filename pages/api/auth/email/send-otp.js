@@ -61,7 +61,7 @@ async function sendOtpEmail(email, otp) {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
 
-  const from = process.env.RESEND_FROM ?? "HeatWise <hello@heatwise.in>";
+  const from = process.env.RESEND_FROM ?? "HeatWise <hello@heatwise.codes>";
 
   const { error } = await resend.emails.send({
     from,
@@ -111,7 +111,7 @@ async function sendOtpEmail(email, otp) {
                 <td style="padding:0 32px 28px;border-top:1px solid rgba(255,255,255,0.06)">
                   <p style="color:rgba(224,245,232,0.28);font-size:11px;margin:20px 0 0;text-align:center;line-height:1.6">
                     HeatWise · Bengaluru, India<br>
-                    <a href="mailto:hello@heatwise.in" style="color:#40b070;text-decoration:none">hello@heatwise.in</a>
+                    <a href="mailto:hello@heatwise.codes" style="color:#40b070;text-decoration:none">hello@heatwise.codes</a>
                   </p>
                 </td>
               </tr>
@@ -122,7 +122,7 @@ async function sendOtpEmail(email, otp) {
       </body>
       </html>
     `,
-    text: `Your HeatWise verification code is: ${otp}\n\nThis code expires in ${OTP_EXPIRY_MINUTES} minutes.\nNever share this code with anyone.\n\n— HeatWise Team\nhello@heatwise.in`,
+    text: `Your HeatWise verification code is: ${otp}\n\nThis code expires in ${OTP_EXPIRY_MINUTES} minutes.\nNever share this code with anyone.\n\n— HeatWise Team\nhello@heatwise.codes`,
   });
 
   if (error) throw new Error(error.message);

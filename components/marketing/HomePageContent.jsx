@@ -98,8 +98,8 @@ function CountUp({ target, suffix = "" }) {
 }
 
 function HeroSection() {
-  const words = "Turn urban heat into a living green canopy".split(" ");
-  const gradientWords = ["living", "green"];
+  const words = "From a blank rooftop to a thriving green canopy — in three steps".split(" ");
+  const gradientWords = ["thriving", "green", "three"];
   return (
     <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", overflow: "hidden", background: C.CREAM }}>
       <div style={{ position: "absolute", top: -200, left: "50%", transform: "translateX(-50%)", width: 800, height: 600, background: `radial-gradient(ellipse, ${C.MINT} 0%, transparent 70%)`, pointerEvents: "none" }} />
@@ -111,11 +111,11 @@ function HeroSection() {
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
             style={{ display: "inline-flex", alignItems: "center", gap: 8, background: C.MINT, border: `1px solid rgba(64,176,112,0.3)`, borderRadius: 999, padding: "6px 16px", fontSize: 13, fontWeight: 600, color: C.FOREST_MID, marginBottom: 24 }}>
             <span style={{ width: 8, height: 8, borderRadius: "50%", background: C.HEAT_RED, animation: "pulse-glow 1.5s ease-in-out infinite" }} />
-            Live in 14 cities · 2,800+ rooftops greened
+            50,000+ Indian rooftops · 14 cities · Free scan
           </motion.div>
-          <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(36px, 5vw, 60px)", fontWeight: 700, lineHeight: 1.1, marginBottom: 24, color: C.FOREST }}>
+          <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(32px, 4.5vw, 56px)", fontWeight: 700, lineHeight: 1.1, marginBottom: 24, color: C.FOREST }}>
             {words.map((word, i) => (
-              <motion.span key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, duration: 0.4 }}
+              <motion.span key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04, duration: 0.4 }}
                 style={{ display: "inline-block", marginRight: "0.28em", ...(gradientWords.includes(word) ? { background: `linear-gradient(135deg, ${C.FOREST_MID}, ${C.GREEN})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" } : {}) }}>
                 {word}
               </motion.span>
@@ -123,7 +123,7 @@ function HeroSection() {
           </h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }}
             style={{ fontSize: 18, lineHeight: 1.7, color: C.FOREST, opacity: 0.72, marginBottom: 36, maxWidth: 480 }}>
-            AI-matched plants. Climate-aware layouts. Real cooling — measured in degrees. Transform any rooftop, balcony or terrace in minutes.
+            Powered by satellite data, AR scanning and a recommendation engine trained on 50,000+ Indian rooftops. Real cooling — measured in degrees.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75, duration: 0.5 }}
             style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 40 }}>
@@ -301,37 +301,66 @@ function ProblemSection() {
 function HowItWorksSection() {
   const steps = [
     {
-      num: "01", title: "Scan & Measure",
-      desc: "Point your phone camera at any rooftop, balcony or terrace. Our AR engine maps dimensions, sunlight exposure and surface materials in under 60 seconds.",
+      num: "01", title: "Satellite Data — Know Your Rooftop",
+      desc: "Before you even open the app, we're already mapping your space. Live satellite thermal imagery pinpoints your rooftop's heat signature, while 14 years of Indian climate records decode your exact microclimate — monsoon patterns, UV index, wind corridors and all.",
+      tag: "SATELLITE + MODIS LST",
       visual: (
-        <div style={{ background: C.BG_DARK, borderRadius: 24, padding: 32, position: "relative", overflow: "hidden", minHeight: 280, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div style={{ width: 140, height: 260, border: `3px solid ${C.GREEN_PALE}40`, borderRadius: 24, background: "rgba(64,176,112,0.08)", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ background: C.BG_DARK, borderRadius: 24, padding: 28, position: "relative", overflow: "hidden", minHeight: 280 }}>
+          <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: "0.1em", marginBottom: 12 }}>MODIS LST · LIVE SATELLITE FEED</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 4, marginBottom: 16 }}>
+            {[["#d83030","46°"],["#d87040","44°"],["#d83030","47°"],["#c8a440","41°"],["#c8a440","40°"],
+              ["#d87040","43°"],["#c8a440","39°"],["#3d8a58","36°"],["#40b070","34°"],["#c8a440","38°"],
+              ["#c8a440","41°"],["#3d8a58","36°"],["#40b070","33°"],["#40b070","32°"],["#3d8a58","35°"],
+              ["#d87040","42°"],["#c8a440","38°"],["#3d8a58","35°"],["#40b070","31°"],["#40b070","30°"],
+              ["#d83030","45°"],["#d87040","43°"],["#c8a440","40°"],["#3d8a58","36°"],["#40b070","33°"]].map(([c,t],i) => (
+              <div key={i} style={{ aspectRatio:"1", background: c+"60", border:`1px solid ${c}30`, borderRadius: 4, display:"flex", alignItems:"center", justifyContent:"center", fontSize: 8, fontWeight: 700, color: c, fontFamily:"'JetBrains Mono',monospace" }}>{t}</div>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {[["🌡️","Surface 44°C",C.HEAT_ORANGE],["☀️","UV Index 9.2",C.GOLD],["💧","Monsoon Risk HIGH",C.SKY]].map(([ic,l,c])=>(
+              <span key={l} style={{ background:`${c}18`, border:`1px solid ${c}44`, color:c, borderRadius:999, padding:"3px 10px", fontSize:10, fontWeight:700 }}>{ic} {l}</span>
+            ))}
+          </div>
+          <div style={{ position:"absolute", top:16, right:16, background:C.HEAT_RED+"22", border:`1px solid ${C.HEAT_RED}44`, color:C.HEAT_RED, borderRadius:8, padding:"3px 10px", fontSize:10, fontFamily:"'JetBrains Mono',monospace", display:"flex",alignItems:"center",gap:5 }}>
+            <span style={{ width:6, height:6, borderRadius:"50%", background:C.HEAT_RED, animation:"pulse-glow 1.5s ease-in-out infinite" }} /> LIVE
+          </div>
+        </div>
+      ),
+    },
+    {
+      num: "02", title: "AR Scanning — Map Every Centimetre",
+      desc: "Point your phone at any rooftop, balcony or terrace. Our AR engine captures dimensions, surface materials, sun angles and shade zones in under 60 seconds — no surveyor, no measuring tape, no guesswork.",
+      tag: "AUGMENTED REALITY",
+      visual: (
+        <div style={{ background: C.BG_DARK, borderRadius: 24, padding: 32, position: "relative", overflow: "hidden", minHeight: 280, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 20 }}>
+          <div style={{ width: 140, height: 220, border: `3px solid ${C.GREEN_PALE}40`, borderRadius: 24, background: "rgba(64,176,112,0.08)", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div style={{ fontSize: 40 }}>📷</div>
             <div style={{ position: "absolute", left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${C.GREEN}, transparent)`, animation: "scanLine 2s ease-in-out infinite", boxShadow: `0 0 8px ${C.GREEN}` }} />
+            <div style={{ position:"absolute", bottom:12, left:0, right:0, display:"flex", justifyContent:"center", gap:6 }}>
+              {[["4.2m","W",C.GREEN_PALE],["5.8m","L",C.SKY],["±8cm","ACC",C.GOLD]].map(([v,l,c])=>(
+                <div key={l} style={{ background:`${c}22`, border:`1px solid ${c}44`, borderRadius:6, padding:"2px 6px", textAlign:"center" }}>
+                  <div style={{ fontSize:9, fontWeight:700, color:c, fontFamily:"'JetBrains Mono',monospace" }}>{v}</div>
+                  <div style={{ fontSize:7, color:"rgba(255,255,255,0.4)" }}>{l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ display:"flex", gap:8, justifyContent:"center" }}>
+            {[["Sun angle","74°",C.GOLD],["Shade zone","28%",C.SKY],["Surface","Concrete",C.GREEN_PALE]].map(([l,v,c])=>(
+              <div key={l} style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:10, padding:"8px 12px", textAlign:"center" }}>
+                <div style={{ fontSize:12, fontWeight:700, color:c }}>{v}</div>
+                <div style={{ fontSize:9, opacity:0.5, marginTop:2 }}>{l}</div>
+              </div>
+            ))}
           </div>
           <div style={{ position: "absolute", top: 16, right: 16, background: `${C.GREEN}22`, border: `1px solid ${C.GREEN}44`, color: C.GREEN_PALE, borderRadius: 8, padding: "4px 10px", fontSize: 11, fontFamily: "'JetBrains Mono',monospace" }}>AR · ACTIVE</div>
         </div>
       ),
     },
     {
-      num: "02", title: "Detect Your Climate",
-      desc: "We pull live weather, UV, humidity and wind data for your exact microclimate — then cross-reference against 14 years of historical patterns to build your plant compatibility profile.",
-      visual: (
-        <div style={{ background: C.BG_DARK, borderRadius: 24, padding: 32, minHeight: 280, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignContent: "center" }}>
-          {[{ label: "Temp", val: "38.2°C", icon: "🌡️", color: C.HEAT_ORANGE }, { label: "UV Index", val: "9.4", icon: "☀️", color: C.GOLD }, { label: "Humidity", val: "58%", icon: "💧", color: C.SKY }, { label: "Wind", val: "12 km/h", icon: "💨", color: C.GREEN_PALE }].map((d, i) => (
-            <motion.div key={i} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.4 }}
-              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 16, color: "#fff" }}>
-              <div style={{ fontSize: 20, marginBottom: 6 }}>{d.icon}</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: d.color, fontFamily: "'Space Grotesk',sans-serif" }}>{d.val}</div>
-              <div style={{ fontSize: 11, opacity: 0.5, marginTop: 2 }}>{d.label}</div>
-            </motion.div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      num: "03", title: "Get Your AI Garden Plan",
-      desc: "Our recommendation engine matches 800+ verified species to your climate profile. You get a printable layout with exact plant positions, watering schedules and expected cooling impact.",
+      num: "03", title: "AI Plan — 50,000 Rooftops of Wisdom",
+      desc: "Our recommendation engine — trained on 50,000+ real Indian rooftop configurations across 14 climate zones — selects the exact species, layout positions and planting schedule for your space. You get a printable plan with guaranteed cooling impact.",
+      tag: "ML ENGINE · 50K+ ROOFTOPS",
       visual: (
         <div style={{ background: "#fff", borderRadius: 24, padding: 32, minHeight: 280, display: "flex", flexDirection: "column", gap: 16, boxShadow: "0 4px 32px rgba(26,56,40,0.08)", border: `1px solid rgba(64,176,112,0.15)` }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
@@ -356,9 +385,12 @@ function HowItWorksSection() {
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: "center", marginBottom: 72 }}>
           <SectionLabel>02 — How It Works</SectionLabel>
           <h2 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(28px,4vw,48px)", fontWeight: 700, color: C.FOREST, lineHeight: 1.15 }}>
-            Three steps to a{" "}
-            <span style={{ background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>cooler space</span>
+            Three steps.{" "}
+            <span style={{ background: `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Blank canvas to living canopy.</span>
           </h2>
+          <p style={{ fontSize: 17, color: C.FOREST, opacity: 0.6, marginTop: 16, maxWidth: 580, margin: "16px auto 0" }}>
+            Satellite data. AR scanning. A recommendation engine trained on 50,000+ Indian rooftops. Each step is a different technology, working together.
+          </p>
         </motion.div>
         <div style={{ display: "flex", flexDirection: "column", gap: 80 }}>
           {steps.map((step, i) => (
@@ -367,6 +399,11 @@ function HowItWorksSection() {
               <style>{`@media (max-width: 768px) { .step-grid { grid-template-columns: 1fr !important; direction: ltr !important; } }`}</style>
               <div style={{ direction: "ltr" }}>
                 <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 72, fontWeight: 800, color: C.MINT, lineHeight: 1, marginBottom: -8 }}>{step.num}</div>
+                {step.tag && (
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: C.MINT, border: `1px solid rgba(64,176,112,0.3)`, borderRadius: 999, padding: "3px 12px", fontSize: 10, fontWeight: 700, color: C.FOREST_MID, fontFamily: "'JetBrains Mono',monospace", letterSpacing: "0.06em", marginBottom: 12 }}>
+                    {step.tag}
+                  </div>
+                )}
                 <h3 style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 28, fontWeight: 700, color: C.FOREST, marginBottom: 16 }}>{step.title}</h3>
                 <p style={{ fontSize: 16, lineHeight: 1.75, color: C.FOREST, opacity: 0.72 }}>{step.desc}</p>
               </div>
@@ -381,12 +418,12 @@ function HowItWorksSection() {
 
 function CapabilitiesSection() {
   const features = [
-    { icon: "🌡️", title: "Live Heat Detection", desc: "Real-time surface temperature mapping using satellite + weather station fusion." },
-    { icon: "🤖", title: "AI Layout Engine", desc: "Proprietary model trained on 50,000+ rooftop configurations across Indian climates." },
-    { icon: "❄️", title: "Cooling Impact Score", desc: "Precise before/after predictions — we're transparent about what each plant will do." },
-    { icon: "🌿", title: "800+ Verified Species", desc: "Every plant tagged by climate zone, sun tolerance, water need and cooling efficiency." },
-    { icon: "🔨", title: "Installer Network", desc: "Vetted green-thumb pros in 14 cities who can execute your plan end-to-end." },
-    { icon: "📱", title: "Works on Any Device", desc: "Browser-based AR scanner works on iOS, Android and desktop — no app required." },
+    { icon: "🛰️", title: "Satellite Thermal Data", desc: "MODIS satellite imagery fused with local weather stations — your rooftop's heat profile before you even arrive." },
+    { icon: "📷", title: "AR Dimensional Scan", desc: "Measure any rooftop in under 60 seconds. Sun angle, shade zones, surface type — all captured by your phone camera." },
+    { icon: "🤖", title: "AI Recommendation Engine", desc: "Trained on 50,000+ real Indian rooftop configurations across 14 climate zones. Species, layout, positions — all personalised." },
+    { icon: "❄️", title: "Cooling Impact Score", desc: "Precise before/after temperature predictions. We show you exactly what each plant will do — in degrees Celsius." },
+    { icon: "🌿", title: "800+ Verified Species", desc: "Every plant in our catalog is tagged by climate zone, sun tolerance, water need, cooling efficiency and Indian availability." },
+    { icon: "🔨", title: "Installer Network", desc: "Vetted green-thumb pros in 14 cities. Background-checked, customer-rated, liability-insured — end-to-end execution." },
   ];
   return (
     <section style={{ padding: "100px 24px", background: C.CREAM }}>
@@ -643,7 +680,7 @@ function HeatMapSection() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24, marginTop: 32 }} className="stats-grid">
           <style>{`@media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(2,1fr) !important; } }`}</style>
-          {[{ val: "12", label: "Cities live" }, { val: "42.7°C", label: "Avg surface" }, { val: "3,250", label: "Rooftops greened" }, { val: "−4.2°C", label: "Avg cooling" }].map((s) => (
+          {[{ val: "14", label: "Cities live" }, { val: "50K+", label: "Rooftop dataset" }, { val: "2,800+", label: "Spaces greened" }, { val: "−4.2°C", label: "Avg cooling" }].map((s) => (
             <div key={s.label} style={{ textAlign: "center", padding: 24, background: "rgba(255,255,255,0.04)", borderRadius: 16, border: "1px solid rgba(64,176,112,0.1)" }}>
               <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: 28, fontWeight: 700, color: C.GREEN_PALE }}>{s.val}</div>
               <div style={{ fontSize: 13, opacity: 0.5, marginTop: 4 }}>{s.label}</div>
@@ -655,13 +692,85 @@ function HeatMapSection() {
   );
 }
 
+function useRazorpayCheckout() {
+  const [loading, setLoading] = useState(false);
+
+  const openCheckout = async ({ plan, billingCycle, userId }) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/payments/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan, billingCycle, userId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create order");
+
+      await new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+
+      const rzp = new window.Razorpay({
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        order_id: data.orderId,
+        name: "HeatWise",
+        description: `${plan === "green" ? "Green" : "Pro"} Plan — ${billingCycle}`,
+        image: "/logo.png",
+        theme: { color: "#40B070" },
+        handler: async (response) => {
+          const verifyRes = await fetch("/api/payments/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              userId,
+              plan,
+              billingCycle,
+            }),
+          });
+          if (verifyRes.ok) {
+            window.location.href = "/app?subscribed=1";
+          } else {
+            alert("Payment verification failed. Please contact support.");
+          }
+        },
+      });
+      rzp.open();
+    } catch (e) {
+      alert(e.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { openCheckout, loading };
+}
+
 function PricingSection() {
   const [annual, setAnnual] = useState(false);
+  const { openCheckout, loading } = useRazorpayCheckout();
   const tiers = [
-    { emoji: "🌱", name: "Starter", tagline: "Explore for free", monthly: 0, yearly: 0, cta: "Get Started", ctaHref: "/app", popular: false, perks: ["1 space scan", "Basic species match", "3 layout suggestions", "Community support"] },
-    { emoji: "🌿", name: "Green", tagline: "For homeowners", monthly: 499, yearly: 399, cta: "Start Free Trial", ctaHref: "/app?start=scan", popular: true, perks: ["Unlimited scans", "Full AI layout plans", "800+ species access", "Cooling score reports", "Email support", "PDF export"] },
-    { emoji: "🌳", name: "Pro / Society", tagline: "For buildings & groups", monthly: 2499, yearly: 1999, cta: "Contact Sales", ctaHref: "/contact", popular: false, perks: ["Everything in Green", "Multi-unit management", "Installer coordination", "Custom reports", "API access", "Dedicated support"] },
+    { emoji: "🌱", name: "Starter", tagline: "Explore for free", monthly: 0, yearly: 0, cta: "Get Started", ctaHref: "/app", planKey: null, popular: false, perks: ["1 space scan", "Basic species match", "3 layout suggestions", "Community support"] },
+    { emoji: "🌿", name: "Green", tagline: "For homeowners", monthly: 499, yearly: 399, cta: "Get Green Plan", ctaHref: null, planKey: "green", popular: true, perks: ["Unlimited scans", "Full AI layout plans", "800+ species access", "Cooling score reports", "Email support", "PDF export"] },
+    { emoji: "🌳", name: "Pro / Society", tagline: "For buildings & groups", monthly: 2499, yearly: 1999, cta: "Contact Sales", ctaHref: "mailto:hello@heatwise.codes", planKey: null, popular: false, perks: ["Everything in Green", "Multi-unit management", "Installer coordination", "Custom reports", "API access", "Dedicated support"] },
   ];
+
+  const handlePaidCta = (tier) => {
+    const userId = typeof window !== "undefined"
+      ? (localStorage.getItem("hw_user_id") || sessionStorage.getItem("hw_user_id"))
+      : null;
+    if (!userId) { window.location.href = "/app?upgrade=" + tier.planKey; return; }
+    openCheckout({ plan: tier.planKey, billingCycle: annual ? "yearly" : "monthly", userId });
+  };
+
   return (
     <section id="pricing" style={{ padding: "100px 24px", background: C.CREAM }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
@@ -700,7 +809,16 @@ function PricingSection() {
                   {(annual ? tier.yearly : tier.monthly) > 0 && <span style={{ fontSize: 14, color: C.FOREST, opacity: 0.5, marginLeft: 4 }}>/mo</span>}
                 </motion.div>
               </AnimatePresence>
-              <Link href={tier.ctaHref} style={{ display: "block", textAlign: "center", padding: "12px 0", borderRadius: 999, fontWeight: 700, fontSize: 15, background: tier.popular ? `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})` : "transparent", color: tier.popular ? "#fff" : C.FOREST_MID, border: tier.popular ? "none" : `2px solid ${C.GREEN}`, marginBottom: 28, textDecoration: "none", transition: "all 0.3s" }}>{tier.cta}</Link>
+              {tier.planKey ? (
+                <button
+                  onClick={() => handlePaidCta(tier)}
+                  disabled={loading}
+                  style={{ display: "block", width: "100%", textAlign: "center", padding: "12px 0", borderRadius: 999, fontWeight: 700, fontSize: 15, background: tier.popular ? `linear-gradient(135deg, ${C.GREEN}, ${C.FOREST_MID})` : "transparent", color: tier.popular ? "#fff" : C.FOREST_MID, border: tier.popular ? "none" : `2px solid ${C.GREEN}`, marginBottom: 28, cursor: loading ? "wait" : "pointer", opacity: loading ? 0.7 : 1, transition: "all 0.3s" }}>
+                  {loading ? "Loading..." : tier.cta}
+                </button>
+              ) : (
+                <Link href={tier.ctaHref} style={{ display: "block", textAlign: "center", padding: "12px 0", borderRadius: 999, fontWeight: 700, fontSize: 15, background: "transparent", color: C.FOREST_MID, border: `2px solid ${C.GREEN}`, marginBottom: 28, textDecoration: "none", transition: "all 0.3s" }}>{tier.cta}</Link>
+              )}
               <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
                 {tier.perks.map((p) => (
                   <li key={p} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: C.FOREST }}>
@@ -856,13 +974,18 @@ function FinalCTA() {
         <div key={i} style={{ position: "absolute", width: 4 + (i % 4) * 2, height: 4 + (i % 4) * 2, borderRadius: "50%", background: C.GREEN_PALE, opacity: 0.15 + (i % 5) * 0.08, left: `${(i * 2.5) % 100}%`, top: `${(i * 3.7) % 100}%`, animation: `bob ${3 + (i % 4)}s ease-in-out infinite`, animationDelay: `${(i * 0.12) % 2}s`, pointerEvents: "none" }} />
       ))}
       <div style={{ position: "relative", zIndex: 1 }}>
+        <motion.div initial={{ opacity: 0, y: -10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(64,176,112,0.12)", border: `1px solid rgba(64,176,112,0.3)`, borderRadius: 999, padding: "6px 16px", fontSize: 13, fontWeight: 600, color: C.GREEN_PALE, marginBottom: 24 }}>
+          🛰️ Satellite · 📷 AR · 🤖 50,000+ Rooftops
+        </motion.div>
         <motion.h2 initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           style={{ fontFamily: "'Space Grotesk',sans-serif", fontSize: "clamp(32px,5vw,64px)", fontWeight: 800, color: "#fff", marginBottom: 20, lineHeight: 1.1 }}>
-          Ready to cool your space?
+          Your blank rooftop.<br/>
+          <span style={{ background: `linear-gradient(135deg, ${C.GREEN_PALE}, ${C.GREEN})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Three steps to a canopy.</span>
         </motion.h2>
         <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1, duration: 0.5 }}
           style={{ fontSize: 18, color: C.GREEN_PALE, opacity: 0.85, marginBottom: 48 }}>
-          Scan once. Get a plan. Watch your city breathe.
+          Scan once. Get a plan. Watch your city breathe cooler.
         </motion.p>
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.5 }} style={{ marginBottom: 40 }}>
           <GreenBtn href="/?start=scan" size="lg">📷 Start Free Scan →</GreenBtn>
@@ -904,7 +1027,7 @@ function FinalCTA() {
 
 export default function HomePage() {
   return (
-    <MarketingLayout title="HeatWise — AI-Powered Urban Cooling" description="AI-matched plants, climate-aware layouts, real cooling measured in degrees. Transform any rooftop, balcony or terrace in minutes.">
+    <MarketingLayout title="HeatWise — From Blank Rooftop to Green Canopy in 3 Steps" description="Powered by satellite data, AR scanning and a recommendation engine trained on 50,000+ Indian rooftops. Real cooling, measured in degrees.">
       <HeroSection />
       <MarqueeSection />
       <ProblemSection />

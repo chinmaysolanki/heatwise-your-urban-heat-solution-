@@ -251,6 +251,7 @@ async function loadCatalogTraits(): Promise<Map<string, TraitRow>> {
       sunExposure: true,
       flowering: true,
       droughtTolerance: true,
+      coolingContribution: true,
     },
   });
   const map = new Map<string, TraitRow>();
@@ -258,6 +259,13 @@ async function loadCatalogTraits(): Promise<Map<string, TraitRow>> {
     const se = r.sunExposure?.trim();
     const prefFromDb =
       se && /^full/i.test(se) ? "FULL" : se && /shade/i.test(se) ? "SHADE" : se && /part/i.test(se) ? "PART" : null;
+    // Use DB coolingContribution if available; fall back to heat-tolerant heuristic
+    const coolingContribution =
+      r.coolingContribution != null && r.coolingContribution > 0
+        ? r.coolingContribution
+        : r.heatTolerant
+        ? 2.2
+        : 1.0;
     map.set(r.code, {
       code: r.code,
       displayName: r.displayName,
@@ -267,7 +275,7 @@ async function loadCatalogTraits(): Promise<Map<string, TraitRow>> {
       waterDemand: null,
       maintenanceNeed: null,
       containerSuitability: null,
-      coolingContribution: r.heatTolerant ? 2.2 : 1.0,
+      coolingContribution,
       edible: r.edible,
       pollinatorValue: 2,
       nativeSupport: null,
@@ -566,6 +574,19 @@ function deriveContextualBlendWeights(
   environment: Record<string, unknown>,
   preferences: Record<string, unknown>,
 ): { rules: number; feasibilityMl: number; heatMl: number; rankingMl: number } {
+  // Ops override: set HEATWISE_BLEND_WEIGHTS_JSON='{"rules":0.3,"feasibilityMl":0.2,"heatMl":0.3,"rankingMl":0.2}'
+  // to tune without a code deploy. All four keys required; values must sum to ~1.
+  const envOverride = process.env.HEATWISE_BLEND_WEIGHTS_JSON;
+  if (envOverride) {
+    try {
+      const p = JSON.parse(envOverride) as Record<string, unknown>;
+      const rules = Number(p.rules); const feasibilityMl = Number(p.feasibilityMl);
+      const heatMl = Number(p.heatMl); const rankingMl = Number(p.rankingMl);
+      if ([rules, feasibilityMl, heatMl, rankingMl].every(Number.isFinite)) {
+        return { rules, feasibilityMl, heatMl, rankingMl };
+      }
+    } catch {}
+  }
   const heatExp = String(environment.heat_exposure ?? "").toLowerCase();
   const maxT = Number(environment.daily_max_temp_c ?? environment.summerTempC ?? NaN);
   const isExtremeHeat =
@@ -791,9 +812,15 @@ function evaluateCandidateHardConstraints(
   }
   const pet = Number(preferences.child_pet_safe_required ?? preferences.petSafeRequired ?? 0);
   if (pet) {
-    const code = String(candidate.species_catalog_code ?? "").toLowerCase();
-    const name = String(candidate.species_primary ?? "").toLowerCase();
-    if (code === "bougainvillea" || name === "bougainvillea") {
+    // Use the reconciled childPetSafety field set from DB petSafe + CSV child_pet_safety.
+    // Falls back to explicit pet_safe boolean on the candidate payload for legacy rows.
+    const petSafety = String(candidate.child_pet_safety ?? "").toUpperCase();
+    const petSafeFlag = candidate.pet_safe;
+    const isUnsafe =
+      petSafety === "UNSAFE" ||
+      petSafeFlag === false ||
+      petSafeFlag === 0;
+    if (isUnsafe) {
       reasons.push("HARD_PET_UNSAFE_SPECIES");
     }
   }

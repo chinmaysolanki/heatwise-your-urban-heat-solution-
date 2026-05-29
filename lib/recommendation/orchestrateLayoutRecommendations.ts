@@ -5,6 +5,7 @@ import {
   mapLayoutToSpatialAnchors,
   buildHeatReductionSummary,
 } from "@/recommendation-engine";
+import { enrichPlantLibraryFromCatalog } from "@/recommendation-engine/plants";
 import { db } from "@/lib/db";
 import { mergeMlIntoLayoutRecommendations } from "@/lib/recommendation/mergeMlIntoLayoutRecommendations";
 import { projectInputToMlRequest } from "@/lib/recommendation/projectInputToMlRequest";
@@ -222,7 +223,14 @@ export async function orchestrateLayoutRecommendations(
     }
   }
 
-  const pipelineResult = runPipeline(input, { topN: 3 });
+  // Enrich plant library with live coolingContribution values from DB catalog
+  const catalogRows = await db.speciesCatalog.findMany({
+    where: { active: true },
+    select: { code: true, coolingContribution: true },
+  });
+  const enrichedPlants = enrichPlantLibraryFromCatalog(catalogRows);
+
+  const pipelineResult = runPipeline(input, { topN: 3, plantLibrary: enrichedPlants });
   let recommendationsForResponse = pipelineResult.recommendations;
   const tsFallbackOnly = isTsMlFallback(mlResult);
   if (mlResult && recommendationsForResponse.length > 0 && !tsFallbackOnly) {

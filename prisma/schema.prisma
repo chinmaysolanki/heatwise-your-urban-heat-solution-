@@ -38,6 +38,27 @@ model User {
   consentRecords                 UserConsentRecord[]
   governancePolicyFlags          GovernancePolicyFlag[]
   governanceReviewsRelated       GovernanceReviewRecord[] @relation("GovernanceReviewRelatedUser")
+  subscription                   UserSubscription?
+}
+
+/// Razorpay-backed subscription for Green / Pro plans.
+model UserSubscription {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  plan               String   // "green" | "pro"
+  billingCycle       String   // "monthly" | "yearly"
+  status             String   @default("active") // "active" | "expired" | "cancelled"
+  amountInr          Int
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  razorpayOrderId    String?  @unique @map("razorpay_order_id")
+  razorpayPaymentId  String?  @unique @map("razorpay_payment_id")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([currentPeriodEnd])
 }
 
 // Email-keyed guest profile — no auth required. Created when user completes
@@ -231,6 +252,8 @@ model SpeciesCatalog {
   invasiveRisk     String?
   ruleTagsJson     String?
   mlWeight         Float?
+  /// Estimated ambient temp reduction contribution (0–5 scale, from species_features CSV).
+  coolingContribution Float? @map("cooling_contribution")
   active           Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

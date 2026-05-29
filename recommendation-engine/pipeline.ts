@@ -26,6 +26,7 @@ import type {
   PipelineResult,
   PipelineLogEntry,
   ScoringWeights,
+  Plant,
 } from "@/models";
 
 import { computeGeometry           } from "./geometry";
@@ -38,8 +39,9 @@ import { generateLayoutSchema      } from "./layoutSchemaGenerator";
 // ─── Public API ──────────────────────────────────────────────
 
 export interface PipelineOptions {
-  topN?:    number;          // how many recommendations to return (default: 3)
-  weights?: ScoringWeights;  // custom scoring weights (default: DEFAULT_WEIGHTS)
+  topN?:         number;          // how many recommendations to return (default: 3)
+  weights?:      ScoringWeights;  // custom scoring weights (default: DEFAULT_WEIGHTS)
+  plantLibrary?: Plant[];         // enriched plant library from DB (falls back to hardcoded PLANT_LIBRARY)
 }
 
 /**
@@ -59,7 +61,7 @@ export function runPipeline(
 ): PipelineResult {
   const startTime = Date.now();
   const log: PipelineLogEntry[] = [];
-  const { topN = 3, weights = DEFAULT_WEIGHTS } = options;
+  const { topN = 3, weights = DEFAULT_WEIGHTS, plantLibrary } = options;
 
   log.push({ stage: "pipeline", message: "▶ Pipeline started", data: { input } });
 
@@ -75,7 +77,7 @@ export function runPipeline(
     });
 
     // ── Stage 2: Generate Candidates ─────────────────────────
-    const allCandidates = generateAllCandidates(input, geometry);
+    const allCandidates = generateAllCandidates(input, geometry, plantLibrary);
 
     log.push({
       stage:   "generate",

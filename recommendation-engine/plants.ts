@@ -45,3 +45,22 @@ const RAW_PLANT_LIBRARY: Plant[] = [
 ];
 
 export const PLANT_LIBRARY: Plant[] = RAW_PLANT_LIBRARY.map(attachSpeciesIdentity);
+
+/**
+ * Enrich the base plant library with live data from SpeciesCatalog DB rows.
+ * Overrides coolingScore using DB coolingContribution (0–5 scale → 0–10 scale).
+ * Falls back to the hardcoded value when no DB row matches.
+ */
+export function enrichPlantLibraryFromCatalog(
+  catalogRows: Array<{ code: string; coolingContribution: number | null }>,
+): Plant[] {
+  const byCode = new Map(catalogRows.map((r) => [r.code, r]));
+  return PLANT_LIBRARY.map((plant) => {
+    const code = plant.speciesCatalogCode;
+    if (!code) return plant;
+    const row = byCode.get(code);
+    if (!row || row.coolingContribution == null) return plant;
+    // DB coolingContribution is 0–5 scale; Plant.coolingScore is 0–10
+    return { ...plant, coolingScore: Math.round(row.coolingContribution * 2) };
+  });
+}
