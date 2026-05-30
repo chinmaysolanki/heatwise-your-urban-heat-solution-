@@ -62,7 +62,8 @@ async function sendOtpEmail(email, otp) {
 
   if (error) {
     console.error("[HeatWise OTP] Resend error:", JSON.stringify(error));
-    throw new Error(error.message || "Email send failed");
+    const detail = [error.name, error.statusCode, error.message].filter(Boolean).join(" / ");
+    throw new Error(detail || "Email send failed");
   }
 
   console.log("[HeatWise OTP] Sent to", email, "id:", data?.id);
@@ -99,16 +100,21 @@ export default async function handler(req, res) {
   const codeHash = hashOtp(otp);
   const expiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
 
-  await db.emailOtp.upsert({
-    where: { email: normalizedEmail },
-    create: { email: normalizedEmail, codeHash, expiresAt, updatedAt: new Date() },
-    update: { codeHash, expiresAt, attempts: 0, consumedAt: null, updatedAt: new Date() },
-  });
+  try {
+    await db.emailOtp.upsert({
+      where: { email: normalizedEmail },
+      create: { email: normalizedEmail, codeHash, expiresAt, updatedAt: new Date() },
+      update: { codeHash, expiresAt, attempts: 0, consumedAt: null, updatedAt: new Date() },
+    });
+  } catch (e) {
+    console.error("[HeatWise OTP] DB error:", e.message);
+    return res.status(500).json({ message: `Database error: ${e.message}` });
+  }
 
   try {
     await sendOtpEmail(normalizedEmail, otp);
   } catch (e) {
-    console.error("[HeatWise OTP] Failed:", e.message);
+    console.error("[HeatWise OTP] Email send failed:", e.message);
     return res.status(500).json({ message: `Could not send verification email: ${e.message}` });
   }
 
