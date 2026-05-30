@@ -10,18 +10,22 @@ if (!dbUrl.startsWith("postgres")) {
   process.exit(0);
 }
 
-const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
-let schema = fs.readFileSync(schemaPath, "utf8");
-
-// Replace sqlite datasource block with postgresql + directUrl
-schema = schema.replace(
-  /datasource db \{[\s\S]*?\}/,
-  `datasource db {
+const directUrl = process.env.DIRECT_URL;
+const datasourceBlock = directUrl
+  ? `datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }`
-);
+  : `datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}`;
+
+const schemaPath = path.join(__dirname, "../prisma/schema.prisma");
+let schema = fs.readFileSync(schemaPath, "utf8");
+
+schema = schema.replace(/datasource db \{[\s\S]*?\}/, datasourceBlock);
 
 fs.writeFileSync(schemaPath, schema);
-console.log("[patch-prisma] Patched schema.prisma → postgresql ✓");
+console.log(`[patch-prisma] Patched schema.prisma → postgresql (directUrl: ${directUrl ? "yes" : "no"}) ✓`);
