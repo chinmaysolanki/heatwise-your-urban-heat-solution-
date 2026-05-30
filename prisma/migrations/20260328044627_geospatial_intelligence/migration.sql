@@ -17,7 +17,7 @@ CREATE TABLE "GeoContext" (
     "airQualityBand" TEXT,
     "waterStressBand" TEXT,
     "sourceConfidence" REAL NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "metadataJson" TEXT,
     CONSTRAINT "GeoContext_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -26,7 +26,7 @@ CREATE TABLE "GeoContext" (
 CREATE TABLE "MicroclimateSnapshot" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "projectId" TEXT NOT NULL,
-    "capturedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "capturedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "monthOfYear" INTEGER NOT NULL,
     "avgDayTempC" REAL,
     "avgNightTempC" REAL,
@@ -68,7 +68,7 @@ CREATE TABLE "SiteExposureProfile" (
     "biodiversityOpportunityScore" REAL NOT NULL,
     "maintenanceStressScore" REAL NOT NULL,
     "overallSiteComplexityScore" REAL NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "metadataJson" TEXT,
     CONSTRAINT "SiteExposureProfile_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -81,7 +81,7 @@ CREATE TABLE "GeoEnrichmentSnapshot" (
     "geoContextId" TEXT,
     "microclimateSnapshotId" TEXT,
     "siteExposureId" TEXT,
-    "enrichmentCreatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "enrichmentCreatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "geoFeaturePayloadJson" TEXT NOT NULL,
     "microclimateFeaturePayloadJson" TEXT NOT NULL,
     "siteExposurePayloadJson" TEXT NOT NULL,

@@ -12,7 +12,7 @@ CREATE TABLE "PlatformAuditEvent" (
     "severity" TEXT NOT NULL DEFAULT 'info',
     "payloadJson" TEXT NOT NULL,
     "correlationId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "metadataJson" TEXT
 );
 
@@ -25,8 +25,8 @@ CREATE TABLE "IdempotencyRecord" (
     "status" TEXT NOT NULL DEFAULT 'in_flight',
     "httpStatus" INTEGER,
     "responseBodyJson" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "completedAt" DATETIME
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "completedAt" TIMESTAMP(3)
 );
 
 -- CreateIndex

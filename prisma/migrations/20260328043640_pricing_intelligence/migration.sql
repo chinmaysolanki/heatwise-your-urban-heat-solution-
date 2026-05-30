@@ -4,7 +4,7 @@ CREATE TABLE "CostEstimateSnapshot" (
     "projectId" TEXT,
     "recommendationSessionId" TEXT,
     "candidateSnapshotId" TEXT,
-    "estimateGeneratedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "estimateGeneratedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "pricingModelVersion" TEXT,
     "pricingRulesVersion" TEXT,
     "region" TEXT NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE "QuoteComparisonRecord" (
     "installerQuoteId" TEXT,
     "installJobId" TEXT,
     "costEstimateId" TEXT,
-    "comparisonGeneratedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "comparisonGeneratedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "predictedInstallCostMedianInr" REAL,
     "quotedInstallCostInr" REAL,
     "finalInstallCostInr" REAL,
@@ -84,7 +84,7 @@ CREATE TABLE "BudgetFitAssessment" (
     "budgetFitReason" TEXT,
     "cheaperAlternativesJson" TEXT,
     "phasedInstallOptionJson" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "BudgetFitAssessment_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "BudgetFitAssessment_candidateSnapshotId_fkey" FOREIGN KEY ("candidateSnapshotId") REFERENCES "RecommendationCandidateSnapshot" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );

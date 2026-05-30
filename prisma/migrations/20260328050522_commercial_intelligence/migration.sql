@@ -2,7 +2,7 @@
 CREATE TABLE "RevenueEvent" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "eventType" TEXT NOT NULL,
-    "eventTimestamp" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "eventTimestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT,
     "projectId" TEXT,
     "recommendationSessionId" TEXT,
@@ -22,7 +22,7 @@ CREATE TABLE "RevenueEvent" (
     "paymentStatus" TEXT,
     "revenueSource" TEXT NOT NULL,
     "metadataJson" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "RevenueEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "RevenueEvent_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "RevenueEvent_recommendationSessionId_fkey" FOREIGN KEY ("recommendationSessionId") REFERENCES "RecommendationTelemetrySession" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
@@ -36,7 +36,7 @@ CREATE TABLE "RevenueEvent" (
 CREATE TABLE "LeadFunnelEvent" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "eventType" TEXT NOT NULL,
-    "eventTimestamp" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "eventTimestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT,
     "projectId" TEXT NOT NULL,
     "recommendationSessionId" TEXT,
@@ -51,7 +51,7 @@ CREATE TABLE "LeadFunnelEvent" (
     "projectType" TEXT,
     "budgetBand" TEXT,
     "metadataJson" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "LeadFunnelEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "LeadFunnelEvent_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "LeadFunnelEvent_recommendationSessionId_fkey" FOREIGN KEY ("recommendationSessionId") REFERENCES "RecommendationTelemetrySession" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
@@ -69,11 +69,11 @@ CREATE TABLE "CommercialOutcome" (
     "installerId" TEXT,
     "region" TEXT,
     "projectType" TEXT,
-    "firstRecommendationAt" DATETIME,
-    "firstQuoteRequestedAt" DATETIME,
-    "firstQuoteReceivedAt" DATETIME,
-    "quoteAcceptedAt" DATETIME,
-    "installCompletedAt" DATETIME,
+    "firstRecommendationAt" TIMESTAMP(3),
+    "firstQuoteRequestedAt" TIMESTAMP(3),
+    "firstQuoteReceivedAt" TIMESTAMP(3),
+    "quoteAcceptedAt" TIMESTAMP(3),
+    "installCompletedAt" TIMESTAMP(3),
     "timeToQuoteHours" REAL,
     "timeToInstallDays" REAL,
     "quotesReceivedCount" INTEGER NOT NULL DEFAULT 0,
@@ -87,15 +87,15 @@ CREATE TABLE "CommercialOutcome" (
     "installerRevenueInr" REAL,
     "commercialStatus" TEXT NOT NULL,
     "metadataJson" TEXT,
-    "updatedAt" DATETIME NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "CommercialOutcome_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateTable
 CREATE TABLE "UnitEconomicsSnapshot" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "windowStart" DATETIME NOT NULL,
-    "windowEnd" DATETIME NOT NULL,
+    "windowStart" TIMESTAMP(3) NOT NULL,
+    "windowEnd" TIMESTAMP(3) NOT NULL,
     "region" TEXT,
     "projectType" TEXT,
     "sourceChannel" TEXT,
@@ -117,7 +117,7 @@ CREATE TABLE "UnitEconomicsSnapshot" (
     "avgTimeToInstallDays" REAL,
     "refundRate" REAL,
     "repeatServiceRate" REAL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "metadataJson" TEXT
 );
 
@@ -125,8 +125,8 @@ CREATE TABLE "UnitEconomicsSnapshot" (
 CREATE TABLE "InstallerCommercialMetrics" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "installerId" TEXT NOT NULL,
-    "windowStart" DATETIME NOT NULL,
-    "windowEnd" DATETIME NOT NULL,
+    "windowStart" TIMESTAMP(3) NOT NULL,
+    "windowEnd" TIMESTAMP(3) NOT NULL,
     "region" TEXT,
     "quotesSubmitted" INTEGER NOT NULL,
     "quotesAccepted" INTEGER NOT NULL,
@@ -140,7 +140,7 @@ CREATE TABLE "InstallerCommercialMetrics" (
     "totalPlatformCommissionInr" REAL,
     "cancellationRate" REAL,
     "refundRate" REAL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "metadataJson" TEXT,
     CONSTRAINT "InstallerCommercialMetrics_installerId_fkey" FOREIGN KEY ("installerId") REFERENCES "InstallerProfile" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );

@@ -6,7 +6,7 @@ CREATE TABLE "RecommendationDossier" (
     "recommendationSessionId" TEXT NOT NULL,
     "candidateSnapshotIdsJson" TEXT NOT NULL,
     "selectedCandidateSnapshotId" TEXT,
-    "generatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "generatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "dossierType" TEXT NOT NULL,
     "dossierVersion" TEXT NOT NULL,
     "projectContextSnapshotJson" TEXT NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE "ReportSection" (
     "sectionPayloadJson" TEXT NOT NULL,
     "explanationRefsJson" TEXT,
     "visibilityScope" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "ReportSection_recommendationDossierId_fkey" FOREIGN KEY ("recommendationDossierId") REFERENCES "RecommendationDossier" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -52,7 +52,7 @@ CREATE TABLE "ReportExplanation" (
     "sourceReferenceId" TEXT,
     "explanationPayloadJson" TEXT NOT NULL,
     "confidenceBand" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "ReportExplanation_recommendationDossierId_fkey" FOREIGN KEY ("recommendationDossierId") REFERENCES "RecommendationDossier" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -65,7 +65,7 @@ CREATE TABLE "InstallerExecutionSummary" (
     "executionPayloadJson" TEXT NOT NULL,
     "readinessChecklistJson" TEXT,
     "metadataJson" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "InstallerExecutionSummary_recommendationDossierId_fkey" FOREIGN KEY ("recommendationDossierId") REFERENCES "RecommendationDossier" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "InstallerExecutionSummary_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "InstallerExecutionSummary_installJobId_fkey" FOREIGN KEY ("installJobId") REFERENCES "InstallerInstallJob" ("id") ON DELETE SET NULL ON UPDATE CASCADE
@@ -79,7 +79,7 @@ CREATE TABLE "AdminReviewDossier" (
     "riskAssessmentJson" TEXT,
     "provenanceAuditJson" TEXT,
     "metadataJson" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "AdminReviewDossier_recommendationDossierId_fkey" FOREIGN KEY ("recommendationDossierId") REFERENCES "RecommendationDossier" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 

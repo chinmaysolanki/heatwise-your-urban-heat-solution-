@@ -1,23 +1,23 @@
 -- CreateTable
 CREATE TABLE "RecommendationInsight" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "windowStart" DATETIME NOT NULL,
-    "windowEnd" DATETIME NOT NULL,
+    "windowStart" TIMESTAMP(3) NOT NULL,
+    "windowEnd" TIMESTAMP(3) NOT NULL,
     "insightType" TEXT NOT NULL,
     "scopeJson" TEXT NOT NULL,
     "metricsJson" TEXT NOT NULL,
     "evidenceRefsJson" TEXT NOT NULL,
     "sourceLayersJson" TEXT NOT NULL,
     "recommendationDossierId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "metadataJson" TEXT
 );
 
 -- CreateTable
 CREATE TABLE "VariantPerformance" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "windowStart" DATETIME NOT NULL,
-    "windowEnd" DATETIME NOT NULL,
+    "windowStart" TIMESTAMP(3) NOT NULL,
+    "windowEnd" TIMESTAMP(3) NOT NULL,
     "experimentId" TEXT,
     "rolloutVariant" TEXT,
     "recommendationType" TEXT,
@@ -34,15 +34,15 @@ CREATE TABLE "VariantPerformance" (
     "dossierCreatedCount" INTEGER NOT NULL DEFAULT 0,
     "followupCompletedCount" INTEGER NOT NULL DEFAULT 0,
     "commercialInstalledCount" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "metadataJson" TEXT
 );
 
 -- CreateTable
 CREATE TABLE "SegmentPerformance" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "windowStart" DATETIME NOT NULL,
-    "windowEnd" DATETIME NOT NULL,
+    "windowStart" TIMESTAMP(3) NOT NULL,
+    "windowEnd" TIMESTAMP(3) NOT NULL,
     "segmentKey" TEXT NOT NULL,
     "projectType" TEXT,
     "climateZone" TEXT,
@@ -53,7 +53,7 @@ CREATE TABLE "SegmentPerformance" (
     "personalizationConfidenceBand" TEXT,
     "metricsJson" TEXT NOT NULL,
     "sampleSize" INTEGER NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "metadataJson" TEXT
 );
 
@@ -67,11 +67,11 @@ CREATE TABLE "LessonMemory" (
     "evidenceRefsJson" TEXT NOT NULL,
     "relatedSegmentKey" TEXT,
     "relatedRecommendationPatternsJson" TEXT,
-    "effectiveFrom" DATETIME,
-    "effectiveTo" DATETIME,
+    "effectiveFrom" TIMESTAMP(3),
+    "effectiveTo" TIMESTAMP(3),
     "createdBy" TEXT NOT NULL DEFAULT 'system',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "metadataJson" TEXT
 );
 

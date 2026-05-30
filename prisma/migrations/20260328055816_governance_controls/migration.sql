@@ -5,13 +5,13 @@ CREATE TABLE "UserConsentRecord" (
     "consentScope" TEXT NOT NULL,
     "consentStatus" TEXT NOT NULL DEFAULT 'granted',
     "sourceChannel" TEXT,
-    "grantedAt" DATETIME,
-    "withdrawnAt" DATETIME,
-    "expiresAt" DATETIME,
+    "grantedAt" TIMESTAMP(3),
+    "withdrawnAt" TIMESTAMP(3),
+    "expiresAt" TIMESTAMP(3),
     "legalBasis" TEXT,
     "metadataJson" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "UserConsentRecord_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -27,8 +27,8 @@ CREATE TABLE "GovernancePolicyFlag" (
     "projectId" TEXT,
     "title" TEXT NOT NULL,
     "detailJson" TEXT,
-    "raisedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "resolvedAt" DATETIME,
+    "raisedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "resolvedAt" TIMESTAMP(3),
     "resolvedBy" TEXT,
     "metadataJson" TEXT,
     CONSTRAINT "GovernancePolicyFlag_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
@@ -44,7 +44,7 @@ CREATE TABLE "DataRetentionCategoryPolicy" (
     "hardDeleteAfterDays" INTEGER,
     "notesJson" TEXT,
     "policyVersion" TEXT NOT NULL DEFAULT 'v1',
-    "updatedAt" DATETIME NOT NULL
+    "updatedAt" TIMESTAMP(3) NOT NULL
 );
 
 -- CreateTable
@@ -62,8 +62,8 @@ CREATE TABLE "GovernanceReviewRecord" (
     "findingsJson" TEXT,
     "resolutionSummary" TEXT,
     "assignedToActorId" TEXT,
-    "openedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "closedAt" DATETIME,
+    "openedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "closedAt" TIMESTAMP(3),
     "metadataJson" TEXT,
     CONSTRAINT "GovernanceReviewRecord_relatedUserId_fkey" FOREIGN KEY ("relatedUserId") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "GovernanceReviewRecord_relatedProjectId_fkey" FOREIGN KEY ("relatedProjectId") REFERENCES "Project" ("id") ON DELETE SET NULL ON UPDATE CASCADE

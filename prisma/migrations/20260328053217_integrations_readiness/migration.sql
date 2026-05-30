@@ -9,7 +9,7 @@ CREATE TABLE "IntegrationEvent" (
     "entityId" TEXT,
     "payloadJson" TEXT NOT NULL,
     "correlationId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "metadataJson" TEXT
 );
 
@@ -22,13 +22,13 @@ CREATE TABLE "OutboundSync" (
     "payloadSnapshotJson" TEXT NOT NULL,
     "syncStatus" TEXT NOT NULL DEFAULT 'pending',
     "attemptCount" INTEGER NOT NULL DEFAULT 0,
-    "lastAttemptAt" DATETIME,
-    "nextRetryAt" DATETIME,
+    "lastAttemptAt" TIMESTAMP(3),
+    "nextRetryAt" TIMESTAMP(3),
     "errorCode" TEXT,
     "errorDetailJson" TEXT,
     "idempotencyKey" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "metadataJson" TEXT
 );
 
@@ -40,8 +40,8 @@ CREATE TABLE "InboundWebhook" (
     "eventType" TEXT NOT NULL,
     "payloadJson" TEXT NOT NULL,
     "validationStatus" TEXT NOT NULL DEFAULT 'received',
-    "receivedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "processedAt" DATETIME,
+    "receivedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "processedAt" TIMESTAMP(3),
     "linkageProjectId" TEXT,
     "linkageUserId" TEXT,
     "linkageRecommendationSessionId" TEXT,
@@ -59,12 +59,12 @@ CREATE TABLE "DeliveryTracking" (
     "relatedEntityId" TEXT,
     "deliveryStatus" TEXT NOT NULL DEFAULT 'queued',
     "attemptCount" INTEGER NOT NULL DEFAULT 0,
-    "lastAttemptAt" DATETIME,
+    "lastAttemptAt" TIMESTAMP(3),
     "lastStatusDetailJson" TEXT,
     "correlationId" TEXT,
     "outboundSyncId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "metadataJson" TEXT
 );
 

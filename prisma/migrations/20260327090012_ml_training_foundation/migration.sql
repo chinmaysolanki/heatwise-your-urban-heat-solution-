@@ -9,8 +9,8 @@ CREATE TABLE "Space" (
     "floorLevel" INTEGER,
     "spaceKind" TEXT NOT NULL DEFAULT 'ROOFTOP',
     "indoor" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "Space_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -25,7 +25,7 @@ CREATE TABLE "EnvironmentSnapshot" (
     "soilPh" REAL,
     "soilMoisture" REAL,
     "notes" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "EnvironmentSnapshot_spaceId_fkey" FOREIGN KEY ("spaceId") REFERENCES "Space" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -38,8 +38,8 @@ CREATE TABLE "UserPreference" (
     "budgetBand" INTEGER,
     "maintenanceBand" INTEGER,
     "waterConstraint" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "UserPreference_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "UserPreference_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -50,7 +50,7 @@ CREATE TABLE "SpeciesCatalog" (
     "code" TEXT NOT NULL,
     "displayName" TEXT NOT NULL,
     "category" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateTable
@@ -70,18 +70,16 @@ CREATE TABLE "OutcomeEvent" (
     "candidateId" TEXT,
     "speciesId" TEXT NOT NULL,
     "outcomeType" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "OutcomeEvent_runId_fkey" FOREIGN KEY ("runId") REFERENCES "RecommendationRun" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "OutcomeEvent_candidateId_fkey" FOREIGN KEY ("candidateId") REFERENCES "RecommendationCandidate" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "OutcomeEvent_speciesId_fkey" FOREIGN KEY ("speciesId") REFERENCES "SpeciesCatalog" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- RedefineTables
-PRAGMA defer_foreign_keys=ON;
-PRAGMA foreign_keys=OFF;
 CREATE TABLE "new_RecommendationRun" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "input" TEXT NOT NULL,
     "durationMs" INTEGER NOT NULL,
     "totalCandidates" INTEGER NOT NULL,
@@ -104,8 +102,6 @@ CREATE INDEX "RecommendationRun_photoSessionId_idx" ON "RecommendationRun"("phot
 CREATE INDEX "RecommendationRun_spaceId_idx" ON "RecommendationRun"("spaceId");
 CREATE INDEX "RecommendationRun_environmentSnapshotId_idx" ON "RecommendationRun"("environmentSnapshotId");
 CREATE INDEX "RecommendationRun_userPreferenceId_idx" ON "RecommendationRun"("userPreferenceId");
-PRAGMA foreign_keys=ON;
-PRAGMA defer_foreign_keys=OFF;
 
 -- CreateIndex
 CREATE INDEX "Space_projectId_idx" ON "Space"("projectId");

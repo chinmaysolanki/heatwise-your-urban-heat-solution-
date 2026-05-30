@@ -5,10 +5,10 @@ ALTER TABLE "RecommendationRun" ADD COLUMN "projectId" TEXT;
 -- CreateTable
 CREATE TABLE "PhotoSession" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "projectId" TEXT,
-    "capturedAt" DATETIME,
+    "capturedAt" TIMESTAMP(3),
     "photoData" TEXT,
     "photoMime" TEXT,
     "photoWidth" INTEGER,
@@ -17,7 +17,7 @@ CREATE TABLE "PhotoSession" (
     "widthM" REAL,
     "lengthM" REAL,
     "floorLevel" INTEGER,
-    "measurementCompletedAt" DATETIME,
+    "measurementCompletedAt" TIMESTAMP(3),
     "recommendationJson" TEXT,
     "layoutSchema" TEXT,
     "spatialMapping" TEXT,
@@ -30,7 +30,7 @@ CREATE TABLE "PhotoSession" (
 -- CreateTable
 CREATE TABLE "VisualizationRecord" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "photoSessionId" TEXT,
     "sourcePhotoRef" TEXT,
     "recommendationId" TEXT NOT NULL,

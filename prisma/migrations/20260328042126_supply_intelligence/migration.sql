@@ -11,8 +11,8 @@ CREATE TABLE "SpeciesAvailability" (
     "seasonalAvailabilityNote" TEXT,
     "substituteSpeciesJson" TEXT,
     "metadataJson" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
 );
 
 -- CreateTable
@@ -27,8 +27,8 @@ CREATE TABLE "MaterialInventory" (
     "compatibleSolutionTypesJson" TEXT NOT NULL DEFAULT '[]',
     "supplierSourceType" TEXT NOT NULL,
     "metadataJson" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
 );
 
 -- CreateTable
@@ -44,8 +44,8 @@ CREATE TABLE "SeasonalWindow" (
     "suitabilityLevel" TEXT NOT NULL,
     "riskFlagsJson" TEXT,
     "notes" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
 );
 
 -- CreateTable
@@ -61,8 +61,8 @@ CREATE TABLE "RegionalSupplyReadiness" (
     "structuralExecutionReadinessScore" REAL NOT NULL,
     "seasonalReadinessScore" REAL NOT NULL,
     "overallSupplyReadinessScore" REAL NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
 );
 
 -- CreateTable
@@ -80,7 +80,7 @@ CREATE TABLE "RecommendationConstraintSnapshot" (
     "allowedSubstitutionsJson" TEXT NOT NULL,
     "supplyReadinessScore" REAL NOT NULL,
     "seasonalReadinessScore" REAL NOT NULL,
-    "generatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "generatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "RecommendationConstraintSnapshot_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "RecommendationConstraintSnapshot_recommendationSessionId_fkey" FOREIGN KEY ("recommendationSessionId") REFERENCES "RecommendationTelemetrySession" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );

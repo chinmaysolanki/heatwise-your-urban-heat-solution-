@@ -9,8 +9,8 @@ CREATE TABLE "PartnerOperationsProfile" (
     "partnerActiveStatus" TEXT NOT NULL DEFAULT 'operational',
     "primaryContactJson" TEXT,
     "metadataJson" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "PartnerOperationsProfile_installerId_fkey" FOREIGN KEY ("installerId") REFERENCES "InstallerProfile" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -24,7 +24,7 @@ CREATE TABLE "PartnerCapabilityMatrix" (
     "seasonalConstraintsJson" TEXT NOT NULL DEFAULT '{}',
     "serviceReadiness" TEXT NOT NULL DEFAULT 'ready',
     "matrixExtrasJson" TEXT,
-    "updatedAt" DATETIME NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "PartnerCapabilityMatrix_installerId_fkey" FOREIGN KEY ("installerId") REFERENCES "InstallerProfile" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -38,7 +38,7 @@ CREATE TABLE "PartnerFieldOpsStatus" (
     "coverageGapsJson" TEXT,
     "regionalReadinessJson" TEXT NOT NULL DEFAULT '{}',
     "signalNotesJson" TEXT,
-    "updatedAt" DATETIME NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "PartnerFieldOpsStatus_installerId_fkey" FOREIGN KEY ("installerId") REFERENCES "InstallerProfile" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -46,8 +46,8 @@ CREATE TABLE "PartnerFieldOpsStatus" (
 CREATE TABLE "PartnerSLAMetrics" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "installerId" TEXT NOT NULL,
-    "windowStart" DATETIME NOT NULL,
-    "windowEnd" DATETIME NOT NULL,
+    "windowStart" TIMESTAMP(3) NOT NULL,
+    "windowEnd" TIMESTAMP(3) NOT NULL,
     "responseTimeMsP50" INTEGER,
     "quoteTurnaroundHoursP50" REAL,
     "siteVisitCompletionRate" REAL,
@@ -55,7 +55,7 @@ CREATE TABLE "PartnerSLAMetrics" (
     "verificationDelayDaysP50" REAL,
     "jobSampleSize" INTEGER NOT NULL DEFAULT 0,
     "metadataJson" TEXT,
-    "computedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "computedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "PartnerSLAMetrics_installerId_fkey" FOREIGN KEY ("installerId") REFERENCES "InstallerProfile" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 

@@ -11,7 +11,7 @@ ALTER TABLE "RecommendationCandidate" ADD COLUMN "summary" TEXT;
 -- CreateTable
 CREATE TABLE "PhotoPipelineEvent" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "photoSessionId" TEXT NOT NULL,
     "action" TEXT NOT NULL,
     "userId" TEXT,

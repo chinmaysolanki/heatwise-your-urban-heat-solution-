@@ -6,13 +6,13 @@ CREATE TABLE "RecommendationFeedbackEvent" (
     "recommendationId" TEXT NOT NULL,
     "projectId" TEXT,
     "action" TEXT NOT NULL,
-    "timestamp" DATETIME NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL,
     "dwellMs" INTEGER,
     "scoreBefore" REAL,
     "scoreAfter" REAL,
     "notes" TEXT,
     "extra" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "candidateId" TEXT,
     CONSTRAINT "RecommendationFeedbackEvent_candidateId_fkey" FOREIGN KEY ("candidateId") REFERENCES "RecommendationCandidate" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -20,7 +20,7 @@ CREATE TABLE "RecommendationFeedbackEvent" (
 -- CreateTable
 CREATE TABLE "RecommendationRun" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "input" TEXT NOT NULL,
     "durationMs" INTEGER NOT NULL,
     "totalCandidates" INTEGER NOT NULL
@@ -38,7 +38,7 @@ CREATE TABLE "RecommendationCandidate" (
     "layoutSchema" TEXT NOT NULL,
     "spatialMapping" TEXT,
     "heatReductionSummary" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "RecommendationCandidate_runId_fkey" FOREIGN KEY ("runId") REFERENCES "RecommendationRun" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 

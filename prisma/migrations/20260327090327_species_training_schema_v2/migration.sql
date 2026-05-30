@@ -12,13 +12,9 @@
 DROP INDEX "RecommendationCandidateSpecies_speciesId_idx";
 
 -- DropTable
-PRAGMA foreign_keys=off;
 DROP TABLE "RecommendationCandidateSpecies";
-PRAGMA foreign_keys=on;
 
 -- RedefineTables
-PRAGMA defer_foreign_keys=ON;
-PRAGMA foreign_keys=OFF;
 CREATE TABLE "new_OutcomeEvent" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "runId" TEXT NOT NULL,
@@ -32,7 +28,7 @@ CREATE TABLE "new_OutcomeEvent" (
     "healthScore" REAL,
     "source" TEXT,
     "metadataJson" TEXT,
-    "recordedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "recordedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "OutcomeEvent_runId_fkey" FOREIGN KEY ("runId") REFERENCES "RecommendationRun" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "OutcomeEvent_candidateId_fkey" FOREIGN KEY ("candidateId") REFERENCES "RecommendationCandidate" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT "OutcomeEvent_speciesId_fkey" FOREIGN KEY ("speciesId") REFERENCES "SpeciesCatalog" ("id") ON DELETE CASCADE ON UPDATE CASCADE
@@ -65,7 +61,7 @@ CREATE TABLE "new_RecommendationCandidate" (
     "saved" BOOLEAN NOT NULL DEFAULT false,
     "accepted" BOOLEAN NOT NULL DEFAULT false,
     "installed" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "RecommendationCandidate_runId_fkey" FOREIGN KEY ("runId") REFERENCES "RecommendationRun" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "RecommendationCandidate_speciesId_fkey" FOREIGN KEY ("speciesId") REFERENCES "SpeciesCatalog" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -93,8 +89,8 @@ CREATE TABLE "new_SpeciesCatalog" (
     "ruleTagsJson" TEXT,
     "mlWeight" REAL,
     "active" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
 );
 INSERT INTO "new_SpeciesCatalog" ("category", "code", "createdAt", "displayName", "id") SELECT "category", "code", "createdAt", "displayName", "id" FROM "SpeciesCatalog";
 DROP TABLE "SpeciesCatalog";
@@ -103,8 +99,6 @@ CREATE UNIQUE INDEX "SpeciesCatalog_code_key" ON "SpeciesCatalog"("code");
 CREATE INDEX "SpeciesCatalog_category_idx" ON "SpeciesCatalog"("category");
 CREATE INDEX "SpeciesCatalog_active_idx" ON "SpeciesCatalog"("active");
 CREATE INDEX "SpeciesCatalog_family_idx" ON "SpeciesCatalog"("family");
-PRAGMA foreign_keys=ON;
-PRAGMA defer_foreign_keys=OFF;
 
 -- CreateIndex
 CREATE INDEX "RecommendationRun_projectId_spaceId_idx" ON "RecommendationRun"("projectId", "spaceId");
