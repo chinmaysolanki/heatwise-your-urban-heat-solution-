@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node scripts/patch-prisma-for-prod.js && prisma generate && next build",
+  "buildCommand": "node scripts/patch-prisma-for-prod.js && prisma generate && prisma migrate deploy && next build",
   "framework": "nextjs",
   "functions": {
     "pages/api/generate-runware-visual": { "maxDuration": 60 },
