@@ -70,7 +70,9 @@ async function sendOtpEmail(email, otp) {
 }
 
 export default async function handler(req, res) {
+  // TEMP DEBUG — remove after confirming handler is reached
   if (req.method !== "POST") return res.status(405).json({ message: "Method not allowed" });
+  if (req.query._test === "1") return res.status(200).json({ ok: true, handler: "email-send-otp" });
 
   const { email } = req.body ?? {};
   if (!email || typeof email !== "string") {
