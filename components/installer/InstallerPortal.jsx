@@ -116,7 +116,7 @@ function Btn({ children, onClick, variant = "primary", disabled, style: extra })
     <button
       onClick={onClick} disabled={disabled}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ padding: "12px 20px", borderRadius: 12, border: "none", cursor: disabled ? "not-allowed", fontFamily: T.sans, fontSize: 14, transition: "all 0.18s", opacity: disabled ? 0.45 : 1, ...styles[variant], ...extra }}
+      style={{ padding: "12px 20px", borderRadius: 12, border: "none", cursor: disabled ? "not-allowed" : "pointer", fontFamily: T.sans, fontSize: 14, transition: "all 0.18s", opacity: disabled ? 0.45 : 1, ...styles[variant], ...extra }}
     >
       {children}
     </button>

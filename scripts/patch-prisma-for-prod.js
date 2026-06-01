@@ -5,9 +5,15 @@ const fs = require("fs");
 const path = require("path");
 
 const dbUrl = process.env.DATABASE_URL ?? "";
-if (!dbUrl.startsWith("postgres")) {
+const isVercel = process.env.VERCEL === "1";
+
+// Force postgres patch on Vercel even if DATABASE_URL isn't exposed at patch-time
+if (!dbUrl.startsWith("postgres") && !isVercel) {
   console.log("[patch-prisma] DATABASE_URL is not postgres — skipping patch (local sqlite mode).");
   process.exit(0);
+}
+if (!dbUrl.startsWith("postgres") && isVercel) {
+  console.log("[patch-prisma] On Vercel but DATABASE_URL not postgres — patching anyway for runtime.");
 }
 
 const directUrl = process.env.DIRECT_URL;
